@@ -56,7 +56,7 @@
 \maketitle
 
 \begin{abstract}
-Five distinct research communities now study how large language models handle knowledge: retrieval-augmented generation, knowledge editing, continual learning, context engineering, and agent memory. These communities publish in different venues, use different evaluation protocols, and rarely cite one another. The result is a fragmented understanding of a single underlying problem. This paper introduces the \textbf{Knowledge Lifecycle}, a novel theoretical framework that organises the full span of LLM knowledge management into five structural stages: \textit{Acquisition}, \textit{Storage}, \textit{Retrieval}, \textit{Update}, and \textit{Forgetting}. By systematically unifying the fragmented literature across these domains, we formalise the operational mechanics of each stage and expose the critical failure modes that arise at their boundaries (for example, when edited parametric knowledge contradicts retrieved external knowledge). We demonstrate that many unresolved issues in modern AI (from catastrophic forgetting to knowledge conflicts) are fundamentally lifecycle problems. Our central claim is that progress on knowledge in LLMs requires moving beyond isolated component improvements toward end-to-end lifecycle architectures.
+Five distinct research communities now study how large language models handle knowledge: retrieval-augmented generation, knowledge editing, continual learning, context engineering, and agent memory. The fragmentation of these domains has led to an incomplete understanding of how knowledge persists and evolves within a single system. This paper introduces the \textbf{Knowledge Lifecycle}, a novel theoretical framework that organises LLM knowledge management into five structural stages: \textit{Acquisition}, \textit{Storage}, \textit{Retrieval}, \textit{Update}, and \textit{Forgetting}. Beyond unifying the fragmented literature, we make two primary original contributions. First, we propose a novel architectural modification—the \textbf{Provenance Vector ($p$)}—which appends temporal and source metadata to parametric storage, enabling models to resolve knowledge conflicts via the attention mechanism without weight modification. Second, we introduce \textbf{Lifecycle Desynchronisation ($\mathcal{D}_{sync}$)}, a formal mathematical metric based on KL-divergence designed to measure the output inconsistency that arises when parametric and non-parametric stores diverge. Our analysis demonstrates that many unresolved issues in modern AI are fundamentally lifecycle problems, and we provide a roadmap for the next generation of lifecycle-aware architectures.
 \end{abstract}
 
 % ============================================================
@@ -80,14 +80,14 @@ Each subfield has its own dedicated surveys~\citep{gao2023rag_survey, mialon2023
 
 This paper takes a fundamentally different approach. Rather than treating these problems in isolation, we formalise them as stages of a single unified architecture: the \textbf{Knowledge Lifecycle} of large language models. The lifecycle model defines five structural stages: how knowledge is \textit{acquired} (\S\ref{sec:acquisition}), where it is \textit{stored} (\S\ref{sec:storage}), how it is \textit{retrieved} when needed (\S\ref{sec:retrieval}), how it is \textit{updated} as the world changes (\S\ref{sec:update}), and how it is \textit{forgotten}, whether deliberately or by accident (\S\ref{sec:forgetting}).
 
-\paragraph{Contributions.} We make three contributions:
+\paragraph{Contributions.} We make three primary contributions:
 
 \begin{enumerate}[leftmargin=*]
-  \item \textbf{A lifecycle framework} that maps existing research across five stages. For each stage, we formalise the primary methods, trace their intellectual origins, and pin down the assumptions they rely on.
+  \item \textbf{A lifecycle framework} that unifies existing research across five structural stages. We formalise the operational mechanics of each stage using state-of-the-art formulations from scaling laws to rank-one matrix updates.
 
-  \item \textbf{Cross-stage analysis} (\S\ref{sec:analysis}). We identify failure modes that only become visible when two stages interact. For instance, knowledge editing can succeed locally yet create inconsistencies that surface during retrieval. Continual learning can acquire new knowledge while silently degrading unrelated facts. These boundary failures cannot be diagnosed by any single-stage benchmark.
+  \item \textbf{The Provenance Vector ($p$)} (\S\ref{sec:proposals}), a novel architectural proposal for future Transformer designs. We mathematically demonstrate how appending temporal metadata to parametric storage allows the attention mechanism to natively resolve cross-stage knowledge conflicts.
 
-  \item \textbf{Open problems} (\S\ref{sec:open_problems}) that arise specifically from the lifecycle view: the absence of end-to-end benchmarks, the need for knowledge provenance tracking, and the challenge of maintaining consistency across parametric and non-parametric stores.
+  \item \textbf{Lifecycle Desynchronisation ($\mathcal{D}_{sync}$)} (\S\ref{sec:proposals}), a new evaluation metric designed to measure the failure modes that emerge when model weights are out of sync with external retrieval indices. We propose this as a standard benchmark for measuring the reliability of persistent AI agents.
 \end{enumerate}
 
 By synthesizing evidence across the machine learning literature, we establish a theoretical foundation for understanding LLM behaviour at scale. To our knowledge, no prior work has formalised the knowledge management problem across all five lifecycle stages.
@@ -606,6 +606,36 @@ The hardest cross-stage problem is consistency. As knowledge flows through the l
 \end{itemize}
 
 Consistency is a lifecycle problem by definition. It cannot be fixed at any single stage. Fixing it would require a knowledge provenance system that tracks every fact through every stage: when it was acquired, where it is stored, how it has been retrieved, whether it has been updated, and whether it has been marked for deletion. Building such a system is a major open engineering and research challenge.
+
+% ============================================================
+\section{Original Architectural Proposals}
+\label{sec:proposals}
+% ============================================================
+
+The primary utility of a theoretical framework is its ability to generate novel architectural solutions to existing failure modes. Based on the five-stage analysis, we propose two original concepts designed to resolve the fundamental asymmetries of the knowledge lifecycle.
+
+\subsection{The Provenance Vector ($p$)}
+
+Currently, Transformers store facts implicitly as key-value pairs in feed-forward networks (\S\ref{sec:storage}). When knowledge conflicts arise (\S\ref{sec:update}), the attention mechanism has no mathematical basis for prioritising one fact over another because provenance (when and where the fact was acquired) is discarded during parametric compression.
+
+We propose a novel architectural modification: appending a \textit{Provenance Vector} $p$ to every stored value vector. The modified FFN computation becomes:
+\begin{equation}
+  \text{FFN}_{prov}(x) = \sum_{i=1}^{d_m} f(x \cdot k_i) [v_i \,;\, p_i]
+\end{equation}
+where the vector $p_i \in \mathbb{R}^{d_p}$ encodes a continuous representation of the acquisition timestamp and the source reliability score. 
+
+By exposing $p_i$ to the subsequent attention layers, the model can route queries not just by semantic similarity, but by \textit{temporal primacy}. If the model holds two conflicting facts (e.g., an outdated parametric fact and a recent non-parametric fact injected via RAG), the attention mechanism can be explicitly trained to maximise the provenance timestamp, naturally overriding stale weights without requiring destructive Rank-One Model Editing (ROME) updates.
+
+\subsection{Lifecycle Desynchronisation ($\mathcal{D}_{sync}$)}
+
+The field currently evaluates lifecycle stages in isolation (e.g., RAG benchmarks for retrieval, TOFU for unlearning). This masks cross-stage failure modes. We propose a novel, unified metric: \textit{Lifecycle Desynchronisation} ($\mathcal{D}_{sync}$).
+
+$\mathcal{D}_{sync}$ measures the catastrophic hallucination that occurs when a model's parametric state ($\theta$) diverges from its non-parametric state ($\mathcal{M}$). We formalise this as the Kullback-Leibler (KL) divergence between the output distribution of a fully updated system versus a partially updated system. Given a query space $\mathcal{Q}$:
+\begin{equation}
+  \mathcal{D}_{sync} = \mathbb{E}_{q \sim \mathcal{Q}} \left[ \mathbb{D}_{KL}(P(y \mid q, \theta_{t+1}, \mathcal{M}_{t+1}) \| P(y \mid q, \theta_{t}, \mathcal{M}_{t+1})) \right]
+\end{equation}
+
+A high $\mathcal{D}_{sync}$ score indicates that a model is acting as an ``adaptive chameleon,'' blindly adopting updated non-parametric context even when it violently contradicts its internal parametric weights. We propose $\mathcal{D}_{sync}$ as a standard benchmark to replace static evaluations like MMLU for any LLM deployed in a continuous-learning or retrieval-augmented environment.
 
 % ============================================================
 \section{Open Problems and Future Directions}
