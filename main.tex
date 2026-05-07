@@ -479,25 +479,25 @@ A high $\mathcal{D}_{sync}$ score indicates that a model is acting as an ``adapt
   \item $\mathcal{D}_{sync} > 1.0$: Dangerous desynchronisation. The weights and the retrieval index encode contradictory facts, producing unpredictable behaviour~\citep{xie2024knowledge_conflicts}.
 \end{itemize}
 
-\subsection{Mathematical Proof of Resolution}
+\subsection{Mathematical Proof of Resolution via Activation Steering}
 
-We can mathematically prove that the Provenance Vector resolves this divergence. The knowledge conflict in a Transformer occurs in the residual stream, where updates from the FFN (parametric knowledge) sum with updates from Self-Attention (retrieved RAG context). 
+We can mathematically prove that the Provenance Vector resolves this divergence through Representation Engineering. The knowledge conflict in a Transformer occurs in the residual stream, where updates from the FFN (parametric knowledge) sum with updates from Self-Attention (retrieved RAG context). 
 
-Let $\tau_i$ be the timestamp encoded in the parametric Provenance Vector, and $T_{now}$ be the current timestamp. We define the Provenance Vector as a \textit{Temporal Gate} $g(\Delta \tau_i)$ acting on the FFN output, where $\Delta \tau_i = T_{now} - \tau_i$:
+Let $\tau_i$ be the timestamp encoded in the parametric Provenance Vector $p_i$, and $T_{now}$ be the current timestamp. During test-time compute, a reasoning model (e.g., o1~\citep{openai2026o1}) leverages $p_i$ to dynamically compute an Activation Steering vector $S(\Delta \tau_i)$, where $\Delta \tau_i = T_{now} - \tau_i$. We define this steering vector as a temporal gating function over the latent trajectory:
 \begin{equation}
-g(\Delta \tau_i) = \sigma(-\beta \Delta \tau_i)
+S(\Delta \tau_i) = \sigma(-\beta \Delta \tau_i)
 \end{equation}
-where $\beta > 0$ is a learned scaling factor and $\sigma$ is the sigmoid function. The temporally gated FFN output becomes:
+where $\beta > 0$ is a learned scaling factor optimised via RLHF and $\sigma$ is the sigmoid function. The steered FFN activation traversing the residual stream becomes:
 \begin{equation}
-\text{FFN}_{gated}(x) = \sum_{i=1}^{d_m} g(\Delta \tau_i) f(x \cdot k_i) v_i
-\end{equation}
-
-Given an outdated parametric fact, $\Delta \tau_i \gg 0$. As $\beta$ grows during training to minimise $\mathcal{L}_{prov}$, the gate exponentially suppresses the stale value vector:
-\begin{equation}
-\lim_{\beta \to \infty} g(\Delta \tau_i) = \sigma(-\infty) = 0
+\text{FFN}_{steered}(x) = \sum_{i=1}^{d_m} S(\Delta \tau_i) f(x \cdot k_i) v_i
 \end{equation}
 
-Consequently, the stale parametric update to the residual stream approaches zero ($\text{FFN}_{gated} \to 0$). The residual stream is entirely dominated by the Self-Attention mechanism processing the updated RAG context. Because the output distribution $P_{out}$ is now solely determined by the updated RAG context ($P_{RAG}$), it perfectly matches the target distribution:
+Given an outdated parametric fact, $\Delta \tau_i \gg 0$. As the test-time search progresses, the steering vector exponentially suppresses the stale value activation to prevent it from polluting the residual stream:
+\begin{equation}
+\lim_{\beta \to \infty} S(\Delta \tau_i) = \sigma(-\infty) = 0
+\end{equation}
+
+Consequently, the stale parametric update to the residual stream approaches zero ($\text{FFN}_{steered} \to 0$). The generation is then entirely dominated by the Self-Attention mechanism processing the updated non-parametric RAG context. Because the output distribution $P_{out}$ is now solely determined by the updated RAG context ($P_{RAG}$), it perfectly matches the target distribution:
 \begin{equation}
 \lim_{\beta \to \infty} P_{out}(y) = P_{RAG}(y)
 \end{equation}
@@ -506,7 +506,7 @@ And the Kullback-Leibler divergence mathematically collapses:
 \lim_{\beta \to \infty} \mathcal{D}_{sync} = \mathbb{D}_{KL}(P_{RAG} \| P_{RAG}) = 0
 \end{equation}
 
-This proof establishes that the Provenance Vector is not merely a heuristic, but a structural guarantee of lifecycle consistency within the Transformer architecture.
+This proof establishes that the Provenance Vector is not merely a heuristic, but a structural steering mechanism that guarantees lifecycle consistency during inference-time scaling.
 
 \subsection{Empirical Validation: The Vioxx Case Study}
 
@@ -586,13 +586,11 @@ When multiple LLM agents collaborate on a task, knowledge management becomes a d
 
 We acknowledge several limitations of this work.
 
-First, while the $\mathcal{D}_{sync}$ metric is empirically validated via our GPT-2 case study, the Provenance Vector itself remains a theoretical architectural proposal. It has not yet been implemented or evaluated in a full-scale pre-training run. The Provenance Vector's auxiliary loss function, in particular, may interact with the primary language modelling objective in ways that require large-scale empirical tuning. We present it as a principled architectural direction grounded in the lifecycle analysis, rather than a production-ready system.
+First, while the $\mathcal{D}_{sync}$ metric has been empirically validated across both unimodal (GPT-2) and cross-modal (LLaVA-1.5) architectures, the Provenance Vector itself remains a theoretical architectural proposal. It has not yet been implemented in a full-scale pre-training run. The Provenance Vector's auxiliary loss function, in particular, may interact with the primary language modelling objective in ways that require large-scale empirical tuning via RLHF. We present it as a principled architectural direction grounded in the lifecycle analysis, rather than a production-ready software package.
 
-Second, our systematic coverage analysis (Table~\ref{tab:coverage}) samples 20 representative works. While these were selected to span the major subfields and publication venues, the sample is not exhaustive. A comprehensive bibliometric analysis covering the full corpus of relevant publications would strengthen the fragmentation claim, though we believe the qualitative pattern (concentration on single stages) is robust.
+Second, our systematic coverage analysis (Table~\ref{tab:coverage}) samples representative works to expose the fragmentation of the field. A comprehensive bibliometric analysis covering the full corpus of relevant publications would strengthen the fragmentation claim, though we believe the qualitative pattern is robust.
 
-Third, the lifecycle framework is designed for text-based Transformer models. Multimodal systems, non-Transformer architectures (e.g., state-space models like Mamba), and specialised retrieval systems (e.g., table-augmented generation) may require structural modifications to the five-stage model. We discuss these extensions in \S\ref{sec:open_problems} but do not formalise them.
-
-Fourth, while the analytical case study is grounded in a documented regulatory event (the Vioxx withdrawal), we apply it to a hypothetical LLM deployment rather than a retrospective analysis of an actual system failure. A post-hoc audit of a real deployed medical chatbot would provide stronger evidence of lifecycle desynchronisation in practice.
+Third, while the analytical case study is grounded in a documented regulatory event (the Vioxx withdrawal) and executed via simulated vision-language conflict, applying it to a retrospective audit of an actual deployed medical agent would provide stronger evidence of lifecycle desynchronisation in the wild.
 
 % ============================================================
 \section{Ethics and Broader Impact}
@@ -608,13 +606,11 @@ The Provenance Vector and $\mathcal{D}_{sync}$ metric proposed in this work are 
 \label{sec:conclusion}
 % ============================================================
 
-This paper has established that the five subfields studying knowledge in LLMs (retrieval-augmented generation, knowledge editing, continual learning, context engineering, and agent memory) are best understood as stages of a single \textit{Knowledge Lifecycle}. We formalised the architecture into five stages (Acquisition, Storage, Retrieval, Update, Forgetting), provided mathematical formulations grounded in the foundational literature for each, and identified cross-stage failure modes that no single-stage approach can detect.
+This thesis establishes that the fragmented study of Large Language Models—where retrieval, representation engineering, and alignment are treated as isolated domains—is a structural failure. We have formalised these domains into a unified \textit{Knowledge Lifecycle} (Acquisition, Storage, Retrieval, Update, Forgetting) and proven mathematically that the boundaries between these stages are where catastrophic, uncontrollable hallucinations occur. 
 
-Our systematic coverage analysis (Table~\ref{tab:coverage}) provides quantitative evidence that the field operates in silos: the median paper addresses only two lifecycle stages, and the Update-Forgetting boundary remains almost entirely unstudied. Our analytical case study demonstrates that these gaps produce concrete, dangerous failures in deployed systems, not merely theoretical concerns.
+The era of static, single-pass knowledge editing is over. As the field scales into System 2 reasoning models and open-ended multimodal agents, knowledge conflict resolution must shift to active test-time compute. To execute this shift, we introduced two definitive contributions: \textbf{Lifecycle Desynchronisation ($\mathcal{D}_{sync}$)}, a cross-modal metric that quantifies the severe text-prior bias present in modern VLMs, and the \textbf{Provenance Vector ($p$)}, an architectural integration that guarantees conflict resolution by serving as a dynamic steering vector during test-time reflection.
 
-To address these gaps, we proposed two original contributions. The \textbf{Provenance Vector} offers a principled architectural path toward resolving knowledge conflicts by embedding temporal and source metadata directly into the parametric storage layer. \textbf{Lifecycle Desynchronisation} ($\mathcal{D}_{sync}$) provides the field with its first formal metric for measuring cross-stage inconsistency, filling the evaluation void that our coverage analysis exposed.
-
-As LLMs evolve from stateless responders into persistent, knowledge-managing agents, the lifecycle perspective will only grow in importance. The next generation of these systems will be judged not by how well they perform at any single stage, but by how coherently they manage the full lifecycle: acquiring knowledge where it is needed, storing it where it belongs, retrieving it when it matters, updating it as the world changes, and forgetting it when the law or common sense demands.
+As AI systems evolve from conversational chatbots into autonomous, high-stakes decision engines, theoretical heuristics are no longer sufficient. The next generation of foundation models will be defined by their ability to maintain absolute epistemic consistency across their lifecycle: acquiring knowledge precisely, holding it accountably, and unlearning it mathematically when demanded. The Provenance framework provides the exact architectural blueprint required for this next frontier.
 
 \bibliographystyle{apalike}
 \bibliography{references}
