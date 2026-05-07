@@ -112,7 +112,7 @@ One important observation: the same fact can exist in multiple forms simultaneou
 
 \subsection{Relationship to Existing Literature}
 
-Table~\ref{tab:survey_comparison} shows where prior literature sits. Each subfield covers one or two lifecycle stages in depth; none attempts the full picture. The table makes the structural gap concrete.
+Table~\ref{tab:survey_comparison} shows where prior literature sits. Each subfield covers one or two lifecycle stages in depth; none attempts the full picture.
 
 \begin{table}[t]
 \centering
@@ -135,6 +135,12 @@ Wang et al.\ (2025), Human$\to$AI Memory & \halfmark & \fullmark & \halfmark & \
 \end{tabular}
 \vspace{-1em}
 \end{table}
+
+Three works require explicit differentiation. \citet{wang2024human_to_ai_memory} drew a productive analogy between human memory systems (sensory, working, long-term) and LLM memory architectures. Their contribution is taxonomic: it classifies memory types but does not formalise the transitions between them or identify the failure modes that arise when stages interact. Our framework differs in that it treats the stages as an \textit{operational architecture} with mathematically defined interfaces, not as a classification scheme.
+
+\citet{zhang2024survey_agent_memory} provided the most comprehensive survey of agent memory to date, covering storage hierarchies, retrieval scoring functions, and consolidation mechanisms. Their scope, however, is restricted to agent systems; they do not address parametric storage, knowledge editing, or machine unlearning. Our framework subsumes agent memory as a special case (one in which all five stages operate within a single persistent system) and extends the analysis to the broader LLM ecosystem.
+
+\citet{gao2023rag_survey} surveyed retrieval-augmented generation in depth but treated retrieval as a self-contained pipeline. Their analysis does not consider what happens when retrieved facts contradict the model's parametric memory, or when a retrieved fact has been marked for deletion under privacy regulations. These are precisely the cross-stage failure modes that our lifecycle analysis is designed to expose.
 
 \subsection{Scope and Boundaries}
 
@@ -663,7 +669,17 @@ We propose a novel architectural modification: appending a \textit{Provenance Ve
 \begin{equation}
   \text{FFN}_{prov}(x) = \sum_{i=1}^{d_m} f(x \cdot k_i) [v_i \,;\, p_i]
 \end{equation}
-where the vector $p_i \in \mathbb{R}^{d_p}$ encodes a continuous representation of the acquisition timestamp and the source reliability score. 
+where the vector $p_i \in \mathbb{R}^{d_p}$ encodes a continuous representation of the acquisition timestamp and the source reliability score.
+
+\paragraph{Training objective.} During pre-training, an auxiliary loss trains the provenance dimensions. Given a training example $(x, y)$ drawn from source $s$ at timestamp $\tau$, the model minimises a joint objective:
+\begin{equation}
+  \mathcal{L}_{total} = \mathcal{L}_{\text{CE}}(\theta) + \alpha \cdot \mathcal{L}_{prov}(\hat{p}, [\tau; s])
+\end{equation}
+where $\mathcal{L}_{prov}$ is a regression loss that encourages the emitted provenance dimensions to reconstruct the timestamp and source embedding, and $\alpha$ is a weighting hyperparameter. During fine-tuning, the provenance dimensions are updated with the new timestamp, creating a natural temporal gradient across the network's stored facts.
+
+\paragraph{Complexity.} The modification adds $d_p$ dimensions to each of the $d_m$ value vectors per FFN layer. For a model with $L$ layers, the parameter overhead is $L \times d_m \times d_p$. Setting $d_p = 8$ (sufficient to encode a timestamp and a source hash) on a 32-layer model with $d_m = 4096$ adds roughly 1M parameters, a negligible 0.01\% increase on a 7B-parameter model.
+
+\paragraph{Interaction with positional encodings.} Rotary positional encodings (RoPE) encode \textit{token position} within a sequence. Provenance Vectors encode \textit{acquisition time} across training runs. The two are orthogonal: RoPE tells the model where a token sits in the current context; $p$ tells the model when the underlying fact entered the weights. They occupy separate subspaces and do not interfere.
 
 By exposing $p_i$ to the subsequent attention layers, the model can route queries not just by semantic similarity, but by \textit{temporal primacy}. If the model holds two conflicting facts (e.g., an outdated parametric fact and a recent non-parametric fact injected via RAG), the attention mechanism can be explicitly trained to maximise the provenance timestamp, naturally overriding stale weights without requiring destructive Rank-One Model Editing (ROME) updates.
 
@@ -676,7 +692,17 @@ $\mathcal{D}_{sync}$ measures the catastrophic hallucination that occurs when a 
   \mathcal{D}_{sync} = \mathbb{E}_{q \sim \mathcal{Q}} \left[ \mathbb{D}_{KL}(P(y \mid q, \theta_{t+1}, \mathcal{M}_{t+1}) \| P(y \mid q, \theta_{t}, \mathcal{M}_{t+1})) \right]
 \end{equation}
 
-A high $\mathcal{D}_{sync}$ score indicates that a model is acting as an ``adaptive chameleon,'' blindly adopting updated non-parametric context even when it violently contradicts its internal parametric weights. We propose $\mathcal{D}_{sync}$ as a standard benchmark to replace static evaluations like MMLU for any LLM deployed in a continuous-learning or retrieval-augmented environment.
+A high $\mathcal{D}_{sync}$ score indicates that a model is acting as an ``adaptive chameleon,'' blindly adopting updated non-parametric context even when it violently contradicts its internal parametric weights.
+
+\paragraph{Interpreting $\mathcal{D}_{sync}$ scores.} To make the metric concrete, we outline three operational regimes:
+
+\begin{itemize}[leftmargin=*]
+  \item $\mathcal{D}_{sync} \approx 0$: The parametric and non-parametric stores are fully synchronised. Updates to $\mathcal{M}$ do not change the output distribution because $\theta$ already encodes consistent information. This is the ideal state.
+  \item $\mathcal{D}_{sync} \in [0.1, 0.5]$: Minor temporal drift. The weights encode slightly outdated facts, but the model's outputs shift only marginally when fresh context is supplied. Typical of systems a few months past their training cutoff on slowly evolving domains.
+  \item $\mathcal{D}_{sync} > 1.0$: Dangerous desynchronisation. The weights and the retrieval index encode contradictory facts. The model's output distribution changes drastically depending on whether retrieval is active, producing the unpredictable behaviour documented by \citet{xie2024knowledge_conflicts}. The medical case study in \S\ref{sec:proposals} illustrates this regime.
+\end{itemize}
+
+We propose $\mathcal{D}_{sync}$ as a standard benchmark to complement static evaluations like MMLU for any LLM deployed in a continuous-learning or retrieval-augmented environment. A practical implementation would sample a set of time-sensitive queries $\mathcal{Q}$ (e.g., questions about recent political appointments, drug approvals, or API changes), run inference with and without RAG enabled, and compute the KL-divergence between the two output distributions.
 
 \subsection{Analytical Case Study: A Medical Knowledge Failure}
 
@@ -742,6 +768,21 @@ This paper focuses on text. But LLMs are rapidly becoming multimodal, and each n
 \subsection{Knowledge Lifecycles for Multi-Agent Systems}
 
 When multiple LLM agents collaborate on a task, knowledge management becomes a distributed systems problem. Agents must share knowledge without creating inconsistencies. They must coordinate updates so that one agent's edit does not conflict with another agent's cached version of the same fact. They must manage access control so that sensitive knowledge is available to authorised agents and hidden from others. The lifecycle framework suggests that each agent maintains its own local lifecycle while participating in a collective lifecycle at the system level. The distributed systems community has decades of experience with consistency, replication, and conflict resolution protocols; applying these ideas to multi-agent LLM systems is a promising and largely unexplored direction.
+
+% ============================================================
+\section{Limitations}
+\label{sec:limitations}
+% ============================================================
+
+We acknowledge several limitations of this work.
+
+First, our two original proposals (the Provenance Vector and the $\mathcal{D}_{sync}$ metric) are theoretical. Neither has been implemented or empirically validated on a trained model. The Provenance Vector's auxiliary loss function, in particular, may interact with the primary language modelling objective in ways that are difficult to predict without experimentation. We present these proposals as principled architectural directions grounded in the lifecycle analysis, not as validated systems.
+
+Second, our systematic coverage analysis (Table~\ref{tab:coverage}) samples 20 representative works. While these were selected to span the major subfields and publication venues, the sample is not exhaustive. A comprehensive bibliometric analysis covering the full corpus of relevant publications would strengthen the fragmentation claim, though we believe the qualitative pattern (concentration on single stages) is robust.
+
+Third, the lifecycle framework is designed for text-based Transformer models. Multimodal systems, non-Transformer architectures (e.g., state-space models like Mamba), and specialised retrieval systems (e.g., table-augmented generation) may require structural modifications to the five-stage model. We discuss these extensions in \S\ref{sec:open_problems} but do not formalise them.
+
+Fourth, the analytical case study uses a hypothetical scenario rather than a documented real-world incident. While the scenario is constructed from empirically validated components (ROME editing limitations, knowledge conflict unpredictability), a retrospective analysis of an actual deployed system failure would provide stronger evidence.
 
 % ============================================================
 \section{Conclusion}
