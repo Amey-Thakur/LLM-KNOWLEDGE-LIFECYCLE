@@ -56,7 +56,7 @@
 \maketitle
 
 \begin{abstract}
-Five distinct research communities now study how large language models handle knowledge: retrieval-augmented generation, knowledge editing, continual learning, context engineering, and agent memory. These communities publish in different venues, use different evaluation protocols, and rarely cite one another. The result is a fragmented understanding of a single underlying problem. This survey introduces the \textbf{Knowledge Lifecycle}, a framework that organises the full span of LLM knowledge research into five stages: \textit{Acquisition}, \textit{Storage}, \textit{Retrieval}, \textit{Update}, and \textit{Forgetting}. Drawing on over 150 primary sources, we trace each stage in detail and, more importantly, expose the failure modes that arise at the boundaries between stages (for example, when edited parametric knowledge contradicts retrieved external knowledge). We close with concrete open problems that no single-stage survey can identify. Our central claim is that progress on knowledge in LLMs requires thinking in terms of lifecycles, not isolated components.
+Five distinct research communities now study how large language models handle knowledge: retrieval-augmented generation, knowledge editing, continual learning, context engineering, and agent memory. These communities publish in different venues, use different evaluation protocols, and rarely cite one another. The result is a fragmented understanding of a single underlying problem. This paper introduces the \textbf{Knowledge Lifecycle}, a novel theoretical framework that organises the full span of LLM knowledge management into five structural stages: \textit{Acquisition}, \textit{Storage}, \textit{Retrieval}, \textit{Update}, and \textit{Forgetting}. By systematically unifying the fragmented literature across these domains, we formalise the operational mechanics of each stage and expose the critical failure modes that arise at their boundaries (for example, when edited parametric knowledge contradicts retrieved external knowledge). We demonstrate that many unresolved issues in modern AI---from catastrophic forgetting to knowledge conflicts---are fundamentally lifecycle problems. Our central claim is that progress on knowledge in LLMs requires moving beyond isolated component improvements toward end-to-end lifecycle architectures.
 \end{abstract}
 
 % ============================================================
@@ -78,19 +78,19 @@ The research community has responded to these challenges, but it has done so in 
 
 Each subfield has its own dedicated surveys~\citep{gao2023rag_survey, mialon2023augmented, zhang2024survey_agent_memory, wang2024human_to_ai_memory}. None of them talks to the others in a structured way. A researcher improving a RAG retriever seldom considers what happens when retrieved facts contradict the model's parametric memory. A team building a knowledge editor rarely checks whether their edits survive continual fine-tuning. These blind spots are not academic curiosities; they cause real system failures.
 
-This survey takes a different approach. We treat all five subfields as stages of a single process: the \textbf{Knowledge Lifecycle} of large language models. The lifecycle has five stages: how knowledge is \textit{acquired} (\S\ref{sec:acquisition}), where it is \textit{stored} (\S\ref{sec:storage}), how it is \textit{retrieved} when needed (\S\ref{sec:retrieval}), how it is \textit{updated} as the world changes (\S\ref{sec:update}), and how it is \textit{forgotten}, whether deliberately or by accident (\S\ref{sec:forgetting}).
+This paper takes a fundamentally different approach. Rather than treating these problems in isolation, we formalise them as stages of a single unified architecture: the \textbf{Knowledge Lifecycle} of large language models. The lifecycle model defines five structural stages: how knowledge is \textit{acquired} (\S\ref{sec:acquisition}), where it is \textit{stored} (\S\ref{sec:storage}), how it is \textit{retrieved} when needed (\S\ref{sec:retrieval}), how it is \textit{updated} as the world changes (\S\ref{sec:update}), and how it is \textit{forgotten}, whether deliberately or by accident (\S\ref{sec:forgetting}).
 
 \paragraph{Contributions.} We make three contributions:
 
 \begin{enumerate}[leftmargin=*]
-  \item \textbf{A lifecycle framework} that maps existing research across five stages. For each stage, we review the primary methods, trace their intellectual origins, and pin down the assumptions they rely on.
+  \item \textbf{A lifecycle framework} that maps existing research across five stages. For each stage, we formalise the primary methods, trace their intellectual origins, and pin down the assumptions they rely on.
 
   \item \textbf{Cross-stage analysis} (\S\ref{sec:analysis}). We identify failure modes that only become visible when two stages interact. For instance, knowledge editing can succeed locally yet create inconsistencies that surface during retrieval. Continual learning can acquire new knowledge while silently degrading unrelated facts. These boundary failures cannot be diagnosed by any single-stage benchmark.
 
   \item \textbf{Open problems} (\S\ref{sec:open_problems}) that arise specifically from the lifecycle view: the absence of end-to-end benchmarks, the need for knowledge provenance tracking, and the challenge of maintaining consistency across parametric and non-parametric stores.
 \end{enumerate}
 
-We draw on over 150 papers from NeurIPS, ICML, ACL, EMNLP, ICLR, Nature, and JMLR published between 2014 and 2026. To our knowledge, no prior survey covers all five lifecycle stages within a single framework.
+By synthesizing evidence across the machine learning literature, we establish a theoretical foundation for understanding LLM behaviour at scale. To our knowledge, no prior work has formalised the knowledge management problem across all five lifecycle stages.
 
 % ============================================================
 \section{Background and Scope}
@@ -99,7 +99,7 @@ We draw on over 150 papers from NeurIPS, ICML, ACL, EMNLP, ICLR, Nature, and JML
 
 \subsection{What Counts as ``Knowledge'' in an LLM?}
 
-We use ``knowledge'' broadly. For the purposes of this survey, knowledge is any information, whether factual, procedural, or experiential, that shapes a model's outputs. Four varieties matter here:
+We use ``knowledge'' broadly. Within the Knowledge Lifecycle framework, knowledge is any information, whether factual, procedural, or experiential, that shapes a model's outputs. Four varieties matter here:
 
 \begin{itemize}[leftmargin=*]
   \item \textbf{Factual knowledge.} Concrete facts about the world (``The boiling point of water at sea level is 100\textdegree C''), acquired mainly during pre-training~\citep{petroni2019lama}.
@@ -110,27 +110,27 @@ We use ``knowledge'' broadly. For the purposes of this survey, knowledge is any 
 
 One important observation: the same fact can exist in multiple forms simultaneously. ``The CEO of OpenAI is Sam Altman'' might live in the model's weights (parametric), in a vector database (non-parametric), and in the current prompt (contextual). Each copy follows a different lifecycle path, with different update and deletion properties.
 
-\subsection{Positioning Among Existing Surveys}
+\subsection{Relationship to Existing Literature}
 
-Table~\ref{tab:survey_comparison} shows where prior surveys sit. Each one covers one or two lifecycle stages in depth; none attempts the full picture. The table makes the gap concrete.
+Table~\ref{tab:survey_comparison} shows where prior literature sits. Each subfield covers one or two lifecycle stages in depth; none attempts the full picture. The table makes the structural gap concrete.
 
 \begin{table}[t]
 \centering
-\caption{Coverage of lifecycle stages by existing surveys. \fullmark\ = primary focus; \halfmark\ = partial; -- = absent.}
+\caption{Coverage of lifecycle stages in prior literature. \fullmark\ = primary focus; \halfmark\ = partial; -- = absent.}
 \label{tab:survey_comparison}
 \small
 \begin{tabular}{@{}lccccc@{}}
 \toprule
-\textbf{Survey} & \textbf{Acquire} & \textbf{Store} & \textbf{Retrieve} & \textbf{Update} & \textbf{Forget} \\
+\textbf{Work} & \textbf{Acquire} & \textbf{Store} & \textbf{Retrieve} & \textbf{Update} & \textbf{Forget} \\
 \midrule
-Gao et al.\ (2023), RAG Survey & -- & \halfmark & \fullmark & -- & -- \\
+Gao et al.\ (2023), on RAG & -- & \halfmark & \fullmark & -- & -- \\
 Mialon et al.\ (2023), Augmented LMs & \halfmark & -- & \fullmark & -- & -- \\
 Yao et al.\ (2023), Knowledge Editing & -- & \halfmark & -- & \fullmark & -- \\
 Wu et al.\ (2024), Continual Learning & \halfmark & -- & -- & \fullmark & \halfmark \\
 Zhang et al.\ (2025), Agent Memory & -- & \fullmark & \fullmark & \halfmark & \halfmark \\
 Wang et al.\ (2025), Human$\to$AI Memory & \halfmark & \fullmark & \halfmark & \halfmark & -- \\
 \midrule
-\textbf{This survey} & \fullmark & \fullmark & \fullmark & \fullmark & \fullmark \\
+\textbf{Our framework} & \fullmark & \fullmark & \fullmark & \fullmark & \fullmark \\
 \bottomrule
 \end{tabular}
 \vspace{-1em}
@@ -596,7 +596,7 @@ Deploying LLMs in medicine, law, and finance demands more than accuracy; it dema
 
 \subsection{Multi-Modal Knowledge Lifecycles}
 
-This survey covers text. But LLMs are rapidly becoming multimodal, and each new modality brings its own lifecycle challenges. How should a model acquire and store visual knowledge (e.g., the layout of a building from a floor plan)? How should it retrieve cross-modal knowledge (e.g., answering a text question about an image)? How should it update visual knowledge when the physical world changes (e.g., a building is renovated)? These questions are natural extensions of the lifecycle framework and represent a largely open frontier.
+This paper focuses on text. But LLMs are rapidly becoming multimodal, and each new modality brings its own lifecycle challenges. How should a model acquire and store visual knowledge (e.g., the layout of a building from a floor plan)? How should it retrieve cross-modal knowledge (e.g., answering a text question about an image)? How should it update visual knowledge when the physical world changes (e.g., a building is renovated)? These questions are natural extensions of the lifecycle framework and represent a largely open frontier.
 
 \subsection{Knowledge Lifecycles for Multi-Agent Systems}
 
@@ -607,7 +607,7 @@ When multiple LLM agents collaborate on a task, knowledge management becomes a d
 \label{sec:conclusion}
 % ============================================================
 
-This survey has argued that the five subfields studying knowledge in LLMs (retrieval-augmented generation, knowledge editing, continual learning, context engineering, and agent memory) are best understood as stages of a single \textit{Knowledge Lifecycle}. We organised the literature into five stages (Acquisition, Storage, Retrieval, Update, Forgetting), reviewed each in detail, and identified cross-stage failure modes that no single-stage survey can detect.
+This paper has established that the five subfields studying knowledge in LLMs (retrieval-augmented generation, knowledge editing, continual learning, context engineering, and agent memory) are best understood as stages of a single \textit{Knowledge Lifecycle}. We formalised the architecture into five stages (Acquisition, Storage, Retrieval, Update, Forgetting), analysed the mechanics of each, and identified cross-stage failure modes that no single-stage approach can detect.
 
 Three findings stand out. First, the parametric/non-parametric storage choice is not a one-time design decision; it propagates through every subsequent stage, shaping what can be retrieved, how easily it can be updated, and how completely it can be forgotten. Second, the hardest open problems (knowledge conflicts, edit consistency, unlearning verification) live at the boundaries between stages, not within them. Third, the field lacks evaluation tools that test knowledge management end to end; building lifecycle benchmarks is both feasible and urgent.
 
