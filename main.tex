@@ -213,8 +213,33 @@ The five stages are not a linear pipeline. They interact, and those interactions
   \item \textbf{Forgetting $\leftrightarrow$ Acquisition.} Catastrophic forgetting during continual training and deliberate unlearning for privacy are studied by different communities, but both boil down to the same question: how to selectively remove information from entangled representations.
 \end{itemize}
 
-We return to these interactions in \S\ref{sec:analysis}. The next five sections examine each stage in turn.
+\subsection{Mathematical Formulation of the Lifecycle}
+\label{sec:math_formulation}
 
+To elevate this conceptual framework into a rigorous architecture, we formalise the state of the LLM's knowledge at any time $t$ as a tuple:
+\begin{equation}
+  S_t = (\theta_t, \mathcal{M}_t)
+\end{equation}
+where $\theta_t$ represents the parametric weights and $\mathcal{M}_t$ represents the non-parametric external store (e.g., a vector database). The five lifecycle stages operate as formal functions over this state:
+
+\begin{enumerate}[leftmargin=*]
+  \item \textbf{Acquisition:} Maps a training dataset $D$ to an initial parametric state by minimising an acquisition loss:
+  \begin{equation}
+    \theta_{acq} = \arg\min_\theta \mathbb{E}_{(x,y) \in D} [ \mathcal{L}_{acq}(x, y; \theta) ]
+  \end{equation}
+  \item \textbf{Storage:} Defines the physical persistence of $S_t$, dictating whether knowledge is strictly parametric ($|\mathcal{M}_t| = 0$), non-parametric, or hybrid.
+  \item \textbf{Retrieval:} A function $R$ over a query $q$ and the non-parametric store that returns relevant context $c = R(q, \mathcal{M}_t)$. Generation is then conditioned on this context: $P(y \mid x, c, \theta_t)$.
+  \item \textbf{Update:} Introduces a new fact $(k, v)$ to create $S_{t+1}$. The fundamental trade-off of knowledge editing (efficacy vs.\ specificity) is defined as minimising loss on the new fact while constraining the Kullback-Leibler divergence on the neighbourhood of unrelated facts $\mathcal{N}(k)$:
+  \begin{equation}
+    \min_{\theta_{t+1}} \mathcal{L}(k, v; \theta_{t+1}) \quad \text{s.t.} \quad \mathbb{D}_{KL}(P_{\theta_t} \| P_{\theta_{t+1}}) < \epsilon \text{ for } x \notin \mathcal{N}(k)
+  \end{equation}
+  \item \textbf{Forgetting:} Unlearning a target subset $D_f$ while retaining a preserve-set $D_r$ requires maximising loss on $D_f$ without perturbing $D_r$:
+  \begin{equation}
+    \theta_{unlearn} = \arg\max_{\theta} \mathcal{L}(D_f; \theta) \quad \text{s.t.} \quad \mathcal{L}(D_r; \theta) \approx \mathcal{L}(D_r; \theta_{t})
+  \end{equation}
+\end{enumerate}
+
+We explore the practical implementations of these functions in the following sections, and return to their cross-stage failure modes in \S\ref{sec:analysis}.
 % ============================================================
 \section{Acquisition: How LLMs Gain Knowledge}
 \label{sec:acquisition}
