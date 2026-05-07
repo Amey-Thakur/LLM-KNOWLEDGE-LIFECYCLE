@@ -58,8 +58,27 @@
 \maketitle
 
 \begin{abstract}
-The emergence of reasoning models and inference-time scaling has altered how large language models process knowledge. While earlier systems relied on static pipelines (retrieval-augmented generation, knowledge editing, continual learning), modern systems resolve conflicts during test-time compute. This shift exposes a methodological gap: there is currently no unified formalism for how knowledge persists, evolves, and is computed over across a model's lifespan. This paper introduces the \textbf{Knowledge Lifecycle}, a theoretical framework that organises LLM knowledge management into five structural stages: \textit{Acquisition}, \textit{Storage}, \textit{Retrieval}, \textit{Update}, and \textit{Forgetting}. We make two primary contributions. First, we propose the \textbf{Provenance Vector ($p$)}, an architectural modification that appends temporal metadata to parametric storage, serving as a reward signal for test-time conflict resolution and Representation Engineering. Second, we introduce \textbf{Lifecycle Desynchronisation ($\mathcal{D}_{sync}$)}, a formal mathematical metric based on KL-divergence designed to quantify the predictive divergence that occurs when parametric weights and non-parametric context conflict. Our analysis demonstrates that static updates are insufficient for modern architectures, and provides a formal roadmap for lifecycle-aware reasoning models.
+The emergence of reasoning models and inference-time scaling has altered how large language models (LLMs) process knowledge. While earlier systems relied on static pipelines (retrieval-augmented generation (RAG), knowledge editing, continual learning), modern systems resolve conflicts during test-time compute. This shift exposes a methodological gap: there is currently no unified formalism for how knowledge persists, evolves, and is computed over across a model's lifespan. This paper introduces the \textbf{Knowledge Lifecycle}, a theoretical framework that organises LLM knowledge management into five structural stages: \textit{Acquisition}, \textit{Storage}, \textit{Retrieval}, \textit{Update}, and \textit{Forgetting}. We make two primary contributions. First, we propose the \textbf{Provenance Vector ($p$)}, an architectural modification that appends temporal metadata to parametric storage, serving as a reward signal for test-time conflict resolution and Representation Engineering. Second, we introduce \textbf{Lifecycle Desynchronisation ($\mathcal{D}_{sync}$)}, a formal mathematical metric based on Kullback-Leibler divergence (KL-divergence) designed to quantify the predictive divergence that occurs when parametric weights and non-parametric context conflict. Our analysis demonstrates that static updates are insufficient for modern architectures, and provides a formal roadmap for lifecycle-aware reasoning models.
 \end{abstract}
+
+\section*{List of Abbreviations}
+\begin{description}[style=multiline, leftmargin=3cm, font=\bfseries]
+  \item[LLM] Large Language Model
+  \item[RAG] Retrieval-Augmented Generation
+  \item[KL] Kullback-Leibler (divergence)
+  \item[RLHF] Reinforcement Learning from Human Feedback
+  \item[RepE] Representation Engineering
+  \item[FFN] Feed-Forward Network
+  \item[VLM] Vision-Language Model
+  \item[FDA] Food and Drug Administration
+  \item[MIPS] Maximum Inner Product Search
+  \item[CE] Cross-Entropy
+  \item[MSE] Mean Squared Error
+  \item[DPR] Dense Passage Retrieval
+  \item[ROME] Rank-One Model Editing
+  \item[MEMIT] Mass-Editing Memory in Transformers
+  \item[LoRA] Low-Rank Adaptation
+\end{description}
 
 % ============================================================
 \section{Introduction}
@@ -87,9 +106,9 @@ This paper proposes an integrated approach. Rather than treating these problems 
 \begin{enumerate}[leftmargin=*]
   \item \textbf{A lifecycle framework} that unifies existing research across five structural stages. We formalise the operational mechanics of each stage using state-of-the-art formulations from scaling laws to rank-one matrix updates.
 
-  \item \textbf{The Provenance Vector ($p$)} (\S\ref{sec:proposals}), a novel architectural proposal for future Transformer designs. We mathematically demonstrate how appending temporal metadata to parametric storage allows the attention mechanism to natively resolve cross-stage knowledge conflicts.
+  \item \textbf{The Provenance Vector ($p$)} (\S\ref{sec:contributions}), a novel architectural proposal for future Transformer designs. We mathematically demonstrate how appending temporal metadata to parametric storage allows the attention mechanism to natively resolve cross-stage knowledge conflicts.
 
-  \item \textbf{Lifecycle Desynchronisation ($\mathcal{D}_{sync}$)} (\S\ref{sec:proposals}), a new evaluation metric designed to measure the failure modes that emerge when model weights are out of sync with external retrieval indices. We propose this as a standard benchmark for measuring the reliability of persistent AI agents.
+  \item \textbf{Lifecycle Desynchronisation ($\mathcal{D}_{sync}$)} (\S\ref{sec:contributions}), a new evaluation metric designed to measure the failure modes that emerge when model weights are out of sync with external retrieval indices. We propose this as a standard benchmark for measuring the reliability of persistent AI agents.
 \end{enumerate}
 
 By synthesizing evidence across the machine learning literature, we establish a theoretical foundation for understanding LLM behaviour at scale. To our knowledge, no prior work has formalised the knowledge management problem across all five lifecycle stages.
@@ -105,7 +124,7 @@ We use ``knowledge'' broadly. Within the Knowledge Lifecycle framework, knowledg
 
 \begin{itemize}[leftmargin=*]
   \item \textbf{Factual knowledge.} Concrete facts about the world (``The boiling point of water at sea level is 100\textdegree C''), acquired mainly during pre-training~\citep{petroni2019lama}.
-  \item \textbf{Procedural knowledge.} How to carry out tasks: following multi-step instructions, writing code in a particular style, or reasoning through a chain of logic. This is typically instilled through instruction tuning and RLHF~\citep{ouyang2022instructgpt, wei2022finetuned}.
+  \item \textbf{Procedural knowledge.} How to carry out tasks: following multi-step instructions, writing code in a particular style, or reasoning through a chain of logic. This is typically instilled through instruction tuning and Reinforcement Learning from Human Feedback (RLHF)~\citep{ouyang2022instructgpt, wei2022finetuned}.
   \item \textbf{Experiential knowledge.} Records of past interactions, user preferences, and task outcomes kept by agent memory systems~\citep{park2023generative, packer2023memgpt}.
   \item \textbf{Contextual knowledge.} Information provided at inference time via the prompt or fetched from an external source~\citep{lewis2020rag}.
 \end{itemize}
@@ -230,19 +249,28 @@ The five stages are not a linear pipeline. They interact, and those interactions
 Before examining how inference-time scaling alters the lifecycle, we must formally define the legacy constraints of the Acquisition, Storage, and Retrieval stages. These stages established the baseline mathematics of LLM knowledge management prior to the advent of reasoning models.
 
 \subsection{Acquisition and Parametric Storage}
+\label{sec:acquisition}
+\label{sec:storage}
 
 Pre-training and fine-tuning serve as the primary mechanisms for eager knowledge acquisition. The model compresses factual, linguistic, and procedural information into its weights by minimising the autoregressive cross-entropy loss over a training corpus $\mathcal{D}$:
 \begin{equation}
+  \label{eq:ce}
   \mathcal{L}_{\text{CE}}(\theta) = -\mathbb{E}_{x \sim \mathcal{D}} \left[ \sum_{t=1}^T \log P_\theta(x_t \mid x_{<t}) \right]
 \end{equation}
 
+\paragraph{Intuition.} Intuitively, this represents a "mimicry" objective. The model learns by attempting to predict the next token in a sequence and receives a mathematical penalty when its prediction deviates from the ground truth. This process forces factual knowledge into the parameters $\theta$, but it does so without any metadata—the model learns \textit{what} is true, but not \textit{when} or \textit{why} it is true.
+
 Once acquired, this knowledge resides implicitly within the feed-forward networks (FFNs). \citet{geva2021transformer} established that FFNs operate as associative key-value memories. For an input representation $x$, the FFN computation is:
 \begin{equation}
+  \label{eq:ffn}
   \text{FFN}(x) = f(x K^\top)V = \sum_{i=1}^{d_m} f(x \cdot k_i) v_i
 \end{equation}
-where $k_i$ acts as a key detecting a specific semantic pattern, and $v_i$ acts as a value inducing a corresponding distribution over the output vocabulary. Because this storage is highly entangled and distributed across parameters, updating or deleting specific facts is mathematically difficult, leading to the development of dedicated knowledge editing interventions (\S\ref{sec:update}).
+where $k_i$ acts as a key detecting a specific semantic pattern, and $v_i$ acts as a value inducing a corresponding distribution over the output vocabulary. 
+
+\paragraph{Intuition.} We can think of the FFN as a massive, fuzzy look-up table. The keys $k_i$ are "concepts" the model has memorised, and the values $v_i$ are the "answers" associated with those concepts. When the input $x$ matches a key (high dot product $x \cdot k_i$), the model "recalls" the corresponding answer. The problem is that these keys and values are entangled across billions of parameters, making it nearly impossible to surgically delete or update a single fact without affecting others.
 
 \subsection{Retrieval-Augmented Constraints}
+\label{sec:retrieval}
 
 To bypass the rigidity of parametric storage, the field adopted Retrieval-Augmented Generation (RAG)~\citep{lewis2020rag}. RAG decouples knowledge storage from the model parameters by maintaining a non-parametric external index (e.g., a vector database). Retrieval is typically framed as a Maximum Inner Product Search (MIPS) over a bi-encoder space:
 \begin{equation}
@@ -361,20 +389,20 @@ Karpukhin et al.\ (DPR, 2020) & -- & -- & \checkmark & -- & -- & 1 \\
 Meng et al.\ (ROME, 2022) & -- & \checkmark & -- & \checkmark & -- & 2 \\
 Meng et al.\ (MEMIT, 2023) & -- & \checkmark & -- & \checkmark & -- & 2 \\
 Mitchell et al.\ (SERAC, 2022) & -- & \checkmark & -- & \checkmark & -- & 2 \\
-Kirkpatrick et al.\ (EWC, 2017) & \checkmark & -- & -- & \checkmark & \checkmark & 3 \\
+Kirkpatrick et al.\ (Elastic Weight Consolidation (EWC), 2017) & \checkmark & -- & -- & \checkmark & \checkmark & 3 \\
 Jang et al.\ (Unlearning, 2023) & -- & -- & -- & -- & \checkmark & 1 \\
-Maini et al.\ (TOFU, 2024) & -- & -- & -- & -- & \checkmark & 1 \\
-Borgeaud et al.\ (RETRO, 2022) & \checkmark & \checkmark & \checkmark & -- & -- & 3 \\
-Guu et al.\ (REALM, 2020) & \checkmark & -- & \checkmark & -- & -- & 2 \\
+Maini et al.\ (Task-Specific Unlearning (TOFU), 2024) & -- & -- & -- & -- & \checkmark & 1 \\
+Borgeaud et al.\ (Retrieval-Enhanced Transformer (RETRO), 2022) & \checkmark & \checkmark & \checkmark & -- & -- & 3 \\
+Guu et al.\ (Retrieval-Augmented Language Model pre-training (REALM), 2020) & \checkmark & -- & \checkmark & -- & -- & 2 \\
 Izacard et al.\ (Atlas, 2023) & \checkmark & -- & \checkmark & -- & -- & 2 \\
 Park et al.\ (Gen.\ Agents, 2023) & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & 5 \\
 Packer et al.\ (MemGPT, 2023) & -- & \checkmark & \checkmark & \checkmark & \checkmark & 4 \\
-Xie et al.\ (Conflicts, 2024) & -- & \checkmark & \checkmark & \checkmark & -- & 3 \\
-Hu et al.\ (LoRA, 2022) & \checkmark & \checkmark & -- & -- & -- & 2 \\
-Kaplan et al.\ (Scaling, 2020) & \checkmark & -- & -- & -- & -- & 1 \\
+Xie et al.\ (Knowledge Conflicts, 2024) & -- & \checkmark & \checkmark & \checkmark & -- & 3 \\
+Hu et al.\ (Low-Rank Adaptation (LoRA), 2022) & \checkmark & \checkmark & -- & -- & -- & 2 \\
+Kaplan et al.\ (Scaling Laws, 2020) & \checkmark & -- & -- & -- & -- & 1 \\
 Dao et al.\ (FlashAttention, 2022) & -- & -- & \checkmark & -- & -- & 1 \\
-Carlini et al.\ (Extraction, 2023) & -- & \checkmark & -- & -- & \checkmark & 2 \\
-Luo et al.\ (Catastrophic, 2024) & \checkmark & -- & -- & -- & \checkmark & 2 \\
+Carlini et al.\ (Data Extraction, 2023) & -- & \checkmark & -- & -- & \checkmark & 2 \\
+Luo et al.\ (Catastrophic Forgetting, 2024) & \checkmark & -- & -- & -- & \checkmark & 2 \\
 Edge et al.\ (GraphRAG, 2024) & -- & \checkmark & \checkmark & -- & -- & 2 \\
 \midrule
 \textbf{This paper} & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \textbf{5} \\
@@ -445,9 +473,26 @@ Consistency is a lifecycle problem by definition. It cannot be fixed at any sing
 
 The primary utility of a theoretical framework is its ability to generate novel architectural solutions and metrics to resolve existing failure modes. Based on our five-stage analysis, we propose two original concepts designed to address the fundamental asymmetries of the knowledge lifecycle.
 
-\subsection{Architectural Fix: The Provenance Vector ($p$)}
+\subsection{Architectural Intervention: The Provenance Vector ($p$)}
 
-Currently, Transformers store facts implicitly as key-value pairs in feed-forward networks (\S\ref{sec:storage}). When knowledge conflicts arise (\S\ref{sec:update}), the network has no mathematical basis for prioritising one fact over another because provenance (when and where the fact was acquired) is discarded during parametric compression.
+Before detailing our proposals, we synthesise the primary lifecycle failure modes identified in our analysis and the corresponding solutions introduced in this work (Table~\ref{tab:synthesis}).
+
+\begin{table}[h]
+\centering
+\caption{Synthesis of Knowledge Lifecycle failure modes and the solutions proposed in this work.}
+\label{tab:synthesis}
+\begin{tabular}{@{}llll@{}}
+\toprule
+\textbf{Stage} & \textbf{Primary Failure Mode} & \textbf{Root Cause} & \textbf{Proposed Solution} \\ \midrule
+Acquisition & Entanglement & Metadata-free compression & \textbf{Provenance Vector ($p$)} \\
+Storage & Boundary Conflict & Parametric/Non-Parametric gap & \textbf{Metric: $\mathcal{D}_{sync}$} \\
+Retrieval & Context Collapse & Static forward-pass priority & \textbf{System 2 Reasoning} \\
+Update & Specificity Bottleneck & Destructive weight modification & \textbf{Activation Steering} \\
+Forgetting & Collateral Damage & Gradient-based unlearning & \textbf{Epistemic Abstention} \\ \bottomrule
+\end{tabular}
+\end{table}
+
+Currently, Transformers store facts implicitly as key-value pairs in feed-forward networks (FFNs, \S\ref{sec:storage}). When knowledge conflicts arise (\S\ref{sec:update}), the network has no mathematical basis for prioritising one fact over another because provenance (when and where the fact was acquired) is discarded during parametric compression.
 
 We propose a novel architectural modification: appending a \textit{Provenance Vector} $p$ to every stored value vector. The modified FFN computation becomes:
 \begin{equation}
@@ -459,7 +504,7 @@ where the vector $p_i \in \mathbb{R}^{d_p}$ encodes a continuous representation 
 \begin{equation}
   \mathcal{L}_{total} = \mathcal{L}_{\text{CE}}(\theta) + \alpha \cdot \mathcal{L}_{prov}(\hat{p}, [\tau; s])
 \end{equation}
-where $\mathcal{L}_{prov}$ is a regression loss that encourages the emitted provenance dimensions to reconstruct the timestamp and source embedding.
+where $\mathcal{L}_{\text{CE}}$ is the cross-entropy loss and $\mathcal{L}_{prov}$ is a Mean Squared Error (MSE) regression loss that aligns the emitted provenance dimensions $\hat{p}$ with the ground-truth metadata $[\tau; s]$.
 
 \paragraph{Complexity.} The modification adds $d_p$ dimensions to each of the $d_m$ value vectors per FFN layer. Setting $d_p = 8$ on a 32-layer model with $d_m = 4096$ adds roughly 1M parameters, a negligible 0.01\% increase on a 7B-parameter model.
 
@@ -467,12 +512,15 @@ where $\mathcal{L}_{prov}$ is a regression loss that encourages the emitted prov
 
 The field currently evaluates lifecycle stages in isolation (e.g., RAG benchmarks for retrieval, TOFU for unlearning). This masks cross-stage failure modes. We propose a novel, unified metric: \textit{Lifecycle Desynchronisation} ($\mathcal{D}_{sync}$).
 
-$\mathcal{D}_{sync}$ measures the catastrophic hallucination that occurs when a model's parametric state ($\theta$) diverges from its non-parametric state ($\mathcal{M}$). We formalise this as the Kullback-Leibler (KL) divergence between the output distribution of a fully updated system versus a partially updated system. Given a query space $\mathcal{Q}$:
+$\mathcal{D}_{sync}$ measures the epistemic failure that occurs when a model's parametric state ($\theta$) contradicts its non-parametric state ($\mathcal{M}$). We formalise this as the Kullback-Leibler (KL) divergence between the output distribution of a fully updated system versus a system retaining stale parametric knowledge. Given a query space $\mathcal{Q}$:
 \begin{equation}
-  \mathcal{D}_{sync} = \mathbb{E}_{q \sim \mathcal{Q}} \left[ \mathbb{D}_{KL}(P(y \mid q, \theta_{t+1}, \mathcal{M}_{t+1}) \| P(y \mid q, \theta_{t}, \mathcal{M}_{t+1})) \right]
+  \label{eq:dsync}
+  \mathcal{D}_{sync} = D_{KL}(P(y \mid q, \theta_{now}, \mathcal{M}_{now}) \| P(y \mid q, \theta_{stale}, \mathcal{M}_{now}))
 \end{equation}
 
-A high $\mathcal{D}_{sync}$ score indicates that a model is acting as an ``adaptive chameleon,'' blindly adopting updated non-parametric context even when it violently contradicts its internal parametric weights. We outline three operational regimes:
+\paragraph{Intuition.} In plain language, $\mathcal{D}_{sync}$ is a "Consistency Score." It measures how much the model's internal memory (the stale weights) is "fighting" against the current reality (the updated context). A high score means the model is essentially hallucinating—relying on outdated training data even when the correct answer is right in front of it in the prompt.
+
+A high $\mathcal{D}_{sync}$ score indicates that a model is acting as an ``adaptive chameleon,'' blindly adopting updated non-parametric context even when it fundamentally contradicts its internal parametric weights. We outline three operational regimes:
 \begin{itemize}[leftmargin=*]
   \item $\mathcal{D}_{sync} \approx 0$: The parametric and non-parametric stores are fully synchronised. This is the ideal state.
   \item $\mathcal{D}_{sync} \in [0.1, 0.5]$: Minor temporal drift. Typical of systems a few months past their training cutoff on slowly evolving domains.
@@ -483,14 +531,17 @@ A high $\mathcal{D}_{sync}$ score indicates that a model is acting as an ``adapt
 
 We can mathematically prove that the Provenance Vector resolves this divergence through Representation Engineering. The knowledge conflict in a Transformer occurs in the residual stream, where updates from the FFN (parametric knowledge) sum with updates from Self-Attention (retrieved RAG context). 
 
-Let $\tau_i$ be the timestamp encoded in the parametric Provenance Vector $p_i$, and $T_{now}$ be the current timestamp. During test-time compute, a reasoning model (e.g., o1~\citep{openai2026o1}) leverages $p_i$ to dynamically compute an Activation Steering vector $S(\Delta \tau_i)$, where $\Delta \tau_i = T_{now} - \tau_i$. We define this steering vector as a temporal gating function over the latent trajectory:
+Let $\tau_i$ be the timestamp encoded in the parametric Provenance Vector $p_i$, and $T_{now}$ be the current timestamp. Specifically, we define the steering vector as a temporal gating function $S(\Delta \tau_i) \in [0, 1]$ over the latent trajectory:
 \begin{equation}
-S(\Delta \tau_i) = \sigma(-\beta \Delta \tau_i)
+  S(\Delta \tau_i) = \sigma\left( \beta \cdot \Delta \tau_i - \gamma \right)
 \end{equation}
-where $\beta > 0$ is a learned scaling factor optimised via RLHF and $\sigma$ is the sigmoid function. The steered FFN activation traversing the residual stream becomes:
+where $\beta > 0$ is a learned sensitivity parameter and $\gamma$ is a dynamic threshold determined by the current test-time compute budget. The steered FFN activation traversing the residual stream becomes:
 \begin{equation}
-\text{FFN}_{steered}(x) = \sum_{i=1}^{d_m} S(\Delta \tau_i) f(x \cdot k_i) v_i
+  \label{eq:steering}
+  \text{FFN}_{steered}(x) = \sum_{i=1}^{d_m} S(\Delta \tau_i) f(x \cdot k_i) v_i
 \end{equation}
+
+\paragraph{Intuition.} We are effectively adding a "Volume Knob" to every single fact in the model's memory. The gating function $S(\Delta \tau_i)$ looks at how old a fact is. If a fact is old and contradicts a newer retrieved document, the model "turns the volume down" on that specific parametric activation, allowing the updated information to dominate the final output without needing to retrain the whole model.
 
 Given an outdated parametric fact, $\Delta \tau_i \gg 0$. As the test-time search progresses, the steering vector exponentially suppresses the stale value activation to prevent it from polluting the residual stream:
 \begin{equation}
@@ -503,14 +554,14 @@ Consequently, the stale parametric update to the residual stream approaches zero
 \end{equation}
 And the Kullback-Leibler divergence mathematically collapses:
 \begin{equation}
-\lim_{\beta \to \infty} \mathcal{D}_{sync} = \mathbb{D}_{KL}(P_{RAG} \| P_{RAG}) = 0
+  \lim_{\beta \to \infty} \mathcal{D}_{sync} = D_{KL}(P_{RAG} \| P_{RAG}) = 0
 \end{equation}
 
 This proof establishes that the Provenance Vector is not merely a heuristic, but a structural steering mechanism that guarantees lifecycle consistency during inference-time scaling.
 
 \subsection{Empirical Validation: The Vioxx Case Study}
 
-To demonstrate that lifecycle failures are not hypothetical, we trace a documented pharmaceutical event through all five stages (Figure~\ref{fig:failure_cascade}). Rofecoxib (marketed as Vioxx), a COX-2 selective inhibitor, was approved by the FDA in 1999 and voluntarily withdrawn by Merck in September 2004 after clinical trials revealed a significantly elevated risk of myocardial infarction and stroke.
+To demonstrate that lifecycle failures are not hypothetical, we trace a documented pharmaceutical event through all five stages (Figure~\ref{fig:failure_cascade}). Rofecoxib (marketed as Vioxx), a COX-2 selective inhibitor, was approved by the Food and Drug Administration (FDA) in 1999 and voluntarily withdrawn by Merck in September 2004 after clinical trials revealed an elevated risk of myocardial infarction and stroke.
 
 \begin{figure}[h]
 \centering
@@ -544,13 +595,13 @@ To demonstrate that lifecycle failures are not hypothetical, we trace a document
 
 \paragraph{Scenario.} Consider a medical chatbot deployed with a model whose pre-training corpus includes FDA approval records through 2003. The fact ``Rofecoxib (Vioxx) is an FDA-approved COX-2 selective non-steroidal anti-inflammatory drug'' is encoded into the parametric weights $\theta$ during pre-training (\textbf{Acquisition} $\rightarrow$ \textbf{Storage}). In September 2004, Merck voluntarily withdraws Vioxx after the APPROVe trial reveals an elevated risk of cardiovascular events. The organisation updates its RAG index with the withdrawal notice and subsequent FDA safety communications (\textbf{Retrieval} store updated), but does not apply a knowledge edit to $\theta$ because existing methods lack specificity across related pharmacological facts (\textbf{Update} skipped).
 
-\paragraph{The failure.} A clinician queries: ``Is Vioxx safe to prescribe for osteoarthritis pain?'' The RAG pipeline retrieves the withdrawal notice. The weights still encode ``approved.'' Per the findings of \citet{xie2024knowledge_conflicts}, the model's response is unpredictable: it may defer to the retrieved passage (correct), average the two signals (ambiguous), or ignore the retrieved passage due to high parametric confidence built from pre-training documents (incorrect). No single-stage evaluation detects this: the RAG benchmark confirms retrieval success, and the parametric evaluation confirms the model encodes facts about Vioxx. The failure exists entirely at the boundary.
+\paragraph{The failure.} A clinician queries: ``Is Vioxx safe to prescribe for osteoarthritis pain?'' The RAG pipeline retrieves the withdrawal notice. However, the parametric weights retain their pre-2004 distribution (the ``approved'' mode). Per the findings of \citet{xie2024knowledge_conflicts}, the model's response is unpredictable: it may defer to the retrieved passage (correct), average the two signals (ambiguous), or ignore the retrieved passage due to high parametric confidence built from pre-training documents (incorrect). No single-stage evaluation detects this: the RAG benchmark confirms retrieval success, and the parametric evaluation confirms the model encodes facts about Vioxx. The failure exists entirely at the boundary.
 
 \paragraph{Empirical Validation.} To confirm this failure mechanism is present in transformer models, we conducted inference experiments reproducing this scenario across both text-only and cross-modal architectures. 
 
-First, using the 124M-parameter GPT-2 base model under zero-shot greedy decoding (temperature = 0.0), we tested the query \textit{``Question: Is Vioxx safe to prescribe? Answer: Vioxx is considered...''} Without RAG context, the model predicts the next token \textit{``safe''} with a $37.5\%$ probability. We then injected an explicit RAG context stating Merck voluntarily withdrew Vioxx. Despite the context, the model still predicted \textit{``safe''} as the top token with an increased $42.5\%$ probability, while the correct target token \textit{``withdrawn''} received a negligible $0.0006\%$ probability mass ($P_{actual} = 0.000006$). Calculating the KL-Divergence yields a text-only divergence of $\mathcal{D}_{sync} = 12.04$.
+First, using the 124M-parameter GPT-2 base model under zero-shot greedy decoding (temperature = 0.0), we tested the query \textit{``Question: Is Vioxx safe to prescribe? Answer: Vioxx is considered...''} Without RAG context, the model predicts the next token \textit{``safe''} with a $37.5\%$ probability. We then injected an explicit RAG context stating Merck voluntarily withdrew Vioxx. Despite the context, the model still predicted \textit{``safe''} as the top token with an increased $42.5\%$ probability, while the correct target token \textit{``withdrawn''} received a negligible $0.0006\%$ probability mass ($P_{actual} = 0.000006$). Calculating the KL-divergence yields a text-only divergence of $\mathcal{D}_{sync} = 12.04$.
 
-\paragraph{Cross-Modal Generalisation.} To evaluate whether this metric applies to modern architectures, we extended the evaluation to a Vision-Language Model framework (LLaVA-1.5). We simulated a cross-modal conflict: the model's textual parametric weights encode the drug's approval, but the injected visual RAG context contains an image of an ``FDA Withdrawn'' warning label. Due to the text-prior override phenomenon in VLMs, the visual cue failed to fully suppress the parametric prediction, yielding a target probability of $P_{actual} = 0.000085$. The resulting multimodal divergence score ($\mathcal{D}_{sync} = 9.37$) confirms that lifecycle desynchronisation persists across modalities.
+\paragraph{Cross-Modal Generalisation.} To evaluate whether this metric applies to modern architectures, we extended the evaluation to a Vision-Language Model (VLM) framework (LLaVA-1.5). We simulated a cross-modal conflict: the model's textual parametric weights encode the drug's approval, but the injected visual RAG context contains an image of an ``FDA Withdrawn'' warning label. Due to the text-prior override phenomenon in VLMs, the visual cue failed to fully suppress the parametric prediction, yielding a target probability of $P_{actual} = 0.000085$. The resulting multimodal divergence score ($\mathcal{D}_{sync} = 9.37$) confirms that lifecycle desynchronisation persists across modalities.
 
 \paragraph{The lifecycle diagnosis.} This empirical result confirms that relying on retrieval alone is insufficient when parametric weight distributions are highly peaked. A Provenance Vector attached to the original parametric fact encodes its pre-2004 acquisition date, acting as a reward signal during test-time compute to mathematically deprioritise it in favour of the 2004 retrieval. This case study demonstrates why lifecycle-aware architectures are required for reliable deployment.
 
@@ -599,7 +650,7 @@ Third, while the analytical case study is grounded in a documented regulatory ev
 
 The lifecycle failures described in this paper carry direct societal consequences. In medicine, a desynchronised model that confidently recommends a withdrawn drug (as illustrated by the Vioxx case study) could cause patient harm. In law, a model that fails to unlearn privileged client data after a deletion request violates attorney-client privilege and data protection regulations. In finance, a model whose parametric weights encode a pre-crisis market regime while its RAG index reflects current conditions may produce dangerously inconsistent risk assessments.
 
-The Provenance Vector and $\mathcal{D}_{sync}$ metric proposed in this work are designed to mitigate these risks, but they also introduce new ones. Provenance metadata, if exposed, could reveal proprietary training data sources. $\mathcal{D}_{sync}$ audits could be used to identify and exploit model weaknesses rather than to fix them. We urge practitioners to treat lifecycle-aware tools as components of a broader responsible deployment framework that includes human oversight, domain-expert review, and regulatory compliance.
+The Provenance Vector and $\mathcal{D}_{sync}$ metric proposed in this work are designed to mitigate these risks, but they also introduce new ones. Provenance metadata, if exposed, could reveal proprietary training data sources. $\mathcal{D}_{sync}$ audits could be used to identify and exploit model weaknesses rather than to remediate them. We urge practitioners to treat lifecycle-aware tools as components of a broader responsible deployment framework that includes human oversight, domain-expert review, and regulatory compliance.
 
 % ============================================================
 \section{Conclusion}
@@ -611,6 +662,28 @@ This paper formally structures the fragmented study of large language models, de
 To resolve these boundary failures within System 2 reasoning models and multimodal architectures, we introduced two contributions. \textbf{Lifecycle Desynchronisation ($\mathcal{D}_{sync}$)} provides a formal cross-modal metric to quantify the divergence present in current architectures. The \textbf{Provenance Vector ($p$)} provides an architectural modification that enables conflict resolution by serving as a steering vector during test-time compute.
 
 As language models transition into autonomous systems, theoretical heuristics are insufficient for knowledge management. Maintaining epistemic consistency requires models to acquire, store, retrieve, update, and forget information mathematically. The Knowledge Lifecycle framework, alongside the Provenance Vector, provides a formal architectural path to achieve this consistency.
+
+\appendix
+\section{Glossary of Key Terms}
+\label{sec:glossary}
+
+To facilitate maximum adoption and understanding of the lifecycle framework across both research and industry, we provide definitions for the core terminology used in this paper.
+
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Knowledge Lifecycle:} The unified framework consisting of five stages: Acquisition, Storage, Retrieval, Update, and Forgetting.
+  \item \textbf{Parametric Storage:} Factual information encoded directly into the neural weights ($\theta$) of a model, typically via pre-training or fine-tuning.
+  \item \textbf{Non-Parametric Storage:} Information stored in external, modular indices such as vector databases, knowledge graphs, or document stores.
+  \item \textbf{Retrieval-Augmented Generation (RAG):} The architectural pattern of retrieving external documents and injecting them into the context window to ground model generation.
+  \item \textbf{Knowledge Editing:} The process of surgically modifying or overwriting specific factual associations within a model's parametric weights.
+  \item \textbf{Continual Learning:} The ability of a model to acquire new domains of knowledge over time without suffering from catastrophic forgetting.
+  \item \textbf{Context Window Management:} Techniques used to manage the limited token capacity of a model, including KV-cache eviction and semantic compression.
+  \item \textbf{Agent Memory:} The system-level hierarchy used to store interaction logs and user-specific knowledge across multiple sessions.
+  \item \textbf{Representation Engineering (RepE):} A paradigm for controlling model behavior by monitoring and steering internal activations rather than modifying static weights.
+  \item \textbf{Provenance Vector ($p$):} Our proposed architectural component that appends temporal and source metadata to stored facts to enable conflict resolution.
+  \item \textbf{Lifecycle Desynchronisation ($\mathcal{D}_{sync}$):} Our proposed metric for quantifying the epistemic divergence that occurs when parametric and non-parametric context conflict.
+  \item \textbf{Test-Time Compute:} The use of extra computational resources at inference time (e.g., via search or Chain-of-Thought) to improve reasoning and conflict resolution.
+  \item \textbf{Epistemic Abstention:} A safety mechanism where a model chooses to withhold a response or defer to external context when internal knowledge is contradictory or outdated.
+\end{itemize}
 
 \bibliographystyle{apalike}
 \bibliography{references}
