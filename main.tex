@@ -704,9 +704,9 @@ A high $\mathcal{D}_{sync}$ score indicates that a model is acting as an ``adapt
 
 We propose $\mathcal{D}_{sync}$ as a standard benchmark to complement static evaluations like MMLU for any LLM deployed in a continuous-learning or retrieval-augmented environment. A practical implementation would sample a set of time-sensitive queries $\mathcal{Q}$ (e.g., questions about recent political appointments, drug approvals, or API changes), run inference with and without RAG enabled, and compute the KL-divergence between the two output distributions.
 
-\subsection{Analytical Case Study: A Medical Knowledge Failure}
+\subsection{Analytical Case Study: The Rofecoxib (Vioxx) Withdrawal}
 
-To demonstrate that lifecycle failures are not hypothetical, we trace a concrete scenario through all five stages (Figure~\ref{fig:failure_cascade}).
+To demonstrate that lifecycle failures are not hypothetical, we trace a documented pharmaceutical event through all five stages (Figure~\ref{fig:failure_cascade}). Rofecoxib (marketed as Vioxx), a COX-2 selective inhibitor, was approved by the FDA in 1999 and voluntarily withdrawn by Merck in September 2004 after clinical trials revealed a significantly elevated risk of myocardial infarction and stroke.
 
 \begin{figure}[t]
 \centering
@@ -717,10 +717,10 @@ To demonstrate that lifecycle failures are not hypothetical, we trace a concrete
   farr/.style={-{Stealth[length=2mm]}, line width=0.9pt, color=red!60}
 ]
 
-\node[stage, fill=blue!8] (acq) at (0, 0) {1. Acquire: Drug X approved\\(pre-training, Jan 2023)};
-\node[stage, fill=teal!8] (sto) at (0, -1.2) {2. Store: ``Drug X is safe''\\encoded in weights $\theta$};
-\node[stage, fill=orange!8] (ret) at (0, -2.4) {3. Retrieve: RAG returns\\FDA withdrawal (Mar 2024)};
-\node[fail] (upd) at (0, -3.6) {4. Update: Weights NOT edited\\$\theta$ still encodes ``safe''};
+\node[stage, fill=blue!8] (acq) at (0, 0) {1. Acquire: Vioxx approved\\(pre-training, pre-2004 data)};
+\node[stage, fill=teal!8] (sto) at (0, -1.2) {2. Store: ``Vioxx is an approved\\COX-2 inhibitor'' in weights $\theta$};
+\node[stage, fill=orange!8] (ret) at (0, -2.4) {3. Retrieve: RAG returns\\FDA withdrawal notice (2004)};
+\node[fail] (upd) at (0, -3.6) {4. Update: Weights NOT edited\\$\theta$ still encodes ``approved''};
 \node[fail] (conf) at (0, -4.8) {5. CONFLICT: $\theta$ says ``approved''\\$\mathcal{M}$ says ``withdrawn''};
 \node[fail] (fgt) at (0, -6.0) {6. Forget: Cannot unlearn\\``approved'' without retraining};
 
@@ -734,15 +734,15 @@ To demonstrate that lifecycle failures are not hypothetical, we trace a concrete
 \node[font=\sffamily\tiny, text=red!60, align=right] at (-2.8, -4.2) {Failure\\cascade};
 
 \end{tikzpicture}
-\caption{A lifecycle failure cascade in a medical chatbot. The parametric weights encode an outdated drug approval (Stages 1--2). The RAG index is updated with a withdrawal notice (Stage 3), but no weight edit is applied (Stage 4). The resulting conflict produces a dangerous output (Stage 5), and cannot be resolved without costly retraining (Stage 6). No single-stage benchmark detects this failure.}
+\caption{A lifecycle failure cascade applied to the Rofecoxib (Vioxx) withdrawal. The parametric weights encode an outdated drug approval from pre-training data (Stages 1--2). The RAG index is updated with the FDA withdrawal notice (Stage 3), but no weight edit is applied (Stage 4). The resulting conflict produces a dangerous output (Stage 5), and cannot be resolved without costly retraining (Stage 6). No single-stage benchmark detects this failure.}
 \label{fig:failure_cascade}
 \end{figure}
 
-\paragraph{Scenario.} A medical chatbot is deployed in January 2023 using a model pre-trained on FDA data through December 2022. The fact ``Drug X has been approved for clinical use'' is encoded into the parametric weights $\theta$ during pre-training (\textbf{Acquisition} $\rightarrow$ \textbf{Storage}). In March 2024, the FDA issues a safety withdrawal for Drug X. The organisation updates its RAG index with the withdrawal notice (\textbf{Retrieval} store updated), but does not apply a knowledge edit to $\theta$ because ROME-class methods cannot guarantee specificity across related pharmacological facts (\textbf{Update} skipped).
+\paragraph{Scenario.} Consider a medical chatbot deployed with a model whose pre-training corpus includes FDA approval records through 2003. The fact ``Rofecoxib (Vioxx) is an FDA-approved COX-2 selective non-steroidal anti-inflammatory drug'' is encoded into the parametric weights $\theta$ during pre-training (\textbf{Acquisition} $\rightarrow$ \textbf{Storage}). In September 2004, Merck voluntarily withdraws Vioxx after the APPROVe trial reveals a doubled risk of serious cardiovascular events. The organisation updates its RAG index with the withdrawal notice and subsequent FDA safety communications (\textbf{Retrieval} store updated), but does not apply a knowledge edit to $\theta$ because ROME-class methods cannot guarantee specificity across related pharmacological facts (drug interactions, dosage protocols, alternative prescriptions) that also reference Vioxx (\textbf{Update} skipped).
 
-\paragraph{The failure.} A clinician queries: ``Is Drug X safe to prescribe?'' The RAG pipeline retrieves the withdrawal notice. The weights still encode ``approved.'' Per the findings of \citet{xie2024knowledge_conflicts}, the model's response is unpredictable: it may defer to the retrieved passage (correct), average the two signals (dangerously ambiguous), or ignore the retrieved passage entirely due to high parametric confidence (incorrect and harmful). No single-stage evaluation detects this: the RAG benchmark confirms retrieval success, and the parametric evaluation confirms the model ``knows'' about Drug X. The failure exists only at the boundary.
+\paragraph{The failure.} A clinician queries: ``Is Vioxx safe to prescribe for osteoarthritis pain?'' The RAG pipeline retrieves the withdrawal notice. The weights still encode ``approved.'' Per the findings of \citet{xie2024knowledge_conflicts}, the model's response is unpredictable: it may defer to the retrieved passage (correct), average the two signals (dangerously ambiguous), or ignore the retrieved passage entirely due to high parametric confidence built from thousands of pre-training documents that reference Vioxx positively (incorrect and harmful). No single-stage evaluation detects this: the RAG benchmark confirms retrieval success, and the parametric evaluation confirms the model ``knows'' about Vioxx. The failure exists only at the boundary.
 
-\paragraph{The lifecycle diagnosis.} Applying the $\mathcal{D}_{sync}$ metric to this scenario would produce a high score, flagging the dangerous desynchronisation between $\theta$ (which encodes ``approved'') and $\mathcal{M}$ (which contains ``withdrawn''). A Provenance Vector attached to the original fact would encode its 2022 acquisition date, allowing the attention mechanism to mathematically deprioritise it in favour of the 2024 retrieval. Neither fix is available in current production systems. This case study illustrates why lifecycle-level evaluation and lifecycle-aware architectures are not academic abstractions but engineering necessities.
+\paragraph{The lifecycle diagnosis.} Applying the $\mathcal{D}_{sync}$ metric to this scenario would produce a high score ($\mathcal{D}_{sync} > 1.0$), flagging the dangerous desynchronisation between $\theta$ (which encodes ``approved'') and $\mathcal{M}$ (which contains ``withdrawn''). A Provenance Vector attached to the original fact would encode its pre-2004 acquisition date, allowing the attention mechanism to mathematically deprioritise it in favour of the 2004 retrieval. Neither fix is available in current production systems. This case study, grounded in a documented regulatory event, illustrates why lifecycle-level evaluation and lifecycle-aware architectures are not academic abstractions but engineering necessities.
 
 % ============================================================
 \section{Open Problems and Future Directions}
@@ -782,7 +782,16 @@ Second, our systematic coverage analysis (Table~\ref{tab:coverage}) samples 20 r
 
 Third, the lifecycle framework is designed for text-based Transformer models. Multimodal systems, non-Transformer architectures (e.g., state-space models like Mamba), and specialised retrieval systems (e.g., table-augmented generation) may require structural modifications to the five-stage model. We discuss these extensions in \S\ref{sec:open_problems} but do not formalise them.
 
-Fourth, the analytical case study uses a hypothetical scenario rather than a documented real-world incident. While the scenario is constructed from empirically validated components (ROME editing limitations, knowledge conflict unpredictability), a retrospective analysis of an actual deployed system failure would provide stronger evidence.
+Fourth, while the analytical case study is grounded in a documented regulatory event (the Vioxx withdrawal), we apply it to a hypothetical LLM deployment rather than a retrospective analysis of an actual system failure. A post-hoc audit of a real deployed medical chatbot would provide stronger evidence of lifecycle desynchronisation in practice.
+
+% ============================================================
+\section{Ethics and Broader Impact}
+\label{sec:ethics}
+% ============================================================
+
+The lifecycle failures described in this paper carry direct societal consequences. In medicine, a desynchronised model that confidently recommends a withdrawn drug (as illustrated by the Vioxx case study) could cause patient harm. In law, a model that fails to unlearn privileged client data after a deletion request violates attorney-client privilege and data protection regulations. In finance, a model whose parametric weights encode a pre-crisis market regime while its RAG index reflects current conditions may produce dangerously inconsistent risk assessments.
+
+The Provenance Vector and $\mathcal{D}_{sync}$ metric proposed in this work are designed to mitigate these risks, but they also introduce new ones. Provenance metadata, if exposed, could reveal proprietary training data sources. $\mathcal{D}_{sync}$ audits could be used to identify and exploit model weaknesses rather than to fix them. We urge practitioners to treat lifecycle-aware tools as components of a broader responsible deployment framework that includes human oversight, domain-expert review, and regulatory compliance.
 
 % ============================================================
 \section{Conclusion}
