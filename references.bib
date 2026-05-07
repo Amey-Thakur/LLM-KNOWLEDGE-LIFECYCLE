@@ -1,0 +1,585 @@
+% ==========================================
+% MASTER REFERENCE LIST
+% The Knowledge Lifecycle of Large Language Models
+% ==========================================
+
+
+% ==========================================
+% 1. FOUNDATION: Transformers & Language Models
+% ==========================================
+
+@inproceedings{vaswani2017attention,
+  author    = {Vaswani, Ashish and Shazeer, Noam and Parmar, Niki and Uszkoreit, Jakob and Jones, Llion and Gomez, Aidan N and Kaiser, {\L}ukasz and Polosukhin, Illia},
+  title     = {Attention is All You Need},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {30},
+  year      = {2017}
+}
+
+@inproceedings{devlin2019bert,
+  author    = {Devlin, Jacob and Chang, Ming-Wei and Lee, Kenton and Toutanova, Kristina},
+  title     = {{BERT}: Pre-training of Deep Bidirectional Transformers for Language Understanding},
+  booktitle = {Proceedings of NAACL-HLT},
+  pages     = {4171--4186},
+  year      = {2019}
+}
+
+@inproceedings{brown2020language,
+  author    = {Brown, Tom and Mann, Benjamin and Ryder, Nick and Subbiah, Melanie and Kaplan, Jared D and Dhariwal, Prafulla and Neelakantan, Arvind and others},
+  title     = {Language Models are Few-Shot Learners},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {33},
+  pages     = {1877--1901},
+  year      = {2020}
+}
+
+@article{touvron2023llama,
+  author    = {Touvron, Hugo and Lavril, Thibaut and Izacard, Gautier and Martinet, Xavier and Lachaux, Marie-Anne and Lacroix, Timoth{\'e}e and others},
+  title     = {{LLaMA}: Open and Efficient Foundation Language Models},
+  journal   = {arXiv preprint arXiv:2302.13971},
+  year      = {2023}
+}
+
+@article{achiam2023gpt4,
+  author    = {Achiam, Josh and Adler, Steven and Agarwal, Sandhini and Ahmad, Lama and Akkaya, Ilge and others},
+  title     = {{GPT-4} Technical Report},
+  journal   = {arXiv preprint arXiv:2303.08774},
+  year      = {2023}
+}
+
+@article{team2023gemini,
+  author    = {{Gemini Team, Google}},
+  title     = {Gemini: A Family of Highly Capable Multimodal Models},
+  journal   = {arXiv preprint arXiv:2312.11805},
+  year      = {2023}
+}
+
+
+% ==========================================
+% 2. ACQUISITION: Pre-training & Data
+% ==========================================
+
+@article{raffel2020t5,
+  author    = {Raffel, Colin and Shazeer, Noam and Roberts, Adam and Lee, Katherine and Narang, Sharan and Matena, Michael and Zhou, Yanqi and Li, Wei and Liu, Peter J},
+  title     = {Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer},
+  journal   = {Journal of Machine Learning Research},
+  volume    = {21},
+  number    = {140},
+  pages     = {1--67},
+  year      = {2020}
+}
+
+@article{hoffmann2022chinchilla,
+  author    = {Hoffmann, Jordan and Borgeaud, Sebastian and Mensch, Arthur and Buchatskaya, Elena and Cai, Trevor and Rutherford, Eliza and others},
+  title     = {Training Compute-Optimal Large Language Models},
+  journal   = {arXiv preprint arXiv:2203.15556},
+  year      = {2022}
+}
+
+@article{penedo2023refinedweb,
+  author    = {Penedo, Guilherme and Malartic, Quentin and Hesslow, Daniel and Cojocaru, Ruxandra and Cappelli, Alessandro and Alobeidli, Hamza and others},
+  title     = {The {RefinedWeb} Dataset for {Falcon LLM}: Outperforming Curated Corpora with Web Data, and Web Data Only},
+  journal   = {arXiv preprint arXiv:2306.01116},
+  year      = {2023}
+}
+
+@inproceedings{ouyang2022instructgpt,
+  author    = {Ouyang, Long and Wu, Jeffrey and Jiang, Xu and Almeida, Diogo and Wainwright, Carroll and Mishkin, Pamela and others},
+  title     = {Training Language Models to Follow Instructions with Human Feedback},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {35},
+  year      = {2022}
+}
+
+@article{wei2022finetuned,
+  author    = {Wei, Jason and Bosma, Maarten and Zhao, Vincent Y and Guu, Kelvin and Yu, Adams Wei and Lester, Brian and Du, Nan and Dai, Andrew M and Le, Quoc V},
+  title     = {Finetuned Language Models Are Zero-Shot Learners},
+  journal   = {arXiv preprint arXiv:2109.01652},
+  year      = {2022}
+}
+
+@article{hu2022lora,
+  author    = {Hu, Edward J and Shen, Yelong and Wallis, Phillip and Allen-Zhu, Zeyuan and Li, Yuanzhi and Wang, Shean and Wang, Lu and Chen, Weizhu},
+  title     = {{LoRA}: Low-Rank Adaptation of Large Language Models},
+  journal   = {arXiv preprint arXiv:2106.09685},
+  year      = {2022}
+}
+
+
+% ==========================================
+% 3. ACQUISITION: In-Context Learning
+% ==========================================
+
+@inproceedings{dong2023icl_survey,
+  author    = {Dong, Qingxiu and Li, Lei and Dai, Damai and Zheng, Ce and Wu, Zhiyong and Chang, Baobao and Sun, Xu and Xu, Jingjing and Sui, Zhifang},
+  title     = {A Survey on In-Context Learning},
+  booktitle = {Proceedings of ACL},
+  year      = {2024}
+}
+
+@inproceedings{min2022rethinking,
+  author    = {Min, Sewon and Lyu, Xinxi and Holtzman, Ari and Arber, Mihael and Lewis, Mike and Hajishirzi, Hannaneh and Zettlemoyer, Luke},
+  title     = {Rethinking the Role of Demonstrations: What Makes In-Context Learning Work?},
+  booktitle = {Proceedings of EMNLP},
+  year      = {2022}
+}
+
+
+% ==========================================
+% 4. STORAGE: Parametric Knowledge
+% ==========================================
+
+@inproceedings{petroni2019lama,
+  author    = {Petroni, Fabio and Rockt{\"a}schel, Tim and Riedel, Sebastian and Lewis, Patrick and Bakhtin, Anton and Wu, Yuxiang and Miller, Alexander},
+  title     = {Language Models as Knowledge Bases?},
+  booktitle = {Proceedings of EMNLP},
+  pages     = {2463--2473},
+  year      = {2019}
+}
+
+@article{geva2021transformer,
+  author    = {Geva, Mor and Schuster, Roei and Berant, Jonathan and Levy, Omer},
+  title     = {Transformer Feed-Forward Layers Are Key-Value Memories},
+  journal   = {arXiv preprint arXiv:2012.14913},
+  year      = {2021}
+}
+
+@inproceedings{meng2022locating,
+  author    = {Meng, Kevin and Bau, David and Andonian, Alex and Belinkov, Yonatan},
+  title     = {Locating and Editing Factual Associations in {GPT}},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {35},
+  year      = {2022}
+}
+
+@article{allen2023physics,
+  author    = {Allen-Zhu, Zeyuan and Li, Yuanzhi},
+  title     = {Physics of Language Models: Part 1, Context-Free Grammar},
+  journal   = {arXiv preprint arXiv:2305.13673},
+  year      = {2023}
+}
+
+
+% ==========================================
+% 5. STORAGE: Non-Parametric & Hybrid
+% ==========================================
+
+@article{khandelwal2020knnlm,
+  author    = {Khandelwal, Urvashi and Levy, Omer and Jurafsky, Dan and Zettlemoyer, Luke and Lewis, Mike},
+  title     = {Generalization through Memorization: Nearest Neighbor Language Models},
+  journal   = {arXiv preprint arXiv:1911.00172},
+  year      = {2020}
+}
+
+@inproceedings{borgeaud2022retro,
+  author    = {Borgeaud, Sebastian and Mensch, Arthur and Hoffmann, Jordan and Cai, Trevor and Rutherford, Eliza and Millican, Katie and others},
+  title     = {Improving Language Models by Retrieving from Trillions of Tokens},
+  booktitle = {International Conference on Machine Learning},
+  pages     = {2206--2240},
+  year      = {2022},
+  organization = {PMLR}
+}
+
+@article{johnson2019faiss,
+  author    = {Johnson, Jeff and Douze, Matthijs and J{\'e}gou, Herv{\'e}},
+  title     = {Billion-Scale Similarity Search with {GPUs}},
+  journal   = {IEEE Transactions on Big Data},
+  volume    = {7},
+  number    = {3},
+  pages     = {535--547},
+  year      = {2021}
+}
+
+
+% ==========================================
+% 6. STORAGE: Agent Memory
+% ==========================================
+
+@inproceedings{park2023generative,
+  author    = {Park, Joon Sung and O'Brien, Joseph C and Cai, Carrie J and Morris, Meredith Ringel and Liang, Percy and Bernstein, Michael S},
+  title     = {Generative Agents: Interactive Simulacra of Human Behavior},
+  booktitle = {Proceedings of the 36th Annual ACM Symposium on User Interface Software and Technology},
+  pages     = {1--22},
+  year      = {2023}
+}
+
+@article{packer2023memgpt,
+  author    = {Packer, Charles and Wooders, Vivian and Lin, Kevin and Fang, Shishir and Shafiullah, Sarah and others},
+  title     = {{MemGPT}: Towards {LLMs} as Operating Systems},
+  journal   = {arXiv preprint arXiv:2310.08560},
+  year      = {2023}
+}
+
+@article{wang2023voyager,
+  author    = {Wang, Guanzhi and Xie, Yuqi and Jiang, Yunfan and Mandlekar, Ajay and Xiao, Chaowei and Zhu, Yuke and Fan, Linxi and Anandkumar, Animashree},
+  title     = {Voyager: An Open-Ended Embodied Agent with Large Language Models},
+  journal   = {arXiv preprint arXiv:2305.16291},
+  year      = {2023}
+}
+
+@article{zhang2024survey_agent_memory,
+  author    = {Zhang, Yuyang and others},
+  title     = {Memory in the Age of {AI} Agents},
+  journal   = {arXiv preprint arXiv:2512.13564},
+  year      = {2025}
+}
+
+
+% ==========================================
+% 7. RETRIEVAL: RAG Foundations
+% ==========================================
+
+@inproceedings{lewis2020rag,
+  author    = {Lewis, Patrick and Perez, Ethan and Piktus, Aleksandra and Petroni, Fabio and Karpukhin, Vladimir and Goyal, Naman and K{\"u}ttler, Heinrich and Lewis, Mike and Yih, Wen-tau and Rockt{\"a}schel, Tim and others},
+  title     = {Retrieval-Augmented Generation for Knowledge-Intensive {NLP} Tasks},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {33},
+  pages     = {9459--9474},
+  year      = {2020}
+}
+
+@inproceedings{guu2020realm,
+  author    = {Guu, Kelvin and Lee, Kenton and Tung, Zora and Pasupat, Panupong and Chang, Mingwei},
+  title     = {{REALM}: Retrieval-Augmented Language Model Pre-Training},
+  booktitle = {International Conference on Machine Learning},
+  pages     = {3929--3938},
+  year      = {2020}
+}
+
+@inproceedings{karpukhin2020dpr,
+  author    = {Karpukhin, Vladimir and Oguz, Barlas and Min, Sewon and Lewis, Patrick and Wu, Ledell and Edunov, Sergey and Chen, Danqi and Yih, Wen-tau},
+  title     = {Dense Passage Retrieval for Open-Domain Question Answering},
+  booktitle = {Proceedings of EMNLP},
+  pages     = {6769--6781},
+  year      = {2020}
+}
+
+@article{izacard2022atlas,
+  author    = {Izacard, Gautier and Lewis, Patrick and Lomeli, Maria and Hosseini, Lucas and Petroni, Fabio and Schick, Timo and others},
+  title     = {Atlas: Few-shot Learning with Retrieval-Augmented Language Models},
+  journal   = {Journal of Machine Learning Research},
+  volume    = {24},
+  number    = {251},
+  pages     = {1--43},
+  year      = {2023}
+}
+
+@article{gao2023rag_survey,
+  author    = {Gao, Yunfan and Xiong, Yun and Gao, Xinyu and Jia, Kangfeng and Pan, Jinliu and Bi, Yutong and Dai, Yi and Sun, Jiawei and Wang, Haofen},
+  title     = {Retrieval-Augmented Generation for Large Language Models: A Survey},
+  journal   = {arXiv preprint arXiv:2312.10997},
+  year      = {2023}
+}
+
+@article{mialon2023augmented,
+  author    = {Mialon, Gr{\'e}goire and Dess{\`i}, Roberto and Lomeli, Maria and Nalmpantis, Christos and Pasunuru, Ram and Raileanu, Roberta and Rozi{\`e}re, Baptiste and Schick, Timo and Dwivedi-Yu, Jane and others},
+  title     = {Augmented Language Models: a Survey},
+  journal   = {arXiv preprint arXiv:2302.07842},
+  year      = {2023}
+}
+
+
+% ==========================================
+% 8. RETRIEVAL: Advanced RAG
+% ==========================================
+
+@article{asai2024selfrag,
+  author    = {Asai, Akari and Wu, Zeqiu and Wang, Yizhong and Sil, Avirup and Hajishirzi, Hannaneh},
+  title     = {Self-{RAG}: Learning to Retrieve, Generate, and Critique through Self-Reflection},
+  journal   = {arXiv preprint arXiv:2310.11511},
+  year      = {2024}
+}
+
+@article{yan2024crag,
+  author    = {Yan, Shi-Qi and Gu, Jia-Chen and Zhu, Yun and Ling, Zhen-Hua},
+  title     = {Corrective Retrieval-Augmented Generation},
+  journal   = {arXiv preprint arXiv:2401.15884},
+  year      = {2024}
+}
+
+@article{edge2024graphrag,
+  author    = {Edge, Darren and Trinh, Ha and Cheng, Newman and Bradley, Joshua and Chao, Alex and Mody, Apurva and Truitt, Steven and Larson, Jonathan},
+  title     = {From Local to Global: A Graph {RAG} Approach to Query-Focused Summarization},
+  journal   = {arXiv preprint arXiv:2404.16130},
+  year      = {2024}
+}
+
+@article{jiang2023active,
+  author    = {Jiang, Zhengbao and Xu, Frank F and Gao, Luyu and Sun, Zhiqing and Liu, Qian and Dwivedi-Yu, Jane and Yang, Yiming and Callan, Jamie and Neubig, Graham},
+  title     = {Active Retrieval Augmented Generation},
+  journal   = {arXiv preprint arXiv:2305.06983},
+  year      = {2023}
+}
+
+
+% ==========================================
+% 9. RETRIEVAL: Long Context
+% ==========================================
+
+@inproceedings{dai2019transformerxl,
+  author    = {Dai, Zihang and Yang, Zhilin and Yang, Yiming and Carbonell, Jaime and Le, Quoc V and Salakhutdinov, Ruslan},
+  title     = {Transformer-{XL}: Attentive Language Models Beyond a Fixed-Length Context},
+  booktitle = {Proceedings of ACL},
+  year      = {2019}
+}
+
+@article{beltagy2020longformer,
+  author    = {Beltagy, Iz and Peters, Matthew E and Cohan, Arman},
+  title     = {Longformer: The Long-Document Transformer},
+  journal   = {arXiv preprint arXiv:2004.05150},
+  year      = {2020}
+}
+
+@inproceedings{kitaev2020reformer,
+  author    = {Kitaev, Nikita and Kaiser, {\L}ukasz and Levskaya, Anselm},
+  title     = {Reformer: The Efficient Transformer},
+  booktitle = {International Conference on Learning Representations},
+  year      = {2020}
+}
+
+@article{peng2023yarn,
+  author    = {Peng, Bowen and Quesnelle, Jeffrey and Fan, Honglu and Shao, Enrico},
+  title     = {{YaRN}: Efficient Context Window Extension of Large Language Models},
+  journal   = {arXiv preprint arXiv:2309.00071},
+  year      = {2023}
+}
+
+@article{xiao2024streamingllm,
+  author    = {Xiao, Guangxuan and Tian, Yuandong and Chen, Beidi and Han, Song and Lewis, Mike},
+  title     = {Efficient Streaming Language Models with Attention Sinks},
+  journal   = {arXiv preprint arXiv:2309.17453},
+  year      = {2024}
+}
+
+
+% ==========================================
+% 10. UPDATE: Knowledge Editing
+% ==========================================
+
+@inproceedings{meng2023memit,
+  author    = {Meng, Kevin and Sharma, Arnab Sen and Andonian, Alex and Belinkov, Yonatan and Bau, David},
+  title     = {Mass-Editing Memory in a Transformer},
+  booktitle = {International Conference on Learning Representations},
+  year      = {2023}
+}
+
+@article{mitchell2022rome,
+  author    = {Mitchell, Eric and Lin, Charles and Bosselut, Antoine and Finn, Chelsea and Manning, Christopher D},
+  title     = {Fast Model Editing at Scale},
+  journal   = {arXiv preprint arXiv:2104.08164},
+  year      = {2022}
+}
+
+@article{mitchell2022serac,
+  author    = {Mitchell, Eric and Lin, Charles and Bosselut, Antoine and Manning, Christopher D and Finn, Chelsea},
+  title     = {Memory-Based Model Editing at Scale},
+  journal   = {arXiv preprint arXiv:2206.06520},
+  year      = {2022}
+}
+
+@article{yao2023editing_survey,
+  author    = {Yao, Yunzhi and Wang, Peng and Tian, Bozhong and Cheng, Siyuan and Li, Zhoubo and Deng, Shumin and Chen, Huajun and Zhang, Ningyu},
+  title     = {Editing Large Language Models: Problems, Methods, and Opportunities},
+  journal   = {arXiv preprint arXiv:2305.13172},
+  year      = {2023}
+}
+
+@article{de2021kaediting,
+  author    = {De Cao, Nicola and Aziz, Wilker and Titov, Ivan},
+  title     = {Editing Factual Knowledge in Language Models},
+  journal   = {arXiv preprint arXiv:2104.08164},
+  year      = {2021}
+}
+
+
+% ==========================================
+% 11. UPDATE: Continual Learning
+% ==========================================
+
+@article{ke2023continual,
+  author    = {Ke, Zixuan and Shao, Yijia and Lin, Haowei and Konishi, Tatsuya and Kim, Gyuhak and Liu, Bing},
+  title     = {Continual Pre-training of Language Models: A Survey},
+  journal   = {arXiv preprint arXiv:2302.03241},
+  year      = {2023}
+}
+
+@article{wu2024continual_survey,
+  author    = {Wu, Tongtong and Luo, Linhao and Li, Yuan-Fang and Pan, Shirui and Vu, Thuy-Trang and Haffari, Gholamreza},
+  title     = {Continual Learning for Large Language Models: A Survey},
+  journal   = {arXiv preprint arXiv:2402.01364},
+  year      = {2024}
+}
+
+@article{kirkpatrick2017ewc,
+  author    = {Kirkpatrick, James and Pascanu, Razvan and Rabinowitz, Neil and Veness, Joel and Desjardins, Guillaume and Rusu, Andrei A and others},
+  title     = {Overcoming Catastrophic Forgetting in Neural Networks},
+  journal   = {Proceedings of the National Academy of Sciences},
+  volume    = {114},
+  number    = {13},
+  pages     = {3521--3526},
+  year      = {2017}
+}
+
+
+% ==========================================
+% 12. UPDATE: Knowledge Conflicts
+% ==========================================
+
+@article{xie2024knowledge_conflicts,
+  author    = {Xie, Jian and Zhang, Kai and Chen, Jiangjie and Lou, Renze and Su, Yu},
+  title     = {Adaptive Chameleon or Stubborn Sloth: Revealing the Behavior of Large Language Models in Knowledge Conflicts},
+  journal   = {arXiv preprint arXiv:2305.13300},
+  year      = {2024}
+}
+
+@article{chen2022rich,
+  author    = {Chen, Jiawei and Lin, Hongyu and Han, Xianpei and Sun, Le},
+  title     = {Benchmarking Large Language Models in Retrieval-Augmented Generation},
+  journal   = {arXiv preprint arXiv:2309.01431},
+  year      = {2023}
+}
+
+@article{longpre2021entity,
+  author    = {Longpre, Shayne and Perisetla, Kartik and Chen, Anthony and Ramesh, Nikhil and DuBois, Chris and Singh, Sameer},
+  title     = {Entity-Based Knowledge Conflicts in Question Answering},
+  journal   = {arXiv preprint arXiv:2109.05052},
+  year      = {2021}
+}
+
+
+% ==========================================
+% 13. FORGETTING: Machine Unlearning
+% ==========================================
+
+@article{jang2023unlearning,
+  author    = {Jang, Joel and Yun, Dongkeun and Ahn, Seonghyeon and Kim, Minjoon and Seo, Minjoon},
+  title     = {Knowledge Unlearning for Mitigating Language Models' Risks},
+  journal   = {arXiv preprint arXiv:2210.01504},
+  year      = {2023}
+}
+
+@article{maini2024tofu,
+  author    = {Maini, Pratyush and Feng, Zhili and Schwarzschild, Avi and Lipton, Zachary C and Kolter, J Zico},
+  title     = {{TOFU}: A Task of Fictitious Unlearning for {LLMs}},
+  journal   = {arXiv preprint arXiv:2401.06121},
+  year      = {2024}
+}
+
+@article{liu2024unlearning_survey,
+  author    = {Liu, Zheyuan and others},
+  title     = {Rethinking Machine Unlearning for Large Language Models},
+  journal   = {arXiv preprint arXiv:2402.08787},
+  year      = {2024}
+}
+
+
+% ==========================================
+% 14. FORGETTING: Catastrophic Forgetting
+% ==========================================
+
+@article{luo2024empirical_catastrophic,
+  author    = {Luo, Yun and Yang, Zhen and Meng, Fandong and Li, Yafu and Zhou, Jie and Zhang, Yue},
+  title     = {An Empirical Study of Catastrophic Forgetting in Large Language Models During Continual Fine-tuning},
+  journal   = {arXiv preprint arXiv:2308.08747},
+  year      = {2024}
+}
+
+@inproceedings{rae2020compressive,
+  author    = {Rae, Jack W and Potapenko, Anna and Jayakumar, Siddhant M and Lillicrap, Timothy P},
+  title     = {Compressive Transformers for Long-Range Sequence Modelling},
+  booktitle = {International Conference on Learning Representations},
+  year      = {2020}
+}
+
+
+% ==========================================
+% 15. NEURAL MEMORY ARCHITECTURES (Historical)
+% ==========================================
+
+@article{graves2014ntm,
+  author    = {Graves, Alex and Wayne, Greg and Danihelka, Ivo},
+  title     = {Neural Turing Machines},
+  journal   = {arXiv preprint arXiv:1410.5401},
+  year      = {2014}
+}
+
+@article{weston2014memory,
+  author    = {Weston, Jason and Chopra, Sumit and Bordes, Antoine},
+  title     = {Memory Networks},
+  journal   = {arXiv preprint arXiv:1410.3916},
+  year      = {2014}
+}
+
+@inproceedings{sukhbaatar2015end,
+  author    = {Sukhbaatar, Sainbayar and Weston, Jason and Fergus, Rob and others},
+  title     = {End-to-End Memory Networks},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {28},
+  year      = {2015}
+}
+
+@article{graves2016dnc,
+  author    = {Graves, Alex and Wayne, Greg and Reynolds, Malcolm and Harley, Tim and Danihelka, Ivo and Grabska-Barwi{\'n}ska, Agnieszka and others},
+  title     = {Hybrid Computing Using a Neural Network with Dynamic External Memory},
+  journal   = {Nature},
+  volume    = {538},
+  number    = {7626},
+  pages     = {471--476},
+  year      = {2016}
+}
+
+
+% ==========================================
+% 16. EVALUATION & BENCHMARKS
+% ==========================================
+
+@article{chen2024benchmarking_rag,
+  author    = {Chen, Jiawei and Lin, Hongyu and Han, Xianpei and Sun, Le},
+  title     = {Benchmarking Large Language Models in Retrieval-Augmented Generation},
+  journal   = {Proceedings of AAAI},
+  year      = {2024}
+}
+
+@article{es2024ragas,
+  author    = {Es, Shahul and James, Jithin and Espinosa-Anke, Luis and Schockaert, Steven},
+  title     = {{RAGAS}: Automated Evaluation of Retrieval Augmented Generation},
+  journal   = {arXiv preprint arXiv:2309.15217},
+  year      = {2024}
+}
+
+@article{liu2024lost,
+  author    = {Liu, Nelson F and Lin, Kevin and Hewitt, John and Paranjape, Ashwin and Bevilacqua, Michele and Petroni, Fabio and Liang, Percy},
+  title     = {Lost in the Middle: How Language Models Use Long Contexts},
+  journal   = {Transactions of the Association for Computational Linguistics},
+  volume    = {12},
+  pages     = {157--173},
+  year      = {2024}
+}
+
+
+% ==========================================
+% 17. CROSS-CUTTING: Surveys & Frameworks
+% ==========================================
+
+@article{wang2024human_to_ai_memory,
+  author    = {Wang, Xiaoliang and others},
+  title     = {From Human Memory to {AI} Memory: A Survey on Memory Mechanisms in the Era of {LLMs}},
+  journal   = {arXiv preprint arXiv:2504.15965},
+  year      = {2025}
+}
+
+@article{zhao2023llm_survey,
+  author    = {Zhao, Wayne Xin and Zhou, Kun and Li, Junyi and Tang, Tianyi and Wang, Xiaolei and Hou, Yupeng and others},
+  title     = {A Survey of Large Language Models},
+  journal   = {arXiv preprint arXiv:2303.18223},
+  year      = {2023}
+}
+
+@article{wang2024llm_agents_survey,
+  author    = {Wang, Lei and Ma, Chen and Feng, Xueyang and Zhang, Zeyu and Yang, Hao and Zhang, Jingsen and others},
+  title     = {A Survey on Large Language Model Based Autonomous Agents},
+  journal   = {Frontiers of Computer Science},
+  volume    = {18},
+  number    = {6},
+  year      = {2024}
+}
