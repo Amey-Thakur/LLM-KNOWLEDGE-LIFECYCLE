@@ -1,5 +1,14 @@
-/* Restrained academic styling. Color carries meaning only: the five stage
-   colors from the paper's lifecycle figure, and three regime colors. */
+/* ============================================================================
+   File        : style.css
+   Project     : The Knowledge Lifecycle of Large Language Models
+   Purpose     : Restrained academic styling. Color carries meaning only: the five
+                 stage colors from the paper's lifecycle figure and three regime colors.
+   Authors     : Amey Thakur (https://github.com/Amey-Thakur)
+                 Sarvesh Talele (https://github.com/sarveshtalele)
+   Repository  : https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE
+   Release Date: August 16, 2026
+   License     : CC BY 4.0
+   ============================================================================ */
 
 :root {
   --ink: #1a1a1a;
@@ -31,7 +40,14 @@ body {
   max-width: 58rem;
   font: 16px/1.55 -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   color: var(--ink);
-  background: var(--bg);
+  background:
+    linear-gradient(180deg,
+      rgba(74,127,212,.07) 0%, rgba(42,157,143,.055) 22%,
+      rgba(224,138,46,.045) 44%, rgba(208,83,83,.038) 66%,
+      rgba(143,95,184,.03) 84%, rgba(255,255,255,0) 100%) no-repeat 0 0 / 100% 340px,
+    repeating-linear-gradient(0deg, transparent 0 23px, rgba(26,26,26,.035) 23px 24px),
+    repeating-linear-gradient(90deg, transparent 0 23px, rgba(26,26,26,.035) 23px 24px),
+    var(--bg);
 }
 
 header { text-align: center; }
@@ -84,7 +100,7 @@ header h1 { margin: 0 0 .35rem; font-size: 1.75rem; letter-spacing: -.01em; }
 }
 #load-btn:disabled { background: var(--faint); cursor: default; }
 #load-status { font-size: .88rem; color: var(--faint); }
-#load-bar-wrap { flex-basis: 100%; height: 5px; background: var(--line); }
+#load-bar-wrap { flex-basis: 100%; height: 5px; background: var(--line); margin-top: 1rem; }
 #load-bar { height: 100%; width: 0%; background: var(--accent); transition: width .2s; }
 
 /* presets */
@@ -189,3 +205,74 @@ footer { margin-top: 3rem; border-top: 1px solid var(--line); padding-top: 1.4re
 footer pre { background: var(--panel); border: 1px solid var(--line); padding: .8rem; overflow-x: auto; font-size: .8rem; text-align: left; }
 summary { cursor: pointer; }
 .foot-links { margin-top: .8rem; }
+
+/* lede and narrative */
+.lede { max-width: 44rem; color: var(--muted); margin: 0 0 1.1rem; }
+.narrative {
+  max-width: 46rem; margin: 0 0 1.6rem; padding: .8rem 1rem;
+  background: #fff; border: 1px solid var(--line); border-left: 3px solid var(--accent);
+  font-size: .95rem;
+}
+.small { font-size: .82rem; }
+
+/* stage bar diagnostic states: participating stages carry a glyph, the
+   others dim, so the diagnosis reads as intent rather than decoration */
+.stagenote { text-align: center; font-size: .8rem; color: var(--faint); margin: .5rem 0 0; }
+.stagebar span { transition: opacity .3s; }
+.stagebar.diagnosed .dimstage { opacity: .4; }
+
+/* paired bars */
+#bars { margin: .4rem 0 1.6rem; background: #fff; border: 1px solid var(--line); padding: .7rem .9rem; }
+.bar-row { display: flex; align-items: center; gap: .7rem; padding: .18rem 0; }
+.bar-tok { flex: 0 0 7rem; text-align: right; font-family: ui-monospace, Consolas, monospace; font-size: .84rem; }
+.bar-pair { flex: 1; display: grid; grid-template-columns: 1fr 5.2rem 1fr 5.2rem; align-items: center; gap: .35rem; }
+.bar { display: block; height: 11px; min-width: 1px; }
+.b-plain { background: #b9b9b9; }
+.b-ctx { background: var(--accent); }
+.bar-pair em { font-style: normal; font-size: .76rem; color: var(--faint); font-variant-numeric: tabular-nums; }
+.bar-row.hit .bar-tok { color: var(--ok); font-weight: 700; }
+.bar-row.hit .bar { outline: 2px solid var(--ok); outline-offset: 1px; }
+.bar-head em { font-size: .74rem; color: var(--faint); }
+.bar-head { border-bottom: 1px solid var(--line); margin-bottom: .3rem; }
+
+/* temperature control */
+.temp-block { margin: 0 0 1.4rem; background: #fff; border: 1px solid var(--line); padding: .8rem 1rem; }
+.temp-block input[type=range] { width: 100%; accent-color: var(--accent); margin: .4rem 0 .3rem; }
+
+/* inputs on panels for readability over the grid */
+.inputs, .presets .preset, fieldset { background-clip: padding-box; }
+select { padding: .42rem .5rem; font: inherit; font-size: .93rem; border: 1px solid var(--line); background: #fff; margin-top: .25rem; display: block; }
+.fine summary { font-size: .88rem; color: var(--muted); }
+.fine { margin-bottom: 1rem; }
+
+/* interaction polish */
+#run, .preset, select, textarea, input[type=text], .chip, .alert, .narrative,
+#bars, .temp-block, #load-bar-wrap { border-radius: 6px; }
+.badges img { border-radius: 3px; }
+#load-bar { border-radius: 6px; }
+.avatar { transition: transform .15s ease, box-shadow .15s ease; }
+.avatar:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(26,26,26,.18); }
+
+#run {
+  border-radius: 7px;
+  transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+  box-shadow: 0 1px 3px rgba(26,79,138,.3);
+}
+#run:hover:not(:disabled) {
+  background: #16406f;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(26,79,138,.35);
+}
+#run:active:not(:disabled) { transform: translateY(0); box-shadow: 0 1px 3px rgba(26,79,138,.3); }
+
+.preset { transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease; }
+.preset:hover { transform: translateY(-1px); box-shadow: 0 3px 10px rgba(26,26,26,.08); }
+.preset.active { box-shadow: 0 2px 8px rgba(26,26,26,.08); }
+
+.tab { transition: color .12s ease; border-radius: 6px 6px 0 0; }
+.tab:hover { color: var(--ink); background: rgba(26,79,138,.04); }
+
+textarea:focus, input:focus, select:focus, #run:focus-visible, .preset:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 1px;
+}
+.stagebar { border-radius: 6px; overflow: hidden; }

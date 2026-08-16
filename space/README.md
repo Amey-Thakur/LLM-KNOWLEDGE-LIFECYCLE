@@ -6,6 +6,7 @@ colorTo: blue
 sdk: static
 pinned: false
 license: cc-by-4.0
+thumbnail: https://huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle/resolve/main/social-preview.png
 ---
 
 # LLM Knowledge Lifecycle

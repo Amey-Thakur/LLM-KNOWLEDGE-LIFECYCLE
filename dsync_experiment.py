@@ -1,4 +1,16 @@
-"""Lifecycle Desynchronization probe: the Vioxx conflict on GPT-2.
+"""
+===============================================================================
+FILE         : dsync_experiment.py
+PROJECT      : The Knowledge Lifecycle of Large Language Models
+PURPOSE      : The paper's measurement: the Vioxx conflict probe on GPT-2 base,
+               producing every number reported in Section 7.7.
+TECH STACK   : Python 3, PyTorch, Hugging Face Transformers
+AUTHORS      : Amey Thakur (https://github.com/Amey-Thakur)
+               Sarvesh Talele (https://github.com/sarveshtalele)
+REPOSITORY   : https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE
+RELEASE DATE : August 16, 2026
+LICENSE      : CC BY 4.0
+===============================================================================
 
 Runs the same query under two conditions, with and without the retrieval
 context that contradicts the model's parametric knowledge, and reports

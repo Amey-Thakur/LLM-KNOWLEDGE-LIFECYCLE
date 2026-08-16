@@ -1,4 +1,16 @@
-"""LLM Knowledge Lifecycle: interactive demonstration.
+"""
+===============================================================================
+FILE         : app.py
+PROJECT      : The Knowledge Lifecycle of Large Language Models
+PURPOSE      : Gradio variant of the demonstration for local use; the deployed
+               Space uses the static in-browser build in space/.
+TECH STACK   : Python 3, PyTorch, Hugging Face Transformers, Gradio
+AUTHORS      : Amey Thakur (https://github.com/Amey-Thakur)
+               Sarvesh Talele (https://github.com/sarveshtalele)
+REPOSITORY   : https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE
+RELEASE DATE : August 16, 2026
+LICENSE      : CC BY 4.0
+===============================================================================
 
 Companion demo for the paper "The Knowledge Lifecycle of Large Language
 Models" (Thakur and Talele, 2026). Implements the paper's measurement protocol

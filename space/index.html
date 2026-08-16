@@ -1,9 +1,27 @@
 <!DOCTYPE html>
+<!-- ==========================================================================
+  File        : index.html
+  Project     : The Knowledge Lifecycle of Large Language Models
+  Purpose     : Page structure for the live demonstration: probe, guide,
+                results, and author attribution.
+  Authors     : Amey Thakur (https://github.com/Amey-Thakur)
+                Sarvesh Talele (https://github.com/sarveshtalele)
+  Repository  : https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE
+  Release Date: August 16, 2026
+  License     : CC BY 4.0
+=========================================================================== -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>LLM Knowledge Lifecycle</title>
+<meta name="description" content="When a language model's training memory contradicts the document in its prompt, which one wins? Measure it live on GPT-2, in your browser.">
+<meta property="og:title" content="The Knowledge Lifecycle of Large Language Models">
+<meta property="og:description" content="GPT-2, asked about Vioxx with the 2004 withdrawal notice in its prompt, still answers safe. Measure the failure live in your browser.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle/resolve/main/social-preview.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle/resolve/main/social-preview.png">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -11,7 +29,8 @@
 <header>
   <h1>LLM Knowledge Lifecycle</h1>
   <p class="subtitle">
-    What wins when a model's memory contradicts its context? Companion demonstration for
+    A language model carries two memories: what it learned in training, and what you place in
+    its prompt. When they disagree, which one wins? Companion demonstration for
     <em>The Knowledge Lifecycle of Large Language Models</em>.
   </p>
   <p class="badges">
@@ -22,14 +41,15 @@
   </p>
   <div class="alert a-important">
     <span class="alert-title">Important</span>
-    The model runs entirely in your browser. Every measurement is deterministic and
-    computed locally; nothing leaves your machine.
+    The model runs entirely in your browser. Every measurement is deterministic and computed
+    locally; nothing leaves your machine. First measurement downloads the model once (128 MB).
   </div>
 </header>
 
-<div class="stagebar" title="The five lifecycle stages">
-  <span class="s1">Acquire</span><span class="s2">Store</span><span class="s3">Retrieve</span><span class="s4">Update</span><span class="s5">Forget</span>
+<div class="stagebar" id="stagebar" title="The five lifecycle stages">
+  <span class="s1">Acquire</span><span class="s2">Store</span><span class="s3" id="sb-retrieve">Retrieve</span><span class="s4" id="sb-update">Update</span><span class="s5">Forget</span>
 </div>
+<p class="stagenote" id="stagenote">Knowledge flows through five stages. This probe tests the boundary between Retrieve and Update.</p>
 
 <nav class="tabs" role="tablist">
   <button class="tab active" data-tab="probe" role="tab">Probe</button>
@@ -41,11 +61,12 @@
 <!-- ================= PROBE ================= -->
 <section id="probe" class="panel active">
 
-  <div id="loader">
-    <button id="load-btn">Load GPT-2 <span class="dim">(128 MB, once)</span></button>
-    <span id="load-status">not loaded</span>
-    <div id="load-bar-wrap" hidden><div id="load-bar"></div></div>
-  </div>
+  <p class="lede">
+    Each preset is a real, documented fact change that happened after this model's training
+    data was collected. The model's weights hold the old world; the corrective document in the
+    prompt holds the new one. Pick a case, press Measure, and watch which memory controls the
+    answer.
+  </p>
 
   <div class="presets">
     <button class="preset r-fail active" data-preset="vioxx">
@@ -68,19 +89,36 @@
       <label class="grow">Correct continuation <span class="dim">(one word)</span>
         <input id="answer" type="text">
       </label>
-      <button id="run" disabled>Measure</button>
+      <label>Document repetition <span class="dim">(amplify the context)</span>
+        <select id="repeat">
+          <option value="1" selected>1x</option>
+          <option value="2">2x</option>
+          <option value="3">3x</option>
+        </select>
+      </label>
+      <button id="run">Measure</button>
     </div>
+    <div id="load-bar-wrap" hidden><div id="load-bar"></div></div>
+    <p id="load-status" class="dim"></p>
   </div>
 
   <div id="results" hidden>
+
     <div class="verdict-row">
       <span id="verdict-chip" class="chip"></span>
       <span id="r-verdict-detail" class="dim"></span>
     </div>
 
+    <p id="narrative" class="narrative"></p>
+
+    <h3>The two distributions, side by side</h3>
+    <p class="dim small">Next-token probability without the document (grey) and with it (blue).
+    The correct answer is outlined in green; if its bar is invisible, that is the finding.</p>
+    <div id="bars"></div>
+
     <div class="gauge-block">
       <div class="gauge-label">
-        <span>D<sub>sync</sub> = &minus;ln P(answer | context + query)</span>
+        <span>D<sub>sync</sub> &nbsp;<span class="dim">how lost the correct answer is</span></span>
         <strong id="r-dsync"></strong>
       </div>
       <div class="gauge">
@@ -92,7 +130,7 @@
 
     <div class="gauge-block">
       <div class="gauge-label">
-        <span>I<sub>ctx</sub> = KL(with context &Vert; without)</span>
+        <span>I<sub>ctx</sub> &nbsp;<span class="dim">how much the document moved the model</span></span>
         <strong id="r-ictx"></strong>
       </div>
       <div class="gauge slim">
@@ -102,16 +140,25 @@
       <div class="gauge-ticks"><span style="left:10%">0.05<br><i>inert</i></span><span style="left:50%">0.5<br><i>reshaping</i></span></div>
     </div>
 
-    <table class="kv">
-      <tr><td>P(answer | query alone)</td><td id="r-p0"></td></tr>
-      <tr><td>P(answer | context + query)</td><td id="r-p1"></td></tr>
-      <tr><td>Answer tokenization</td><td id="r-tok"></td></tr>
-    </table>
-
-    <div class="cols">
-      <div><h3>Top tokens, query alone</h3><table class="toks" id="t-plain"></table></div>
-      <div><h3>Top tokens, context + query</h3><table class="toks" id="t-ctx"></table></div>
+    <div class="temp-block">
+      <div class="gauge-label">
+        <span>Sampling temperature <span class="dim">(recomputed live from the measured logits)</span></span>
+        <strong id="t-value">1.0</strong>
+      </div>
+      <input id="temp" type="range" min="0.2" max="2.0" step="0.1" value="1.0">
+      <p id="temp-readout" class="dim small"></p>
     </div>
+
+    <details class="fine">
+      <summary>Measurement details</summary>
+      <table class="kv">
+        <tr><td>P(answer | query alone)</td><td id="r-p0"></td></tr>
+        <tr><td>P(answer | context + query)</td><td id="r-p1"></td></tr>
+        <tr><td>Answer tokenization</td><td id="r-tok"></td></tr>
+        <tr><td>D<sub>sync</sub> definition</td><td>&minus;ln P(answer | context + query), in nats</td></tr>
+        <tr><td>I<sub>ctx</sub> definition</td><td>KL(with context &Vert; without), full vocabulary</td></tr>
+      </table>
+    </details>
   </div>
 </section>
 
@@ -146,6 +193,14 @@
     <tr><td><span class="chip chip-drift">trap</span></td><td><strong>British monarch.</strong> The death announcement's strongest effect is boosting " Queen". Correct context reinforcing the wrong answer.</td></tr>
     <tr><td><span class="chip chip-influence">drift</span></td><td><strong>Twitter rename.</strong> Context lifts the right answer by orders of magnitude and still loses to " Twitter".</td></tr>
   </table>
+
+  <h2>Build your own probe</h2>
+  <p>
+    Any fact change with a single-word answer works. Three rules make a clean probe: the query
+    ends mid-sentence so the next token is the answer; the document states the new fact
+    plainly; the answer is one word, because the estimator measures the first token. Leadership
+    changes, product renames, and policy reversals all fit.
+  </p>
 
   <div class="alert a-warning">
     <span class="alert-title">Scope</span>
