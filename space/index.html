@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LLM Knowledge Lifecycle</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <h1>LLM Knowledge Lifecycle</h1>
+  <p class="subtitle">
+    What wins when a model's memory contradicts its context? Companion demonstration for
+    <em>The Knowledge Lifecycle of Large Language Models</em>.
+  </p>
+  <p class="badges">
+    <a href="https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE"><img src="https://img.shields.io/badge/GitHub-LLM--KNOWLEDGE--LIFECYCLE-181717?logo=github" alt="GitHub repository"></a>
+    <a href="https://www.kaggle.com/ameythakur20"><img src="https://img.shields.io/badge/Author-Amey_Thakur-0969DA" alt="Author"></a>
+    <a href="https://orcid.org/0000-0001-5644-1575"><img src="https://img.shields.io/badge/ORCID-0000--0001--5644--1575-A6CE39" alt="ORCID"></a>
+    <img src="https://img.shields.io/badge/Model-GPT--2_base_(124M)-555555" alt="Model">
+    <img src="https://img.shields.io/badge/License-CC_BY_4.0-lightgrey" alt="License">
+  </p>
+  <div class="alert a-important">
+    <span class="alert-title">Important</span>
+    The model runs entirely in your browser. Every measurement is deterministic and
+    computed locally; nothing leaves your machine.
+  </div>
+</header>
+
+<div class="stagebar" title="The five lifecycle stages">
+  <span class="s1">Acquire</span><span class="s2">Store</span><span class="s3">Retrieve</span><span class="s4">Update</span><span class="s5">Forget</span>
+</div>
+
+<nav class="tabs" role="tablist">
+  <button class="tab active" data-tab="probe" role="tab">Probe</button>
+  <button class="tab" data-tab="guide" role="tab">Guide</button>
+</nav>
+
+<main>
+
+<!-- ================= PROBE ================= -->
+<section id="probe" class="panel active">
+
+  <div id="loader">
+    <button id="load-btn">Load GPT-2 <span class="dim">(128 MB, once)</span></button>
+    <span id="load-status">not loaded</span>
+    <div id="load-bar-wrap" hidden><div id="load-bar"></div></div>
+  </div>
+
+  <div class="presets">
+    <button class="preset r-fail active" data-preset="vioxx">
+      <strong>Vioxx withdrawal</strong> 2004<span>resolution failure</span></button>
+    <button class="preset r-drift" data-preset="monarch">
+      <strong>British monarch</strong> 2022<span>the exposure trap</span></button>
+    <button class="preset r-influence" data-preset="twitter">
+      <strong>Twitter rename</strong> 2023<span>drift under strong context</span></button>
+  </div>
+  <p id="preset-reading" class="reading"></p>
+
+  <div class="inputs">
+    <label>Query <span class="dim">(ends mid-sentence; the next token is the answer)</span>
+      <textarea id="query" rows="2"></textarea>
+    </label>
+    <label>Corrective context <span class="dim">(contradicts the model's memory)</span>
+      <textarea id="context" rows="2"></textarea>
+    </label>
+    <div class="row">
+      <label class="grow">Correct continuation <span class="dim">(one word)</span>
+        <input id="answer" type="text">
+      </label>
+      <button id="run" disabled>Measure</button>
+    </div>
+  </div>
+
+  <div id="results" hidden>
+    <div class="verdict-row">
+      <span id="verdict-chip" class="chip"></span>
+      <span id="r-verdict-detail" class="dim"></span>
+    </div>
+
+    <div class="gauge-block">
+      <div class="gauge-label">
+        <span>D<sub>sync</sub> = &minus;ln P(answer | context + query)</span>
+        <strong id="r-dsync"></strong>
+      </div>
+      <div class="gauge">
+        <div class="zone z-ok" style="width:5%"></div><div class="zone z-drift" style="width:28%"></div><div class="zone z-severe" style="width:33%"></div><div class="zone z-fail" style="width:34%"></div>
+        <div id="g-marker" class="marker"></div>
+      </div>
+      <div class="gauge-ticks"><span style="left:5%">0.7<br><i>50%</i></span><span style="left:33%">4.6<br><i>1%</i></span><span style="left:66%">9.2<br><i>0.01%</i></span></div>
+    </div>
+
+    <div class="gauge-block">
+      <div class="gauge-label">
+        <span>I<sub>ctx</sub> = KL(with context &Vert; without)</span>
+        <strong id="r-ictx"></strong>
+      </div>
+      <div class="gauge slim">
+        <div class="zone z-inert" style="width:10%"></div><div class="zone z-partial" style="width:40%"></div><div class="zone z-strong" style="width:50%"></div>
+        <div id="g-ictx" class="marker"></div>
+      </div>
+      <div class="gauge-ticks"><span style="left:10%">0.05<br><i>inert</i></span><span style="left:50%">0.5<br><i>reshaping</i></span></div>
+    </div>
+
+    <table class="kv">
+      <tr><td>P(answer | query alone)</td><td id="r-p0"></td></tr>
+      <tr><td>P(answer | context + query)</td><td id="r-p1"></td></tr>
+      <tr><td>Answer tokenization</td><td id="r-tok"></td></tr>
+    </table>
+
+    <div class="cols">
+      <div><h3>Top tokens, query alone</h3><table class="toks" id="t-plain"></table></div>
+      <div><h3>Top tokens, context + query</h3><table class="toks" id="t-ctx"></table></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= GUIDE ================= -->
+<section id="guide" class="panel">
+
+  <h2>The five stages</h2>
+  <table class="stages">
+    <tr><td><i class="dot d1"></i><strong>Acquire</strong></td><td>Pre-training compresses a corpus into weights.</td><td class="fail">Facts stored with no record of when or where they were learned.</td></tr>
+    <tr><td><i class="dot d2"></i><strong>Store</strong></td><td>Facts live in weights, external indices, or both.</td><td class="fail">The two copies of a fact age independently.</td></tr>
+    <tr><td><i class="dot d3"></i><strong>Retrieve</strong></td><td>Attention recalls; RAG fetches documents into context.</td><td class="fail">What was retrieved may not control the output.</td></tr>
+    <tr><td><i class="dot d4"></i><strong>Update</strong></td><td>Weights edited, indices refreshed, conflicts resolved.</td><td class="fail">Edits damage neighbors; index updates leave weights stale.</td></tr>
+    <tr><td><i class="dot d5"></i><strong>Forget</strong></td><td>Deliberate unlearning; accidental forgetting and eviction.</td><td class="fail">Removed facts recoverable; retained facts damaged.</td></tr>
+  </table>
+  <div class="alert a-note">
+    <span class="alert-title">Note</span>
+    The probe measures the boundary between <i class="dot d3"></i>Retrieve and
+    <i class="dot d4"></i>Update: the document arrives, and the model must decide
+    which copy of the fact to trust.
+  </div>
+
+  <h2>The diagnosis grid</h2>
+  <table class="grid2">
+    <tr><th></th><th>I<sub>ctx</sub> low</th><th>I<sub>ctx</sub> high</th></tr>
+    <tr><th>D<sub>sync</sub> low</th><td class="c-ok">fact never conflicted</td><td class="c-ok">context resolved the conflict</td></tr>
+    <tr><th>D<sub>sync</sub> high</th><td class="c-fail">resolution failure: context ignored</td><td class="c-drift">drift: context influential but losing</td></tr>
+  </table>
+
+  <h2>The three presets</h2>
+  <table>
+    <tr><td><span class="chip chip-fail">failure</span></td><td><strong>Vioxx withdrawal.</strong> The notice is in the prompt; the model still says "safe". Paper's fp32 run: D<sub>sync</sub> 12.05, I<sub>ctx</sub> 0.033.</td></tr>
+    <tr><td><span class="chip chip-drift">trap</span></td><td><strong>British monarch.</strong> The death announcement's strongest effect is boosting " Queen". Correct context reinforcing the wrong answer.</td></tr>
+    <tr><td><span class="chip chip-influence">drift</span></td><td><strong>Twitter rename.</strong> Context lifts the right answer by orders of magnitude and still loses to " Twitter".</td></tr>
+  </table>
+
+  <div class="alert a-warning">
+    <span class="alert-title">Scope</span>
+    GPT-2 base is small, open, and confound-free, which makes every number reproducible,
+    including in this browser. The browser build is 8-bit quantized: probabilities shift
+    relative to full precision, the regimes and conclusions do not. Exact fp32 values come
+    from the script in the repository. The estimator measures the first token of a
+    single-word answer under deterministic evaluation.
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="authors">
+    <div class="author">
+      <a href="https://github.com/Amey-Thakur"><img class="avatar" src="https://github.com/Amey-Thakur.png" alt="Amey Thakur"></a>
+      <p><a href="https://github.com/Amey-Thakur"><strong>Amey Thakur</strong></a></p>
+      <p><a href="https://orcid.org/0000-0001-5644-1575"><img src="https://img.shields.io/badge/ORCID-0000--0001--5644--1575-A6CE39" alt="ORCID"></a></p>
+    </div>
+    <div class="author">
+      <a href="https://github.com/sarveshtalele"><img class="avatar" src="https://github.com/sarveshtalele.png" alt="Sarvesh Talele"></a>
+      <p><a href="https://github.com/sarveshtalele"><strong>Sarvesh Talele</strong></a></p>
+      <p><a href="https://github.com/sarveshtalele"><img src="https://img.shields.io/badge/GitHub-sarveshtalele-181717?logo=github" alt="GitHub"></a></p>
+    </div>
+  </div>
+  <details>
+    <summary>Cite this work</summary>
+<pre>@article{thakur2026lifecycle,
+  author  = {Thakur, Amey},
+  title   = {The Knowledge Lifecycle of Large Language Models},
+  journal = {arXiv preprint},
+  year    = {2026}
+}</pre>
+  </details>
+  <p class="foot-links">
+    <a href="https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE">Paper repository</a>
+    &middot; <a href="https://amey-thakur.github.io">Amey's Arc</a>
+  </p>
+</footer>
+
+<script type="module" src="main.js"></script>
+</body>
+</html>
