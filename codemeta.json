@@ -6,7 +6,11 @@
   "codeRepository": "https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE",
   "url": "https://huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle",
   "license": "https://spdx.org/licenses/CC-BY-4.0",
-  "programmingLanguage": ["Python", "JavaScript", "TeX"],
+  "programmingLanguage": [
+    "Python",
+    "JavaScript",
+    "TeX"
+  ],
   "keywords": [
     "large language models",
     "knowledge lifecycle",
@@ -23,6 +27,12 @@
       "givenName": "Amey",
       "familyName": "Thakur",
       "@id": "https://orcid.org/0000-0001-5644-1575"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Sarvesh",
+      "familyName": "Talele",
+      "@id": "https://orcid.org/0009-0002-0818-461X"
     }
   ],
   "dateCreated": "2026-08-16",

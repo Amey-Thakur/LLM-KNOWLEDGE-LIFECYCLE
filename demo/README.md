@@ -11,7 +11,7 @@ license: cc-by-4.0
 
 # LLM Knowledge Lifecycle
 
-Companion demonstration for **The Knowledge Lifecycle of Large Language Models** (Amey Thakur, 2026).
+Companion demonstration for **The Knowledge Lifecycle of Large Language Models** (Amey Thakur and Sarvesh Talele, 2026).
 
 The probe measures what happens when a language model's parametric memory conflicts with corrective context. Given a query, a document that contradicts the model's training-time knowledge, and the verified correct continuation, it reports:
 

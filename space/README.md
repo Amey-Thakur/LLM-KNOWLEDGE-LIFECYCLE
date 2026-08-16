@@ -10,7 +10,7 @@ license: cc-by-4.0
 
 # LLM Knowledge Lifecycle
 
-Companion demonstration for **The Knowledge Lifecycle of Large Language Models** (Amey Thakur, 2026). GPT-2 base runs entirely in the visitor's browser via ONNX; every measurement is computed locally with no server involved.
+Companion demonstration for **The Knowledge Lifecycle of Large Language Models** (Amey Thakur and Sarvesh Talele, 2026). GPT-2 base runs entirely in the visitor's browser via ONNX; every measurement is computed locally with no server involved.
 
 The probe measures what happens when a language model's parametric memory conflicts with corrective context:
 

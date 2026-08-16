@@ -6,6 +6,9 @@ authors:
   - family-names: Thakur
     given-names: Amey
     orcid: "https://orcid.org/0000-0001-5644-1575"
+  - family-names: Talele
+    given-names: Sarvesh
+    orcid: "https://orcid.org/0009-0002-0818-461X"
 repository-code: "https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE"
 url: "https://huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle"
 license: CC-BY-4.0
@@ -32,5 +35,8 @@ preferred-citation:
     - family-names: Thakur
       given-names: Amey
       orcid: "https://orcid.org/0000-0001-5644-1575"
+    - family-names: Talele
+      given-names: Sarvesh
+      orcid: "https://orcid.org/0009-0002-0818-461X"
   year: 2026
   journal: "arXiv preprint"

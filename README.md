@@ -94,7 +94,7 @@ Prints both conditions' top tokens, the probabilities of the correct and incorre
 
 <div align="center">
 
-| <a href="https://github.com/Amey-Thakur"><img src="https://github.com/Amey-Thakur.png" width="150" height="150" alt="Amey Thakur"></a><br>[**Amey Thakur**](https://github.com/Amey-Thakur)<br><br>[![ORCID](https://img.shields.io/badge/ORCID-0000--0001--5644--1575-A6CE39.svg)](https://orcid.org/0000-0001-5644-1575)<br>[![Kaggle](https://img.shields.io/badge/Kaggle-ameythakur20-20BEFF?logo=kaggle&logoColor=white)](https://www.kaggle.com/ameythakur20) | <a href="https://github.com/sarveshtalele"><img src="https://github.com/sarveshtalele.png" width="150" height="150" alt="Sarvesh Talele"></a><br>[**Sarvesh Talele**](https://github.com/sarveshtalele)<br><br>[![ORCID](https://img.shields.io/badge/ORCID-0009--0002--0818--461X-A6CE39.svg)](https://orcid.org/0009-0002-0818-461X)<br>[![GitHub](https://img.shields.io/badge/GitHub-sarveshtalele-181717?logo=github)](https://github.com/sarveshtalele) |
+| <a href="https://github.com/Amey-Thakur"><img src="docs/amey-thakur.jpg" width="150" height="150" alt="Amey Thakur"></a><br>[**Amey Thakur**](https://github.com/Amey-Thakur)<br><br>[![ORCID](https://img.shields.io/badge/ORCID-0000--0001--5644--1575-A6CE39.svg)](https://orcid.org/0000-0001-5644-1575)<br>[![Kaggle](https://img.shields.io/badge/Kaggle-ameythakur20-20BEFF?logo=kaggle&logoColor=white)](https://www.kaggle.com/ameythakur20) | <a href="https://github.com/sarveshtalele"><img src="https://github.com/sarveshtalele.png" width="150" height="150" alt="Sarvesh Talele"></a><br>[**Sarvesh Talele**](https://github.com/sarveshtalele)<br><br>[![ORCID](https://img.shields.io/badge/ORCID-0009--0002--0818--461X-A6CE39.svg)](https://orcid.org/0009-0002-0818-461X)<br>[![GitHub](https://img.shields.io/badge/GitHub-sarveshtalele-181717?logo=github)](https://github.com/sarveshtalele) |
 | :---: | :---: |
 
 </div>
@@ -108,7 +108,7 @@ Prints both conditions' top tokens, the probabilities of the correct and incorre
 
 ```bibtex
 @article{thakur2026lifecycle,
-  author  = {Thakur, Amey},
+  author  = {Thakur, Amey and Talele, Sarvesh},
   title   = {The Knowledge Lifecycle of Large Language Models},
   journal = {arXiv preprint},
   year    = {2026}

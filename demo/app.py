@@ -1,7 +1,7 @@
 """LLM Knowledge Lifecycle: interactive demonstration.
 
 Companion demo for the paper "The Knowledge Lifecycle of Large Language
-Models" (Amey Thakur, 2026). Implements the paper's measurement protocol
+Models" (Thakur and Talele, 2026). Implements the paper's measurement protocol
 (Algorithm 2) live on GPT-2 base: given a query, a corrective context, and the
 verified correct continuation, it reports
 
@@ -204,7 +204,7 @@ def probe(query, context, answer):
 
 CITATION = """```bibtex
 @article{thakur2026lifecycle,
-  author  = {Thakur, Amey},
+  author  = {Thakur, Amey and Talele, Sarvesh},
   title   = {The Knowledge Lifecycle of Large Language Models},
   journal = {arXiv preprint},
   year    = {2026}
@@ -216,7 +216,7 @@ with gr.Blocks(theme=gr.themes.Base(), title="LLM Knowledge Lifecycle") as demo:
         "# LLM Knowledge Lifecycle\n"
         "Live measurement of what happens when a language model's parametric memory "
         "conflicts with corrective context. Companion demo for "
-        "*The Knowledge Lifecycle of Large Language Models* (Amey Thakur, 2026). "
+        "*The Knowledge Lifecycle of Large Language Models* (Thakur and Talele, 2026). "
         "Model: GPT-2 base, deterministic evaluation, exactly reproducible."
     )
 
@@ -257,7 +257,7 @@ with gr.Blocks(theme=gr.themes.Base(), title="LLM Knowledge Lifecycle") as demo:
     gr.Markdown(
         "---\nPaper repository: "
         "[Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE](https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE) "
-        "· Author: [Amey Thakur](https://orcid.org/0000-0001-5644-1575)"
+        "· Authors: [Amey Thakur](https://orcid.org/0000-0001-5644-1575) and [Sarvesh Talele](https://orcid.org/0009-0002-0818-461X)"
     )
 
 if __name__ == "__main__":
