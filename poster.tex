@@ -1,12 +1,12 @@
 \documentclass[25pt, a0paper, portrait]{tikzposter}
-\usetheme{Desert} % A professional, premium theme
+\usetheme{Desert}
 \usepackage{booktabs}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta, positioning, shapes.geometric, calc}
 
 \title{The Knowledge Lifecycle of Large Language Models}
 \author{Amey Thakur}
-\institute{Research Presentation, 2026}
+\institute{Independent Researcher, Toronto, Canada}
 
 \begin{document}
 
@@ -15,10 +15,10 @@
 \begin{columns}
     \column{0.5}
     \block{1. The Fragmentation Problem}{
-        Current LLM knowledge management is siloed into subfields like RAG, Editing, and Continual Learning. We optimize these in isolation, but fail at the \textbf{boundaries}.
+        LLM knowledge management is siloed into subfields: RAG, knowledge editing, continual learning, context engineering, and agent memory. Each is optimized in isolation, and systems fail at the \textbf{boundaries}.
         \begin{itemize}
-            \item \textbf{Issue:} No unified formalism for the "life" of a fact.
-            \item \textbf{Consequence:} Epistemic desynchronisation and untrustworthy agents.
+            \item \textbf{Issue:} No unified formalism for the life of a fact.
+            \item \textbf{Evidence:} Across 20 representative works, median lifecycle coverage is 2 of 5 stages.
         \end{itemize}
     }
 
@@ -30,7 +30,7 @@
             \node[draw, rounded corners, fill=orange!10, minimum width=3cm] (ret) at (1.5,-2) {3. Retrieval};
             \node[draw, rounded corners, fill=red!10, minimum width=3cm] (upd) at (-1.5,-2) {4. Update};
             \node[draw, rounded corners, fill=purple!10, minimum width=3cm] (fgt) at (-3,1) {5. Forget};
-            
+
             \draw[->, line width=2pt] (acq) -- (sto);
             \draw[->, line width=2pt] (sto) -- (ret);
             \draw[->, line width=2pt] (ret) -- (upd);
@@ -38,41 +38,42 @@
             \draw[->, line width=2pt] (fgt) -- (acq);
         \end{tikzpicture}
         \vspace{1cm}
-        We define 5 structural stages: Acquisition, Storage, Retrieval, Update, and Forgetting. The interactions between these stages are the source of modern AI failure modes.
+        Five structural stages: Acquisition, Storage, Retrieval, Update, and Forgetting. The interactions between stages are where deployed systems fail.
     }
 
     \column{0.5}
-    \block{3. Metric: Lifecycle Desynchronisation ($\mathcal{D}_{sync}$)}{
-        We introduce a formal cross-modal metric to quantify the conflict between internal memory ($\theta$) and external context ($\mathcal{M}$).
+    \block{3. Metric: Lifecycle Desynchronization ($\mathcal{D}_{sync}$)}{
+        The divergence between a synchronized system's output and the deployed system's output. For a fact with verified answer $y^*$, it reduces to a surprisal:
         \begin{equation*}
-            \mathcal{D}_{sync} = D_{KL}(P(y|q, \theta_{now}, \mathcal{M}_{now}) \| P(y|q, \theta_{stale}, \mathcal{M}_{now}))
+            \widehat{\mathcal{D}}_{sync} = -\ln P\!\left(y^* \mid q,\, \theta_{stale},\, \mathcal{M}_{now}\right)
         \end{equation*}
-        $\mathcal{D}_{sync} > 1.0$ indicates a system that is no longer epistemically consistent.
+        A value of $n$ nats means the correct answer holds probability $e^{-n}$. Above $9.2$ nats, no realistic decoding recovers it.
     }
 
     \block{4. Intervention: The Provenance Vector ($p$)}{
         \begin{itemize}
-            \item \textbf{Mechanism:} Appending temporal metadata $[\tau_i; s_i]$ to every stored fact in the FFN.
-            \item \textbf{Activation Steering:} Dynamically "muting" old facts during test-time compute.
+            \item \textbf{Mechanism:} each FFN memory slot $(k_i, v_i)$ gains metadata $p_i$ encoding acquisition time and source reliability.
+            \item \textbf{Gating:} stale activations are attenuated at inference; weights are never modified.
         \end{itemize}
         \centering
         \begin{equation*}
-            S(\Delta \tau_i) = \sigma(\beta \cdot \Delta \tau_i - \gamma)
+            S(\Delta \tau_i) = \sigma(\gamma - \beta \cdot \Delta \tau_i)
         \end{equation*}
-        Provenance steering resolves conflicts without retraining.
+        Fresh facts pass ($S \approx 1$); outdated facts are muted ($S \to 0$).
     }
 
-    \block{5. Case Study: Vioxx Withdrawal}{
-        We simulated the 2004 Vioxx medical withdrawal across modalities.
+    \block{5. Measurement: Vioxx Withdrawal on GPT-2}{
+        Vioxx was withdrawn in 2004. With the withdrawal notice \textbf{in context}, GPT-2 still answers ``safe.''
         \begin{itemize}
-            \item \textbf{Unsynced System:} Ignores withdrawal labels; recommends dangerous drug.
-            \item \textbf{Synced System ($\mathcal{D}_{sync} \to 0$):} Correctly resolves conflict using Provenance Steering.
+            \item $P(\text{``safe''})$: 37.5\% without context, \textbf{42.6\% with} the withdrawal notice.
+            \item $P(\text{``withdrawn''})$: $5.9 \times 10^{-6}$, so $\widehat{\mathcal{D}}_{sync} = 12.05$ nats.
+            \item Context shifts the full output distribution by only $0.03$ nats: retrieval works, resolution fails.
         \end{itemize}
-        Validated on GPT-2 and LLaVA-1.5 architectures.
+        Fully reproducible: deterministic script in the repository.
     }
 
     \block{6. Conclusion}{
-        Maintaining epistemic consistency is the next frontier of AI safety. The Knowledge Lifecycle framework provides the roadmap for reliable, time-aware autonomous agents.
+        Knowledge conflicts are measurable, and their root cause is metadata-free parametric storage. The Knowledge Lifecycle framework names the stages, $\mathcal{D}_{sync}$ measures the boundary failures, and the Provenance Vector offers an architectural path to closing them.
     }
 \end{columns}
 

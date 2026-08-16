@@ -5,23 +5,23 @@
 \usetikzlibrary{arrows.meta, positioning, shapes.geometric, calc}
 
 \title{The Knowledge Lifecycle of Large Language Models}
-\subtitle{A Unified Framework for Persistent AI Agents}
+\subtitle{A Unified Framework for Persistent AI Systems}
 \author{Amey Thakur}
-\date{Research Presentation, 2026}
+\date{2026}
 
 \begin{document}
 
 \maketitle
 
 % --- SLIDE 1 ---
-\begin{frame}{The Crisis of Fragmentation}
+\begin{frame}{The Fragmentation Problem}
   \begin{itemize}
-    \item Current research is siloed into subfields:
+    \item Research on LLM knowledge is siloed into subfields:
     \begin{itemize}
-      \item RAG, Knowledge Editing, Continual Learning, Agent Memory.
+      \item RAG, knowledge editing, continual learning, context engineering, agent memory.
     \end{itemize}
-    \item \textbf{The Problem:} We optimize individual stages but ignore the \textbf{boundaries} between them.
-    \item \textbf{Result:} "Boundary Failures" (hallucinations) that no single-stage metric can detect.
+    \item \textbf{The problem:} each stage is optimized in isolation; the \textbf{boundaries} between them go unstudied.
+    \item \textbf{The evidence:} across 20 representative works, median lifecycle coverage is 2 of 5 stages.
   \end{itemize}
 \end{frame}
 
@@ -34,7 +34,7 @@
     \node[draw, rounded corners, fill=orange!10] (ret) at (1,-1.5) {3. Retrieval};
     \node[draw, rounded corners, fill=red!10] (upd) at (-1,-1.5) {4. Update};
     \node[draw, rounded corners, fill=purple!10] (fgt) at (-2,0.5) {5. Forget};
-    
+
     \draw[->] (acq) -- (sto);
     \draw[->] (sto) -- (ret);
     \draw[->] (ret) -- (upd);
@@ -43,67 +43,69 @@
   \end{tikzpicture}
   \vspace{0.3cm}
   \begin{itemize}
-    \item A unified view of how knowledge moves through a model.
-    \item Focuses on the \textbf{Interactions} between stages.
+    \item One unified view of how knowledge moves through a model.
+    \item The hard failures live in the \textbf{interactions} between stages.
   \end{itemize}
 \end{frame}
 
 % --- SLIDE 3 ---
 \begin{frame}{Quantifying the Failure: $\mathcal{D}_{sync}$}
   \begin{itemize}
-    \item \textbf{Lifecycle Desynchronisation ($\mathcal{D}_{sync}$):}
-    \item Measures information loss when parametric weights ($\theta$) contradict non-parametric context ($\mathcal{M}$).
+    \item \textbf{Lifecycle Desynchronization:} how far the deployed system's output is from what a synchronized system would produce.
+    \item For a fact with verified answer $y^*$, it reduces to a surprisal:
   \end{itemize}
   \begin{equation*}
-    \mathcal{D}_{sync} = D_{KL}(P_{synced} \| P_{stale})
+    \widehat{\mathcal{D}}_{sync} = -\ln P\!\left(y^* \mid q,\, \theta_{stale},\, \mathcal{M}_{now}\right)
   \end{equation*}
   \begin{itemize}
-    \item \textbf{High $\mathcal{D}_{sync} > 1.0$:} Dangerous desynchronisation.
-    \item The model "hallucinates" by preferring stale memory over updated context.
+    \item $n$ nats means the correct answer holds probability $e^{-n}$.
+    \item Above $9.2$ nats: no realistic decoding recovers the correct answer.
+    \item Companion diagnostic $\mathcal{I}_{ctx}$: how far the context moves the distribution at all.
   \end{itemize}
 \end{frame}
 
 % --- SLIDE 4 ---
-\begin{frame}{Solution 1: The Provenance Vector ($p$)}
+\begin{frame}{Measurement: The Vioxx Probe on GPT-2}
   \begin{itemize}
-    \item \textbf{Proposal:} Append a temporal metadata vector $p_i = [\tau_i; s_i]$ to every FFN value vector.
-    \item This makes the model's memory \textbf{Time-Aware}.
+    \item \textbf{Scenario:} Vioxx withdrawn in 2004 for cardiovascular risk; withdrawal notice placed in context.
+    \item \textbf{Measured:} $P(\text{``safe''})$ rises from 37.5\% to 42.6\% \textit{with} the notice present.
+    \item \textbf{Measured:} $P(\text{``withdrawn''}) = 5.9 \times 10^{-6}$, so $\widehat{\mathcal{D}}_{sync} = 12.05$ nats.
+    \item \textbf{Measured:} the notice shifts the full distribution by only $0.03$ nats.
+    \item Retrieval succeeded; conflict resolution failed. Deterministic, reproducible script.
   \end{itemize}
-  \begin{equation*}
-    \text{FFN}(x) = \sum_{i=1}^{d_m} f(x \cdot k_i) [v_i; p_i]
-  \end{equation*}
 \end{frame}
 
 % --- SLIDE 5 ---
-\begin{frame}{Solution 2: Activation Steering}
+\begin{frame}{Root Cause and Proposal: The Provenance Vector ($p$)}
   \begin{itemize}
-    \item During Inference (System 2), the model "mutes" old facts.
+    \item Parametric storage discards \textit{when} and \textit{from where} a fact was learned.
+    \item \textbf{Proposal:} each FFN memory slot $(k_i, v_i)$ gains metadata $p_i$ encoding acquisition time $\tau_i$ and source reliability $s_i$.
+    \item Metadata feeds a gate; it never enters the residual stream.
   \end{itemize}
   \begin{equation*}
-    S(\Delta \tau_i) = \sigma(\beta \cdot \Delta \tau_i - \gamma)
+    \text{FFN}_{steered}(x) = \sum_{i=1}^{d_m} S(\Delta\tau_i)\, f(x \cdot k_i)\, v_i
   \end{equation*}
-  \begin{itemize}
-    \item \textbf{Impact:} The model resolves the conflict dynamically without retraining.
-    \item Provenance steering reduces $\mathcal{D}_{sync}$ toward the mathematical lower bound.
-  \end{itemize}
 \end{frame}
 
 % --- SLIDE 6 ---
-\begin{frame}{Case Study: The Vioxx Failure}
+\begin{frame}{Provenance-Gated Inference}
+  \begin{equation*}
+    S(\Delta \tau_i) = \sigma(\gamma - \beta \cdot \Delta \tau_i)
+  \end{equation*}
   \begin{itemize}
-    \item \textbf{Scenario:} Vioxx withdrawn in 2004 due to heart risk.
-    \item \textbf{Text-Only Failure:} Model ignores RAG withdrawal notice, predicts "Safe" ($P=42.5\%$).
-    \item \textbf{Multimodal Failure:} Model ignores "FDA Withdrawn" visual label due to text-prior override.
-    \item \textbf{Result:} High $\mathcal{D}_{sync}$ across modalities.
+    \item Fresh facts pass ($S \approx 1$); stale facts are attenuated ($S \to 0$).
+    \item Conflicts resolve at inference time; base weights are never modified.
+    \item Under stated idealized assumptions, gating drives $\mathcal{D}_{sync}$ to zero (Proposition 1 in the paper).
+    \item Cost: about 1M extra parameters on a 7B model, below $0.02\%$.
   \end{itemize}
 \end{frame}
 
 % --- SLIDE 7 ---
-\begin{frame}{Conclusion: The Future of Agentic AI}
+\begin{frame}{Conclusion and Roadmap}
   \begin{itemize}
-    \item We cannot rely on static forward-passes for knowledge management.
-    \item Epistemic consistency requires a **formal lifecycle**.
-    \item \textbf{Roadmap:} Integrate $p$ into pre-training and use $\mathcal{D}_{sync}$ for real-time auditing.
+    \item Knowledge conflicts are real, measurable, and localized to stage boundaries.
+    \item $\mathcal{D}_{sync}$ makes the failure auditable; the Provenance Vector targets its root cause.
+    \item \textbf{Next:} scale the probe into a benchmark across models; extend to text-image conflicts on open VLMs.
   \end{itemize}
   \vspace{0.5cm}
   \centering \Large \textbf{Questions?}

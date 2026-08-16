@@ -1,59 +1,83 @@
-# Mathematical Derivation: Provenance Steering and Lifecycle Desynchronisation
+# Mathematical Derivations: Provenance Gating and Lifecycle Desynchronization
 
-This document provides the granular mathematical derivations required to defend the **Knowledge Lifecycle** framework.
+Supplementary derivations for *The Knowledge Lifecycle of Large Language Models*. Notation follows the paper.
 
 ## 1. The FFN as a Key-Value Memory
-Following Geva et al. (2021), a Feed-Forward Network (FFN) in a Transformer computes:
-$$ \text{FFN}(x) = \sigma(x W_{in}) W_{out} $$
-We decompose this into $d_m$ individual neurons (memory cells):
-$$ \text{FFN}(x) = \sum_{i=1}^{d_m} f(x \cdot k_i) v_i $$
-where:
-- $k_i \in \mathbb{R}^{d_{model}}$ is the **Key** (the input weight row $i$).
-- $v_i \in \mathbb{R}^{d_{model}}$ is the **Value** (the output weight column $i$).
-- $f$ is the activation function (e.g., GeLU).
 
-**Failure Mode:** If a fact is outdated, the activation $f(x \cdot k_i)$ is high (the model "recognises" the concept), and the stale value $v_i$ is added to the residual stream, polluting the output.
+Following Geva et al. (2021), a Transformer feed-forward network computes
 
----
+$$ \text{FFN}(x) = f(x W_{in}) W_{out} = \sum_{i=1}^{d_m} f(x \cdot k_i)\, v_i $$
 
-## 2. The Provenance Vector Intervention
-We propose modifying the value vector $v_i$ to include a metadata dimension $p_i$:
-$$ v_i \rightarrow [v_i; p_i] $$
-The Provenance Vector $p_i = [\tau_i; s_i]$ encodes:
-- $\tau_i$: The acquisition timestamp (normalised).
-- $s_i$: The source reliability score.
+where $k_i \in \mathbb{R}^{d_{model}}$ is the key (row $i$ of $W_{in}$), $v_i \in \mathbb{R}^{d_{model}}$ is the value (column $i$ of $W_{out}$), and $f$ is the activation function.
 
-### 2.1 The Steering Gating Function
-During inference-time compute (System 2), the model computes a temporal delta:
-$$ \Delta \tau_i = T_{now} - \tau_i $$
-We define the steering gate $S(\Delta \tau_i)$ as:
-$$ S(\Delta \tau_i) = \frac{1}{1 + \exp(\beta \cdot \Delta \tau_i - \gamma)} $$
-As $\Delta \tau_i$ (age) increases, $S \rightarrow 0$. The hyperparameter $\beta$ controls the "aggressiveness" of the filter.
+**Failure mode.** If a fact is outdated, the activation $f(x \cdot k_i)$ is still high (the model recognizes the concept), and the stale value $v_i$ is added to the residual stream, steering the output toward the outdated answer.
 
-### 2.2 The Dynamic Threshold ($\gamma$)
-The parameter $\gamma$ is not a static constant. It is a **test-time variable** computed by the reasoning model's reflection loop:
-$$ \gamma = \text{MLP}_{reason}(\text{Entropy}(P_{actual})) $$
-If the model detects high epistemic uncertainty (entropy), it raises $\gamma$ to be more aggressive in filtering parametric noise. This makes the architecture **adaptive** to the difficulty of the query.
+## 2. The Provenance Vector
 
-### 2.3 Proof of Conflict Resolution
+Each memory slot is extended from a pair $(k_i, v_i)$ to a triple $(k_i, v_i, p_i)$, where
+
+$$ p_i = E_p([\tau_i; s_i]) \in \mathbb{R}^{d_p} $$
+
+encodes the acquisition timestamp $\tau_i$ and a source reliability score $s_i$. The provenance store is metadata: it does not enter the residual stream, so the FFN's output dimensionality is unchanged. Its sole consumer is the inference-time gate below.
+
+### 2.1 The Gating Function
+
+With $\Delta \tau_i = T_{now} - \tau_i \geq 0$ the age of slot $i$:
+
+$$ S(\Delta \tau_i) = \sigma(\gamma - \beta \cdot \Delta \tau_i) = \frac{1}{1 + \exp(\beta \cdot \Delta \tau_i - \gamma)} $$
+
+The gate decreases monotonically with age: fresh slots pass with $S \approx \sigma(\gamma) \approx 1$, stale slots are attenuated toward 0. $\beta > 0$ controls how sharply the gate closes with age; $\gamma > 0$ sets the freshness threshold (a slot is attenuated below one half once $\Delta\tau_i > \gamma/\beta$).
+
+### 2.2 The Adaptive Threshold
+
+$\gamma$ need not be static. A reasoning model can compute it during its reflection loop from the entropy of its own predictive distribution: detected conflict (high entropy, divergent candidate continuations) lowers $\gamma$, making the gate stricter for that query. This couples conflict resolution to test-time compute.
+
+### 2.3 Idealized Consistency Result
+
 In the residual stream at layer $L$:
+
 $$ z_{L} = z_{L-1} + \text{Attention}(z_{L-1}) + \text{FFN}_{steered}(z_{L-1}) $$
-If the Attention mechanism (RAG) retrieves a document $\mathcal{M}$ that contradicts $v_i$, and $v_i$ is "old" ($\Delta \tau_i$ is high), then $S(\Delta \tau_i) \approx 0$.
-The FFN contribution to the residual stream for that specific fact becomes:
-$$ S(\Delta \tau_i) \cdot v_i \approx 0 $$
-**Conclusion:** The stale parametric fact is effectively "muted," allowing the RAG-updated attention signal to dominate the hidden state without destructive interference.
 
----
+**Assumption 1 (stale support).** Every slot contributing to the outdated answer has $\Delta\tau_i > \gamma/\beta$; every slot contributing to other necessary computation has $\Delta\tau_i < \gamma/\beta$.
 
-## 3. Lifecycle Desynchronisation ($\mathcal{D}_{sync}$)
-We define desynchronisation as the information loss between an ideal system and the actual system.
+**Assumption 2 (context sufficiency).** The retrieved context contains the updated fact, and with the conflicting parametric contribution suppressed, the output distribution on the query is determined by attention over that context; call it $P_{ctx}$.
 
-### 3.1 Formal Definition
-$$ \mathcal{D}_{sync}(q) = \sum_{y \in \mathcal{V}} P_{synced}(y|q) \log \left( \frac{P_{synced}(y|q)}{P_{actual}(y|q)} \right) $$
-where $P_{synced}$ is the distribution if the model had been perfectly updated with the latest knowledge.
+**Proposition.** Under Assumptions 1 and 2, as $\beta \to \infty$ the gated model's output distribution converges to $P_{ctx}$, hence $D_{KL}(P_{ctx} \| P_{steered}) \to 0$.
 
-### 3.2 Limit Behavior
-If the Provenance Steering is applied with $\beta \rightarrow \infty$:
-$$ P_{actual}(y|q) \rightarrow P_{RAG}(y|q) $$
-$$ \mathcal{D}_{sync} \rightarrow D_{KL}(P_{RAG} \| P_{RAG}) = 0 $$
-**Defensible Claim:** The Provenance Vector is a structural solution that reduces Lifecycle Desynchronisation to its mathematical lower bound in the limit of test-time compute.
+*Proof sketch.* For slots with $\Delta\tau_i > \gamma/\beta$ the gate argument $\gamma - \beta\Delta\tau_i \to -\infty$, so $S \to 0$; for slots with $\Delta\tau_i < \gamma/\beta$ it tends to $+\infty$, so $S \to 1$. Exactly the stale slots are removed from the FFN sum; by Assumption 2 the output distribution is then $P_{ctx}$, and the KL of a distribution against itself is zero.
+
+The assumptions are strong by design: they state exactly what a real implementation must approximate, namely provenance that separates fact slots from infrastructure slots (Assumption 1), and a retriever that found the update at all (Assumption 2).
+
+## 3. Lifecycle Desynchronization
+
+### 3.1 Definition
+
+$$ \mathcal{D}_{sync}(q) = D_{KL}\left( P_{sync}(y|q) \,\|\, P(y \mid q, \theta_{stale}, \mathcal{M}_{now}) \right) $$
+
+where $P_{sync}$ is the output distribution of a hypothetical system whose weights agree with the current external store $\mathcal{M}_{now}$.
+
+### 3.2 Point-Mass Estimator
+
+$P_{sync}$ is not directly observable. For factual queries with a single verifiable answer $y^*$, approximate it with a point mass $\delta_{y^*}$. The KL divergence from a point mass reduces to a surprisal:
+
+$$ \widehat{\mathcal{D}}_{sync}(q) = D_{KL}(\delta_{y^*} \| P) = \sum_y \delta_{y^*}(y) \ln \frac{\delta_{y^*}(y)}{P(y)} = -\ln P(y^* \mid q, \theta_{stale}, \mathcal{M}_{now}) $$
+
+A value of $n$ nats means the deployed system assigns the correct answer probability $e^{-n}$.
+
+### 3.3 Context Influence
+
+$$ \mathcal{I}_{ctx}(q) = D_{KL}\left( P(y \mid q, \mathcal{M}_{now}) \,\|\, P(y \mid q) \right) $$
+
+computed over the full vocabulary. Small $\mathcal{I}_{ctx}$ with large $\widehat{\mathcal{D}}_{sync}$ means the corrective context is present but inert: the failure is in conflict resolution, not retrieval.
+
+### 3.4 Measured Values (Vioxx probe, GPT-2 base)
+
+| Quantity | Value |
+| :--- | ---: |
+| $P(\text{" safe"})$ without context | 37.53% |
+| $P(\text{" safe"})$ with withdrawal context | 42.58% |
+| $P(\text{" withdrawn"})$ with withdrawal context | $5.9 \times 10^{-6}$ |
+| $\mathcal{I}_{ctx}$ | 0.033 nats |
+| $\widehat{\mathcal{D}}_{sync}$ | 12.05 nats |
+
+All values produced by the deterministic script `dsync_experiment.py` in the repository root.
