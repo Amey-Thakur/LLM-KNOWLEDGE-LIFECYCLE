@@ -1,0 +1,36 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it as below."
+title: "The Knowledge Lifecycle of Large Language Models"
+type: software
+authors:
+  - family-names: Thakur
+    given-names: Amey
+    orcid: "https://orcid.org/0000-0001-5644-1575"
+repository-code: "https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE"
+url: "https://huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle"
+license: CC-BY-4.0
+keywords:
+  - large language models
+  - knowledge lifecycle
+  - retrieval-augmented generation
+  - knowledge editing
+  - continual learning
+  - machine unlearning
+  - knowledge conflicts
+abstract: >-
+  A unified framework organizing LLM knowledge management into five structural
+  stages (Acquisition, Storage, Retrieval, Update, Forgetting), with two
+  technical contributions: the Provenance Vector, an architectural proposal that
+  gates stale parametric activations using acquisition metadata, and Lifecycle
+  Desynchronization, a KL-based metric quantifying the failure that occurs when
+  parametric weights and retrieved context conflict, measured reproducibly on
+  GPT-2.
+preferred-citation:
+  type: article
+  title: "The Knowledge Lifecycle of Large Language Models"
+  authors:
+    - family-names: Thakur
+      given-names: Amey
+      orcid: "https://orcid.org/0000-0001-5644-1575"
+  year: 2026
+  journal: "arXiv preprint"
