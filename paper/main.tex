@@ -395,8 +395,12 @@ The most routine form of forgetting is structural: context window eviction. Desp
   % Shares the lifecycle palette with Figures 1 and 3: the parametric path takes
   % the Acquire blue and the non-parametric path the Retrieve orange, tinted for
   % fills and full strength for strokes.
-  box/.style={draw, rounded corners=4pt, minimum width=2.2cm, minimum height=0.7cm,
-              font=\sffamily\scriptsize, align=center, line width=0.7pt},
+  % A height floor above what any box needs, so all eight are the same size and
+  % the two paths read as two rows rather than as eight separate shapes.
+  box/.style={draw, rounded corners=4pt, minimum width=2.2cm, minimum height=0.78cm,
+              text width=1.95cm, font=\sffamily\scriptsize, align=center,
+              line width=0.7pt,
+              execute at begin node={\hyphenpenalty=10000\exhyphenpenalty=10000}},
   parrow/.style={-{Stealth[length=2mm]}, line width=0.9pt, color=acquire},
   nparrow/.style={-{Stealth[length=2mm]}, line width=0.9pt, color=retrieve},
   plabel/.style={font=\sffamily\scriptsize\bfseries, color=acquire},
@@ -709,8 +713,12 @@ To demonstrate that lifecycle failures are not hypothetical, we trace a document
   % boxes came out between 96.4 and 115.4 pt wide, so a stack that should read as
   % one column had ragged edges on both sides. A fixed measure makes all six
   % identical, and hyphenation is off so an overlong line shows itself.
+  % The height floor is what the tallest row needs, for the reason Figure 1 sets
+  % one: the CONFLICT row wraps to three lines where the rest take two, and
+  % letting content decide left one box 29.1 pt against 21.2 pt for its
+  % neighbours in a column that should read as a single stack.
   stage/.style={draw, rounded corners=4pt, minimum width=3.9cm, text width=3.55cm,
-                minimum height=0.65cm, font=\sffamily\scriptsize, align=center,
+                minimum height=1.05cm, font=\sffamily\scriptsize, align=center,
                 line width=0.7pt,
                 execute at begin node={\hyphenpenalty=10000\exhyphenpenalty=10000}},
   % The failing rows are marked by weight and by the red arrows feeding them, not
