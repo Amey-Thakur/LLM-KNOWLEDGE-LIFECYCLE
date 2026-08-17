@@ -13,10 +13,6 @@
 [![Status](https://img.shields.io/badge/Status-Preprint_in_preparation-2EA043)](#read-the-paper)
 [![License](https://img.shields.io/badge/License-CC_BY_4.0-lightgrey)](LICENSE)
 
-[![Paper](https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE/actions/workflows/build-paper.yml/badge.svg)](https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE/actions/workflows/build-paper.yml)
-[![Slides](https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE/actions/workflows/build-slides.yml/badge.svg)](https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE/actions/workflows/build-slides.yml)
-[![Poster](https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE/actions/workflows/build-poster.yml/badge.svg)](https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE/actions/workflows/build-poster.yml)
-
 <br>
 
 <img src=".github/social-preview.png" alt="The Knowledge Lifecycle of Large Language Models. Five stages: acquire, store, retrieve, update, forget. Retrieval succeeds, resolution fails." width="820">
@@ -261,26 +257,26 @@ Short on time: **Section 8.4** defines the metric and **Section 8.5** is the mea
 
 ---
 
-<div align="center">
+## License
+
+Released under the [Creative Commons Attribution 4.0 International](LICENSE)
+licence. You are free to share and adapt this material for any purpose,
+including commercially, provided you give appropriate credit.
+
+The arXiv style file under `paper/` is third-party and carries the licence of its
+own authors.
 
 Copyright © 2026 Amey Thakur, Sarvesh Talele
 
 <br>
 
-**[Amey Thakur](https://github.com/Amey-Thakur)** &nbsp;·&nbsp; [ORCID](https://orcid.org/0000-0001-5644-1575) &nbsp;·&nbsp; [Amey's Arc](https://amey-thakur.github.io)
+<div align="center">
 
-**[Sarvesh Talele](https://github.com/sarveshtalele)** &nbsp;·&nbsp; [ORCID](https://orcid.org/0009-0002-0818-461X)
-
-<br>
-
-**[Demo](https://huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle)** &nbsp;·&nbsp;
-**[Notebook](https://www.kaggle.com/code/ameythakur20/cross-model-lifecycle-desynchronization)** &nbsp;·&nbsp;
 **[Paper](paper/main.pdf)** &nbsp;·&nbsp;
 **[Slides](paper/presentation.pdf)** &nbsp;·&nbsp;
-**[Poster](paper/poster.pdf)**
-
-<br>
-
-[↑ Back to top](#the-knowledge-lifecycle-of-large-language-models)
+**[Poster](paper/poster.pdf)** &nbsp;·&nbsp;
+**[Demo](https://huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle)** &nbsp;·&nbsp;
+**[Notebook](https://www.kaggle.com/code/ameythakur20/cross-model-lifecycle-desynchronization)** &nbsp;·&nbsp;
+**[Discussions](https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE/discussions)**
 
 </div>

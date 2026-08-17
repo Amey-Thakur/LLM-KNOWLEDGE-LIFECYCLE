@@ -670,7 +670,7 @@ The field currently evaluates lifecycle stages in isolation, which masks cross-s
 \end{equation}
 A large value means the deployed system, even with the corrective context in its window, produces a distribution far from what a synchronized system would produce: the parametric prior is overriding the context. In the terminology of \citet{xie2024conflicts}, high $\mathcal{D}_{sync}$ is quantified stubbornness; a model that follows the context faithfully scores near zero.
 
-\paragraph{Point-mass estimator.} The synchronized distribution is not directly observable, but for factual queries with a single verifiable answer $y^*$ it is well approximated by a point mass on $y^*$. The KL divergence from a point mass reduces to a surprisal:
+\paragraph{Point-mass estimator.} Equation~\ref{eq:dsync} is not directly measurable, because the synchronized distribution is not observable, but for factual queries with a single verifiable answer $y^*$ it is well approximated by a point mass on $y^*$. The KL divergence from a point mass reduces to a surprisal:
 \begin{equation}
   \label{eq:estimator}
   \widehat{\mathcal{D}}_{sync}(q) = D_{KL}\!\left( \delta_{y^*} \,\|\, P \right) = -\ln P\!\left(y^* \mid q,\, \theta_{stale},\, \mathcal{M}_{now}\right)
@@ -978,17 +978,6 @@ As language models transition into autonomous systems, knowledge management can 
   \item \textbf{Context Influence ($\mathcal{I}_{ctx}$):} Companion diagnostic measuring how far the retrieved context moves the model's output distribution; small values with large $\mathcal{D}_{sync}$ indicate inert context.
   \item \textbf{Test-Time Compute:} Extra computational resources spent at inference time, through search or extended reasoning, to improve answer quality and conflict resolution.
 \end{itemize}
-
-% ============================================================
-% Stated in the paper as well as in the repository metadata, so the licence a
-% reader sees on the PDF is the one selected on the arXiv form and declared in
-% CITATION.cff and codemeta.json. A preprint whose stated licence contradicts
-% the one it was posted under is a needless thing for a moderator to query.
-% ============================================================
-\paragraph{Licence.} This work is released under the Creative Commons
-Attribution 4.0 International licence (CC BY 4.0). You are free to share and
-adapt the material for any purpose, including commercially, provided you give
-appropriate credit.
 
 \bibliographystyle{apalike}
 \bibliography{references}
