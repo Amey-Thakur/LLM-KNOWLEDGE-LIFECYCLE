@@ -185,45 +185,85 @@ We restrict attention to text-based LLMs built on the Transformer architecture~\
 
 The lifecycle has five stages. Each one maps to a well-defined set of research questions. Figure~\ref{fig:lifecycle} gives the visual overview.
 
+% -----------------------------------------------------------------------------
+% Figure 1, redrawn. The first version placed five stages on a pentagon and then
+% added four dashed "cross-stage" arrows, but every one of those four connected a
+% consecutive pair, so three of them were drawn directly on top of an existing
+% solid arrow and their labels landed on the boxes: "conflict" sat across the
+% Retrieve box and "catastrophic" across Forget.
+%
+% The correction is conceptual before it is graphical. The interactions this
+% figure wants to show are not chords across the pentagon; they are what happens
+% at each boundary of the cycle, which is the paper's thesis. Section 3.2 names
+% all five boundaries, so the figure now carries one arc and one label per
+% boundary, and nothing is drawn twice.
+%
+% The geometry is stated rather than eyeballed. Stage centres sit on a circle of
+% radius 4.0 cm at 72 degree intervals from the top, running clockwise so the
+% numbering reads in the direction a reader scans. Boundary labels sit on the
+% same circle's bisectors at radius 5.0 cm, which puts each one radially outside
+% the gap between the two boxes it joins. The closest approach between a label
+% and a neighbouring box centre is
+%   sqrt(5.0^2 + 4.0^2 - 2*5.0*4.0*cos 36) = 2.93 cm,
+% against a box half-diagonal of 1.72 cm plus a label half-width of about
+% 1.0 cm, so 2.72 cm is occupied and 0.21 cm is clear. Every label is set on two
+% lines to hold that half-width, which also makes the five read as one set.
+% -----------------------------------------------------------------------------
 \begin{figure*}[t]
 \centering
 \begin{tikzpicture}[
   stage/.style={
-    draw, rounded corners=8pt, minimum width=2.6cm, minimum height=1.2cm,
-    font=\sffamily\bfseries, align=center, line width=1pt
+    draw, rounded corners=8pt, minimum width=3.1cm, text width=2.75cm,
+    minimum height=1.3cm, font=\sffamily, align=center, line width=1pt
   },
-  arrow/.style={-{Stealth[length=3mm,width=2mm]}, line width=1.2pt, color=black!70},
-  backarrow/.style={-{Stealth[length=2.5mm,width=1.8mm]}, line width=0.8pt, densely dashed, color=black!40},
-  note/.style={font=\sffamily\footnotesize, text=black!60, align=center}
+  flow/.style={-{Stealth[length=3mm,width=2mm]}, line width=1.1pt, color=black!65},
+  edgelabel/.style={font=\sffamily\footnotesize\itshape, text=black!65,
+                    align=center, inner sep=1pt}
 ]
 
-% --- Five stages arranged in a pentagon ---
-\def\R{3.8}
-\node[stage, fill=blue!15] (acq) at (90:\R) {\textbf{1. Acquire}\\{\footnotesize Pre-train, Fine-tune,}\\{\footnotesize ICL, RAG}};
-\node[stage, fill=teal!15] (sto) at (162:\R) {\textbf{2. Store}\\{\footnotesize Parametric,}\\{\footnotesize Non-parametric, Hybrid}};
-\node[stage, fill=orange!15] (ret) at (234:\R) {\textbf{3. Retrieve}\\{\footnotesize Attention, RAG,}\\{\footnotesize Graph, Context Eng.}};
-\node[stage, fill=red!12] (upd) at (306:\R) {\textbf{4. Update}\\{\footnotesize Edit, Continual Learn,}\\{\footnotesize Consolidate, Resolve}};
-\node[stage, fill=purple!12] (fgt) at (18:\R) {\textbf{5. Forget}\\{\footnotesize Unlearn, Catastrophic,}\\{\footnotesize Prune, Evict}};
+% The five lifecycle colours, identical to the poster, the slides and the
+% demonstration, so the framework is recognisable across every surface.
+\definecolor{acquire} {HTML}{4A7FD4}
+\definecolor{store}   {HTML}{2A9D8F}
+\definecolor{retrieve}{HTML}{E08A2E}
+\definecolor{update}  {HTML}{D05353}
+\definecolor{forget}  {HTML}{8F5FB8}
 
-% --- Forward arrows (main lifecycle flow) ---
-\draw[arrow] (acq.south west) -- (sto.north east);
-\draw[arrow] (sto.south) -- (ret.north west);
-\draw[arrow] (ret.south east) -- (upd.south west);
-\draw[arrow] (upd.north east) -- (fgt.south);
-\draw[arrow] (fgt.north west) -- (acq.east);
+\def\R{4.0}   % stage centres
+\def\L{5.0}   % boundary labels
 
-% --- Cross-stage interaction arrows (dashed) ---
-\draw[backarrow] (ret) -- (upd) node[midway, below, note] {conflict};
-\draw[backarrow] (upd) -- (fgt) node[midway, right, note] {side effects};
-\draw[backarrow] (fgt) to[bend right=20] node[midway, above, note] {catastrophic} (acq);
-\draw[backarrow] (acq) -- (sto) node[midway, left, note] {modality};
+% --- the five stages, clockwise from the top ---------------------------------
+\node[stage, draw=acquire,  fill=acquire!12]  (acq) at ( 90:\R)
+  {\textbf{1. Acquire}\\[1pt]{\footnotesize Pre-train, fine-tune,\\ ICL, RAG}};
+\node[stage, draw=store,    fill=store!12]    (sto) at ( 18:\R)
+  {\textbf{2. Store}\\[1pt]{\footnotesize Parametric,\\ non-parametric, hybrid}};
+\node[stage, draw=retrieve, fill=retrieve!12] (ret) at (-54:\R)
+  {\textbf{3. Retrieve}\\[1pt]{\footnotesize Attention, RAG,\\ graph, context eng.}};
+\node[stage, draw=update,   fill=update!12]   (upd) at (-126:\R)
+  {\textbf{4. Update}\\[1pt]{\footnotesize Edit, continual learn,\\ consolidate, resolve}};
+\node[stage, draw=forget,   fill=forget!12]   (fgt) at (162:\R)
+  {\textbf{5. Forget}\\[1pt]{\footnotesize Unlearn, catastrophic,\\ prune, evict}};
 
-% --- Center label ---
-\node[font=\sffamily\large\bfseries, text=black!50] at (0,0) {Knowledge};
-\node[font=\sffamily\large\bfseries, text=black!50] at (0,-0.5) {Lifecycle};
+% --- one arc per boundary, bending outward so the ring reads as a cycle -------
+\draw[flow] (acq) to[bend left=20] (sto);
+\draw[flow] (sto) to[bend left=20] (ret);
+\draw[flow] (ret) to[bend left=20] (upd);
+\draw[flow] (upd) to[bend left=20] (fgt);
+\draw[flow] (fgt) to[bend left=20] (acq);
+
+% --- what goes wrong at each boundary, on the bisector, outside the ring ------
+\node[edgelabel] at ( 54:\L) {storage\\format};
+\node[edgelabel] at (-18:\L) {access\\mismatch};
+\node[edgelabel] at (-90:\L) {knowledge\\conflict};
+\node[edgelabel] at (198:\L) {collateral\\damage};
+\node[edgelabel] at (126:\L) {catastrophic\\forgetting};
+
+% --- hub ---------------------------------------------------------------------
+\node[font=\sffamily\large\bfseries, text=black!55, align=center] at (0,0)
+  {Knowledge\\Lifecycle};
 
 \end{tikzpicture}
-\caption{The Knowledge Lifecycle framework. Solid arrows show the primary flow of knowledge through five stages. Dashed arrows indicate cross-stage interactions that produce failure modes (knowledge conflicts, catastrophic forgetting, unintended side effects). Each stage maps to a distinct body of research, but the interactions between stages are where the hardest open problems lie.}
+\caption{The Knowledge Lifecycle framework. Knowledge moves clockwise through five stages, each studied by a distinct research community. The italic label on each boundary names what goes wrong when two adjacent stages disagree, following the cross-stage dependencies of \S\ref{sec:framework}: acquisition dictates storage format, retrieval must match that format, a fact edited in one store but not the other produces a knowledge conflict, every edit is a small forgetting event with collateral damage, and forgetting feeds back into acquisition as catastrophic forgetting. The stages are well covered in isolation; the five boundaries between them are where the open problems lie, and the failure measured in \S\ref{sec:crossmodel} sits on the Retrieve--Update boundary.}
 \label{fig:lifecycle}
 \end{figure*}
 

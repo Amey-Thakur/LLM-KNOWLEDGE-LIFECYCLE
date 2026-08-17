@@ -4,7 +4,7 @@
   "license": "https://spdx.org/licenses/CC-BY-4.0.html",
   "name": "The Knowledge Lifecycle of Large Language Models",
   "version": "1.0.0",
-  "datePublished": "2026-08-17",
+  "datePublished": "2026-08-20",
   "runtimePlatform": [
     "Python 3.10+",
     "PyTorch 2.0+",
