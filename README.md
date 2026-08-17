@@ -179,7 +179,7 @@ A [Kaggle notebook](https://www.kaggle.com/code/ameythakur20/cross-model-lifecyc
 
 <br>
 
-Short on time: **Section 7.5** defines the metric and **Section 7.7** is the measurement. Those two stand alone without the survey around them. The slide deck carries speaker notes throughout, so it reads as a written argument as well as a talk.
+Short on time: **Section 8.4** defines the metric and **Section 8.5** is the measurement. Those two stand alone without the survey around them. The slide deck carries speaker notes throughout, so it reads as a written argument as well as a talk.
 
 ```
 .

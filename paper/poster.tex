@@ -380,9 +380,8 @@
     % above it, far below a printed pixel, so a tick marks its origin. Drawing a
     % visible sliver would overstate the result by three orders of magnitude.
     % The ratio is 0.425749748945 / 0.000005865763 taken at full precision. An
-    % earlier draft printed 70,967, which is what the rounded 0.0006 percent
-    % gives, and rounding a denominator that small moves the answer by 2.3
-    % percent.
+    % earlier draft divided by the rounded 0.0006 percent instead, which is
+    % wrong by 2.3 percent: rounding a denominator this small moves the answer.
     % These two values sit beside their own ticks rather than under the values
     % above, so that neither number can be read against the wrong bar.
     \node[anchor=west, font=\bfseries, text=ok, text width=10.5cm] at (0, 1.7)

@@ -3,7 +3,7 @@
 FILE         : dsync_experiment.py
 PROJECT      : The Knowledge Lifecycle of Large Language Models
 PURPOSE      : The paper's measurement: the Vioxx conflict probe on GPT-2 base,
-               producing every number reported in Section 7.7.
+               producing every number reported in Section 8.5.
 TECH STACK   : Python 3, PyTorch, Hugging Face Transformers
 AUTHORS      : Amey Thakur (https://github.com/Amey-Thakur)
                Sarvesh Talele (https://github.com/sarveshtalele)
