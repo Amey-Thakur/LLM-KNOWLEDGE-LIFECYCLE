@@ -169,13 +169,23 @@ A [Kaggle notebook](https://www.kaggle.com/code/ameythakur20/cross-model-lifecyc
 <a name="read-the-paper"></a>
 ## Read the paper
 
-The manuscript is [`paper/main.tex`](paper/main.tex), with a poster and slide deck alongside it.
+<div align="center">
 
-Short on time: **Section 7.5** defines the metric and **Section 7.7** is the measurement. Those two stand alone without the survey around them.
+[![Download the paper](https://img.shields.io/badge/Download-Paper_(PDF,_18_pages)-B31B1B?logo=adobeacrobatreader&logoColor=white)](paper/main.pdf)
+&nbsp;
+[![Download the slides](https://img.shields.io/badge/Download-Slides_(PDF,_18_slides)-4A7FD4?logo=adobeacrobatreader&logoColor=white)](paper/presentation.pdf)
+
+</div>
+
+<br>
+
+Short on time: **Section 7.5** defines the metric and **Section 7.7** is the measurement. Those two stand alone without the survey around them. The slide deck carries speaker notes throughout, so it reads as a written argument as well as a talk.
+
+The LaTeX source is [`paper/main.tex`](paper/main.tex), and every push rebuilds both documents.
 
 ```
 .
-├── paper/          Manuscript, bibliography, poster, slides, derivations
+├── paper/          Manuscript, slides, bibliography, derivations
 ├── experiments/    The measurement script and the cross-model notebook
 ├── space/          The live demonstration
 ├── CITATION.cff    How to cite this work

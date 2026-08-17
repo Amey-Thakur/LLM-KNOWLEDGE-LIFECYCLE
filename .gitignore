@@ -12,9 +12,10 @@
 *.nav
 *.snm
 *.vrb
-paper/main.pdf
 paper/poster.pdf
-paper/presentation.pdf
+
+# main.pdf and presentation.pdf are committed on purpose: a reader should be
+# able to download the paper and the deck without building anything.
 
 # Python
 __pycache__/
