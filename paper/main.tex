@@ -597,7 +597,7 @@ At inference time, let $T_{now}$ be the current timestamp and $\Delta\tau_i = T_
   S(\Delta\tau_i) = \sigma\!\left( \gamma - \beta \cdot \Delta\tau_i \right)
   = \frac{1}{1 + \exp\!\left(\beta \cdot \Delta\tau_i - \gamma\right)}
 \end{equation}
-where $\beta > 0$ is a learned sensitivity parameter and $\gamma > 0$ is a freshness threshold. The gate decreases monotonically with age: fresh slots ($\Delta\tau_i \approx 0$) pass with $S \approx \sigma(\gamma) \approx 1$, while stale slots are attenuated. The steered FFN computation becomes the following, with the full forward pass stated as Algorithm~ef{alg:gated_ffn}:
+where $\beta > 0$ is a learned sensitivity parameter and $\gamma > 0$ is a freshness threshold. The gate decreases monotonically with age: fresh slots ($\Delta\tau_i \approx 0$) pass with $S \approx \sigma(\gamma) \approx 1$, while stale slots are attenuated. The steered FFN computation becomes the following, with the full forward pass stated as Algorithm~\ref{alg:gated_ffn}:
 \begin{equation}
   \label{eq:steering}
   \text{FFN}_{steered}(x) = \sum_{i=1}^{d_m} S(\Delta\tau_i)\, f(x \cdot k_i)\, v_i
@@ -754,7 +754,7 @@ To demonstrate that lifecycle failures are not hypothetical, we trace a document
 \label{fig:failure_cascade}
 \end{figure}
 
-\paragraph{Scenario.} Figure~ef{fig:failure_cascade} traces the cascade stage by stage. Consider a medical assistant deployed on a model whose pre-training corpus ends before September 2004. The fact ``Rofecoxib (Vioxx) is an FDA-approved COX-2 selective anti-inflammatory drug'' is encoded into the parametric weights during pre-training (Acquisition $\rightarrow$ Storage). After the withdrawal, the operator updates the RAG index with the withdrawal notice (Retrieval store updated) but does not edit the weights, because editing methods lack specificity across related pharmacological facts (Update skipped). A clinician asks whether the drug is safe to prescribe. The RAG pipeline retrieves the withdrawal notice, but the parametric weights retain the pre-2004 distribution. Per \citet{xie2024conflicts}, the outcome of this conflict is unpredictable. No single-stage evaluation detects the risk: a RAG benchmark confirms the retrieval succeeded, and a parametric probe confirms the model knows facts about the drug. The failure exists entirely at the boundary.
+\paragraph{Scenario.} Figure~\ref{fig:failure_cascade} traces the cascade stage by stage. Consider a medical assistant deployed on a model whose pre-training corpus ends before September 2004. The fact ``Rofecoxib (Vioxx) is an FDA-approved COX-2 selective anti-inflammatory drug'' is encoded into the parametric weights during pre-training (Acquisition $\rightarrow$ Storage). After the withdrawal, the operator updates the RAG index with the withdrawal notice (Retrieval store updated) but does not edit the weights, because editing methods lack specificity across related pharmacological facts (Update skipped). A clinician asks whether the drug is safe to prescribe. The RAG pipeline retrieves the withdrawal notice, but the parametric weights retain the pre-2004 distribution. Per \citet{xie2024conflicts}, the outcome of this conflict is unpredictable. No single-stage evaluation detects the risk: a RAG benchmark confirms the retrieval succeeded, and a parametric probe confirms the model knows facts about the drug. The failure exists entirely at the boundary.
 
 \paragraph{Measurement.} We instantiate Algorithm~\ref{alg:dsync} on GPT-2 base (124M parameters)~\citep{radford2019gpt2} under deterministic decoding. The query is \textit{``Question: Is Vioxx safe to prescribe? Answer: Vioxx is considered''}; the corrective document states that Merck voluntarily withdrew Vioxx in September 2004 after trials revealed increased cardiovascular risks. Table~\ref{tab:vioxx_results} reports the results. The measurement script is included in the accompanying repository~\citep{thakur2026code} and is exactly reproducible: it uses greedy analysis of the next-token distribution with no sampling. The same probe can be run without installing anything through the interactive demonstration~\citep{thakur2026demo}.
 
@@ -793,7 +793,7 @@ across six open models spanning 124M to 1.5B parameters and three documented
 fact changes: the Vioxx withdrawal of 2004, the British royal succession of
 2022, and the renaming of Twitter to X in 2023. Every model is evaluated in
 float32 on identical prompts, with no sampling, so the eighteen measurements
-reproduce exactly. Table~ef{tab:crossmodel} reports them.
+reproduce exactly. Table~\ref{tab:crossmodel} reports them.
 
 \begin{table}[t]
 \centering
@@ -866,7 +866,7 @@ between 7.7 and 10.6 nats to every model on the ladder, so the correct
 continuation is well within reach of all of them. The corrective document, which
 contains the same fact in prose, is worth at most 0.41 nats to any GPT-2 model.
 The failure is not that the model cannot represent the answer; it is that a
-document saying so does not reach it; Figure~ef{fig:help} shows that gap for
+document saying so does not reach it; Figure~\ref{fig:help} shows that gap for
 every model and probe. Sharper still, on GPT-2 the irrelevant
 document about the Danube moves the output distribution 0.089 nats against the
 withdrawal notice's 0.033, and an irrelevant document has the larger effect in

@@ -29,6 +29,7 @@
 [What we contribute](#what-we-contribute) &nbsp;·&nbsp;
 [Try it](#try-it) &nbsp;·&nbsp;
 [Reproduce it](#reproduce-it-yourself) &nbsp;·&nbsp;
+[More figures](#more-figures) &nbsp;·&nbsp;
 [Read the paper](#read-the-paper) &nbsp;·&nbsp;
 [Citation](#citation)
 
@@ -181,6 +182,42 @@ Two controls make that last row possible: an irrelevant document matched in leng
 The estimator, and both controls, are Sarvesh Talele's.
 
 <br>
+
+<br>
+
+<a name="more-figures"></a>
+## More from the measurement
+
+Four charts come out of the cross-model sweep. One is Figure 4 of the paper; the
+other three answer the same questions and are kept here rather than lost inside a
+notebook output.
+
+<div align="center">
+
+<img src="paper/figures/scale.png" alt="D_sync against model size for each probe. The Vioxx curve stays flat and high while the Twitter curve falls away." width="620">
+
+**Does scale resolve the conflict?** &nbsp; The Vioxx curve never falls below the
+9.2 nat threshold on four of six models, and inside the GPT-2 family it is not
+even monotone in size. The Twitter curve falls away steadily.
+
+<br>
+
+<img src="paper/figures/exposure.png" alt="Nats the corrective document moved the stale answer, per model and probe. Vioxx bars sit above zero." width="620">
+
+**The exposure trap.** &nbsp; Above zero, the document that corrects the fact made
+the *wrong* answer more likely. That is the common case on Vioxx: five of the six
+models.
+
+<br>
+
+<img src="paper/figures/control.png" alt="Context influence from the corrective document against an irrelevant one, log scale on both axes." width="560">
+
+**Was it this document, or would any document have done?** &nbsp; Below the dashed
+line, a paragraph about the Danube moved the model further than the withdrawal
+notice did. That happens in two of the eighteen measurements, one of them GPT-2 on
+the headline probe.
+
+</div>
 
 <a name="read-the-paper"></a>
 ## Read the paper
