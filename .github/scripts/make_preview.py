@@ -62,8 +62,8 @@ for y in range(0, H, 32):
 # a tint in the paper rather than as a shape drawn on top of it.
 wash = Image.new("RGB", (W, H), BG)
 wd = ImageDraw.Draw(wash)
-wd.ellipse([850, 80, 1200, 340], fill=(150, 130, 205))
-wd.ellipse([960, 150, 1230, 360], fill=(205, 145, 150))
+wd.ellipse([846, 186, 1246, 506], fill=(150, 130, 205))
+wd.ellipse([906, 246, 1186, 486], fill=(205, 145, 150))
 img = Image.blend(img, wash.filter(ImageFilter.GaussianBlur(100)), 0.16)
 d = ImageDraw.Draw(img)
 
@@ -88,12 +88,16 @@ d.text((MARGIN, 200), "of Large Language Models", font=f_title, fill=INK)
 
 # --- the five stages, named in their own colours ----------------------------
 # These are the framework, so they are shown rather than listed as prose.
+# Every chip takes the width of the longest name, so the row reads as one
+# object rather than five differently sized ones.
+CHIP_W = max(d.textlength(n, font=f_stage) for n in NAMES) + 34
+CHIP_GAP = 13
 x = MARGIN
 for name, colour in zip(NAMES, STAGES):
-    w = d.textlength(name, font=f_stage)
-    d.rounded_rectangle([x, 292, x + w + 32, 332], radius=6, fill=colour)
-    d.text((x + 16, 300), name, font=f_stage, fill=(255, 255, 255))
-    x += w + 32 + 13
+    d.rounded_rectangle([x, 292, x + CHIP_W, 332], radius=6, fill=colour)
+    d.text((x + (CHIP_W - d.textlength(name, font=f_stage)) / 2, 300),
+           name, font=f_stage, fill=(255, 255, 255))
+    x += CHIP_W + CHIP_GAP
 
 # --- contribution rows -----------------------------------------------------
 rows = [
@@ -130,28 +134,45 @@ def portrait(source, size):
     return face, mask
 
 
-# --- authors, holding the right third --------------------------------------
+# --- authors ---------------------------------------------------------------
+# The block is right-aligned to the same margin the text uses on the left, and
+# vertically centred against the body of the card, so the two columns balance
+# rather than merely sitting beside one another.
 SIZE = 112
+CELL = 178                      # one author: portrait, name, and its share of the gutter
+BLOCK_W = CELL * 2
+BLOCK_L = W - MARGIN - BLOCK_W  # mirrors MARGIN exactly on the right edge
+
+# The block is bottom-aligned with the fact chips rather than floated in the
+# middle. A shared baseline reads as deliberate; a centred block beside a
+# bottom-anchored column reads as drift.
+BODY_BOTTOM = 538                         # bottom edge of the fact chips
+BLOCK_H = SIZE + 20 + 25 + 12 + 18        # portrait, gap, name, gap, affiliation
+TOP = BODY_BOTTOM - BLOCK_H
+
 authors = [
     ("C:/t/tp/space/amey-thakur.jpg", "AMEY THAKUR"),
     ("https://github.com/sarveshtalele.png", "SARVESH TALELE"),
 ]
-centres = [946, 1122]
+centres = [BLOCK_L + CELL // 2, BLOCK_L + CELL + CELL // 2]
+
 for (source, name), cx in zip(authors, centres):
-    top = 372
     try:
         face, mask = portrait(source, SIZE)
-        img.paste(face, (cx - SIZE // 2, top), mask)
+        img.paste(face, (cx - SIZE // 2, TOP), mask)
     except Exception as error:
         print(f"  portrait unavailable for {name}: {error}")
-    d.ellipse([cx - SIZE // 2 - 3, top - 3, cx + SIZE // 2 + 2, top + SIZE + 2],
+    d.ellipse([cx - SIZE // 2 - 3, TOP - 3, cx + SIZE // 2 + 2, TOP + SIZE + 2],
               outline=RULE, width=2)
     tw = sum(d.textlength(c, font=f_name) + 1 for c in name)
-    tracked(d, (cx - tw / 2, top + SIZE + 18), name, f_name, INK, 1)
+    tracked(d, (cx - tw / 2, TOP + SIZE + 20), name, f_name, INK, 1)
 
 affil = "INDEPENDENT RESEARCH"
 aw = sum(d.textlength(c, font=f_affil) + 2 for c in affil)
-tracked(d, ((centres[0] + centres[1]) / 2 - aw / 2, 542), affil, f_affil, DIM, 2)
+tracked(d, (BLOCK_L + BLOCK_W / 2 - aw / 2, TOP + SIZE + 57), affil, f_affil, DIM, 2)
+
+# The wash follows the author block rather than sitting at a fixed spot.
+assert BLOCK_L + BLOCK_W == W - MARGIN, "author block must mirror the left margin"
 
 # --- foot band, the five stages once more ----------------------------------
 seg = W / 5
