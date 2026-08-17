@@ -56,7 +56,7 @@ Research on how language models handle knowledge is split across five subfields 
 
 This paper organizes the five as stages of a single **Knowledge Lifecycle**, then shows that the boundaries between stages are where deployed systems break. Mapping twenty representative works onto the five stages gives a median coverage of two: the interactions nobody tests are precisely the ones that cause harm in production.
 
-The manuscript is [`paper/main.tex`](paper/main.tex). Every push compiles it, the poster, and the slide deck to PDF.
+The manuscript is [`paper/main.tex`](paper/main.tex), accompanied by a poster and a slide deck.
 
 <a name="contributions"></a>
 ## Contributions
@@ -86,9 +86,7 @@ The correction is in the prompt, and the model's confidence that the drug is saf
 
 [**huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle**](https://huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle)
 
-GPT-2 runs entirely in the visitor's browser through ONNX; no server sees the input. Three preset probes cover three distinct regimes, and any fact change with a single-word answer can be entered directly. Two parameters are adjustable: sampling temperature, which controls how randomly the model chooses among candidates, and document repetition, which re-runs the model to test whether stating the correction more than once helps.
-
-The Space is mirrored from [`space/`](space/) by [a workflow](.github/workflows/sync-space.yml) on every push. **GitHub is the source of truth**; edits made through the Hugging Face web interface are overwritten by the next push.
+GPT-2 runs entirely in the visitor's browser, so no server sees the input and identical inputs always give identical numbers. Three preset probes cover three distinct failure regimes, and any fact change with a single-word answer can be entered directly. Two parameters are adjustable: sampling temperature, which controls how randomly the model chooses among candidates, and document repetition, which tests whether stating the correction more than once helps.
 
 <a name="reproducing-the-measurement"></a>
 ## Reproducing the measurement
@@ -115,8 +113,7 @@ Prints the top tokens under both conditions, the probabilities of the correct an
 │   ├── dsync_experiment.py   #   The paper's measurement, deterministic
 │   ├── cross_model_dsync.ipynb  # Cross-model sweep, runs on Kaggle
 │   └── README.md             #   How to run it and what to report
-├── space/                    # The live demonstration, mirrored to Hugging Face
-├── .github/                  # Build and sync workflows
+├── space/                    # The live demonstration
 ├── CITATION.cff              # How to cite this work
 ├── codemeta.json             # Machine-readable project metadata
 └── LICENSE                   # CC BY 4.0
