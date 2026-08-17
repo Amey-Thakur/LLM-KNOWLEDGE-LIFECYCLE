@@ -26,7 +26,7 @@
 % and hyperref fails there whether loaded before or after \usetheme. At A0 a
 % clickable link buys nothing, so URLs are plain text.
 
-\documentclass[25pt, a0paper, portrait, blockverticalspace=12mm, colspace=16mm,
+\documentclass[25pt, a0paper, portrait, blockverticalspace=9mm, colspace=16mm,
                subcolspace=8mm]{tikzposter}
 
 \usepackage{amsmath}
@@ -66,17 +66,6 @@
 \colorlet{blockbodybgcolor}{white}
 \colorlet{blockbodyfgcolor}{ink}
 
-% A circular portrait at a fixed physical size, so both authors always match.
-% #2 is a diameter and the radius is derived: width=2*#2 is not valid LaTeX
-% arithmetic and silently broke an earlier build.
-\newcommand{\portrait}[2]{%
-  \begin{tikzpicture}
-    \begin{scope}\clip (0,0) circle (\dimexpr#2/2\relax);
-      \node at (0,0) {\includegraphics[width=#2]{#1}};\end{scope}
-    \draw[hairline, line width=3pt] (0,0) circle (\dimexpr#2/2\relax);
-  \end{tikzpicture}%
-}
-
 % The identity band, drawn in arbitrary units and scaled by the caller.
 \newcommand{\stageband}{%
   \resizebox{\linewidth}{!}{%
@@ -93,18 +82,19 @@
 \settitle{
   \centering
   \stageband
-  \vspace{14mm}
+  \vspace{10mm}
 
   {\fontsize{104}{116}\selectfont\bfseries\color{ink}
-   The Knowledge Lifecycle of Large Language Models\par}
-  \vspace{10mm}
+   The Knowledge Lifecycle\\[4mm]
+   of Large Language Models\par}
+  \vspace{8mm}
 
   {\fontsize{40}{50}\selectfont\color{muted}
    A model holds two memories. When they disagree, training usually wins.\par}
-  \vspace{14mm}
+  \vspace{10mm}
 
   \begin{minipage}[c]{0.40\linewidth}\raggedleft
-    \begin{minipage}[c]{4.4cm}\portrait{amey-thakur.jpg}{4cm}\end{minipage}%
+    \begin{minipage}[c]{3.6cm}\includegraphics[width=3.4cm]{amey-circle.png}\end{minipage}%
     \hspace{5mm}%
     \begin{minipage}[c]{14cm}\raggedright
       {\fontsize{34}{40}\selectfont\bfseries\color{ink} Amey Thakur\par}
@@ -113,7 +103,7 @@
   \end{minipage}%
   \hspace{0.06\linewidth}%
   \begin{minipage}[c]{0.40\linewidth}\raggedright
-    \begin{minipage}[c]{4.4cm}\portrait{sarvesh-talele.jpg}{4cm}\end{minipage}%
+    \begin{minipage}[c]{3.6cm}\includegraphics[width=3.4cm]{sarvesh-circle.png}\end{minipage}%
     \hspace{5mm}%
     \begin{minipage}[c]{14cm}\raggedright
       {\fontsize{34}{40}\selectfont\bfseries\color{ink} Sarvesh Talele\par}
@@ -217,12 +207,12 @@
   Vioxx was withdrawn worldwide in September 2004 for raising the risk of heart
   attack and stroke. Put that withdrawal notice \textbf{directly into GPT-2's
   prompt}, then ask whether the drug is safe to prescribe.
-  \vspace{8mm}
+  \vspace{6mm}
 
   \resizebox{\linewidth}{!}{%
   \begin{tikzpicture}
-    \node[anchor=west, text=muted] at (14, 6.0) {without the notice};
-    \node[anchor=west, text=muted] at (30, 6.0) {with the notice in the prompt};
+    \node[anchor=west, text=muted] at (14, 5.4) {without the notice};
+    \node[anchor=west, text=muted] at (30, 5.4) {with the notice in the prompt};
 
     \node[anchor=west, font=\bfseries\Large, text=update] at (0, 3.6) {``safe''};
     \fill[update!45] (14, 2.9) rectangle (14 + 5.63, 4.3);
@@ -239,21 +229,21 @@
     \draw[ok, line width=2.5pt] (30, 0.2) -- (30, 1.6);
     \node[anchor=west, font=\bfseries, text=ok] at (37.0, 0.9) {0.0006\%};
 
-    \node[anchor=west, text=muted, font=\small] at (0, -1.4)
+    \node[anchor=west, text=muted, font=\small] at (0, -1.1)
       {Bars true to scale. The correct answer's bar would be 1/70{,}967 the width
        of the one above it, so a tick marks where it begins.};
-    \useasboundingbox (0,-2.2) rectangle (46, 6.6);
+    \useasboundingbox (0,-1.7) rectangle (46, 6.0);
   \end{tikzpicture}}
-  \vspace{9mm}
+  \vspace{6mm}
 
   \resizebox{\linewidth}{!}{%
   \begin{tikzpicture}
-    \fill[panel]  (0,0) rectangle (46, 7.4);
-    \fill[update] (0,0) rectangle (0.45, 7.4);
-    \node[anchor=north west, align=left, text width=42.5cm] at (1.8, 6.4)
+    \fill[panel]  (0,0) rectangle (46, 5.0);
+    \fill[update] (0,0) rectangle (0.45, 5.0);
+    \node[anchor=north west, align=left, text width=42.5cm] at (1.8, 4.4)
       {\bfseries\Large The correction is in the prompt, and confidence that the
        drug is safe \textcolor{update}{goes up}.};
-    \node[anchor=north west, align=left, text width=42.5cm, text=muted] at (1.8, 3.4)
+    \node[anchor=north west, align=left, text width=42.5cm, text=muted] at (1.8, 2.2)
       {Retrieval worked. What failed is the step after it, where the model must
        decide which of its two memories to believe.};
   \end{tikzpicture}}
@@ -348,22 +338,11 @@
   confound the result. A laptop is enough.
   \vspace{7mm}
 
-  {\color{muted}
-   The metric is \textbf{measured}. The architecture is \textbf{proposed}, with an
-   idealized proof under stated assumptions, and has not been trained. The paper
-   says so in its limitations.\par}
-  \vspace{8mm}
+  {\color{muted}The metric is \textbf{measured}. The architecture is
+   \textbf{proposed} and has not been trained; the paper says so.\par}
 
-  \resizebox{\linewidth}{!}{%
-  \begin{tikzpicture}
-    \draw[hairline, line width=3pt] (0, 6.0) -- (26, 6.0);
-    \node[anchor=north west, align=left, text=muted, text width=25.4cm] at (0, 5.2)
-      {\textbf{Paper and code}\\ github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE};
-    \node[anchor=north west, align=left, text=muted, text width=25.4cm] at (0, 2.3)
-      {\textbf{Live demonstration}\\ huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle};
-    \useasboundingbox (0,-1.0) rectangle (26, 6.4);
-  \end{tikzpicture}}
 }
+
 \end{columns}
 
 % =============================================================================
@@ -371,9 +350,22 @@
 % =============================================================================
 \block{}{
   \centering
-  {\color{muted}\normalsize
-   Amey Thakur \; ORCID 0000-0001-5644-1575 \quad$\cdot$\quad
-   Sarvesh Talele \; ORCID 0009-0002-0818-461X \quad$\cdot$\quad CC BY 4.0\par}
+  \resizebox{\linewidth}{!}{%
+  \begin{tikzpicture}
+    \draw[hairline, line width=2pt] (0, 7.4) -- (100, 7.4);
+
+    % Three even bays across the width, so the footer is symmetric rather than
+    % a single centred run of text with empty shoulders.
+    \node[anchor=north, align=center, text=muted] at (16.7, 6.4)
+      {\textbf{Paper and code}\\ github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE};
+    \node[anchor=north, align=center, text=muted] at (50, 6.4)
+      {\textbf{Live demonstration}\\ huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle};
+    \node[anchor=north, align=center, text=muted] at (83.3, 6.4)
+      {\textbf{Authors}\\ ORCID 0000-0001-5644-1575 \quad ORCID 0009-0002-0818-461X};
+
+    \node[anchor=north, text=muted, font=\small] at (50, 2.0) {CC BY 4.0};
+    \useasboundingbox (0, 0.6) rectangle (100, 8.0);
+  \end{tikzpicture}}
   \vspace{7mm}
   \stageband
 }
