@@ -104,6 +104,8 @@ The correction is sitting in front of the model, and its confidence that the dru
 
 This is not a hallucination in the usual sense. Retrieval worked perfectly: the right document was found and delivered. What failed is the step after it, where the model must decide which of its two memories to believe. No benchmark for retrieval, editing, or memory tests that step, because it belongs to none of them.
 
+Two measurements separate those cases. The correct answer sits at **12.05 nats** of surprisal, and anything past **9.2 nats** is below one chance in ten thousand, where no realistic decoding recovers it. Meanwhile the document shifts the model's entire output distribution by only **0.033 nats**: it is present, and it is inert.
+
 The root cause is what training throws away. A model learns *what* is true but never *when* it learned it or *where the claim came from*, so at inference it has no principled basis for preferring fresh evidence over a confident old memory.
 
 <br>
@@ -113,7 +115,7 @@ The root cause is what training throws away. A model learns *what* is true but n
 
 [![Retrieve](https://img.shields.io/badge/Retrieve-E08A2E)](#the-five-stages) [![Update](https://img.shields.io/badge/Update-D05353)](#the-five-stages)
 
-**A metric that makes the failure visible.** Lifecycle Desynchronization measures how far the correct answer has been pushed down while the corrective document is present. It is reported in nats, a unit that converts straight back to probability: 12.05 nats means the right answer holds about six chances in a million. A companion number measures whether the document moved the model at all, which separates a retrieval failure from a resolution failure. No single-stage benchmark can tell those two apart.
+**A metric that makes the failure visible.** Lifecycle Desynchronization measures how far the correct answer has been pushed down while the corrective document is present. It is reported in nats, a unit that converts straight back to probability: 12.05 nats means the right answer holds about six chances in a million. A companion number, context influence, measures whether the document moved the model at all. Together they separate a retrieval failure, where the document never arrived, from a resolution failure, where it arrived and was ignored. No single-stage benchmark can tell those two apart.
 
 [![Acquire](https://img.shields.io/badge/Acquire-4A7FD4)](#the-five-stages) [![Store](https://img.shields.io/badge/Store-2A9D8F)](#the-five-stages)
 
