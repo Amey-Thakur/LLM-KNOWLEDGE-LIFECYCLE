@@ -25,7 +25,7 @@
 [What we contribute](#what-we-contribute) &nbsp;·&nbsp;
 [Try it](#try-it) &nbsp;·&nbsp;
 [Reproduce it](#reproduce-it-yourself) &nbsp;·&nbsp;
-[More figures](#more-figures) &nbsp;·&nbsp;
+[Every figure](#more-figures) &nbsp;·&nbsp;
 [Read the paper](#read-the-paper) &nbsp;·&nbsp;
 [Citation](#citation)
 
@@ -178,38 +178,90 @@ Two controls make that last row possible: an irrelevant document matched in leng
 <br>
 
 <a name="more-figures"></a>
-## More from the measurement
+## Every figure, explained
 
-Four charts come out of the cross-model sweep. One is Figure 4 of the paper; the
-other three answer the same questions and are kept here rather than lost inside a
-notebook output.
+The paper carries six figures. Three are diagrams of the framework, three are
+measurements. All of them are below, with the point of each one written out, so
+you can follow the argument without opening the PDF.
+
+### The framework
 
 <div align="center">
 
-<img src="paper/figures/scale.png" alt="D_sync against model size for each probe. The Vioxx curve stays flat and high while the Twitter curve falls away." width="620">
+<img src="paper/figures/fig1-lifecycle.png" alt="The knowledge lifecycle as a ring of five stages: acquire, store, retrieve, update, forget, with a failure named on each boundary." width="620">
 
-**Does scale resolve the conflict?** &nbsp; The Vioxx curve never falls below the
-9.2 nat threshold on four of six models, and inside the GPT-2 family it is not
-even monotone in size. The Twitter curve falls away steadily.
-
-<br>
-
-<img src="paper/figures/exposure.png" alt="Nats the corrective document moved the stale answer, per model and probe. Vioxx bars sit above zero." width="620">
-
-**The exposure trap.** &nbsp; Above zero, the document that corrects the fact made
-the *wrong* answer more likely. That is the common case on Vioxx: five of the six
-models.
+**Figure 1 &nbsp;·&nbsp; The lifecycle.** &nbsp; A fact moves clockwise through five
+stages. Each stage has its own research community and its own benchmarks. The
+italic word on each boundary is what breaks when two neighbouring stages disagree,
+and those five boundaries are what nobody is testing. The failure measured in this
+work sits on **Retrieve → Update**, at the bottom of the ring.
 
 <br>
 
-<img src="paper/figures/control.png" alt="Context influence from the corrective document against an irrelevant one, log scale on both axes." width="560">
+<img src="paper/figures/fig2-two-paths.png" alt="Two paths from a knowledge source to generated output: a parametric path through weights and attention, and a non-parametric path through an index and a RAG pipeline, meeting at a conflict zone." width="720">
 
-**Was it this document, or would any document have done?** &nbsp; Below the dashed
-line, a paragraph about the Danube moved the model further than the withdrawal
-notice did. That happens in two of the eighteen measurements, one of them GPT-2 on
-the headline probe.
+**Figure 2 &nbsp;·&nbsp; Where knowledge can live.** &nbsp; Put a fact in the weights
+and it is fast but almost impossible to change. Put it in a database and it is
+trivial to change but only as good as the retriever. Real systems do both, and the
+two copies meet at the dashed red line. Nothing in the architecture says which one
+wins.
+
+<br>
+
+<img src="paper/figures/fig3-failure-cascade.png" alt="Six stacked stages showing the Vioxx failure: acquire, store, retrieve, then update not applied, then conflict, then cannot forget." width="560">
+
+**Figure 3 &nbsp;·&nbsp; How the failure actually happens.** &nbsp; Read it top to
+bottom. The first three steps all succeed: the model learned the drug was
+approved, stored it, and the search pipeline correctly returned the 2004
+withdrawal notice. The weights were never edited, so the conflict at step 5 is
+resolved in favour of the old memory, and step 6 cannot undo it without
+retraining. **Every individual stage passed its own test.**
 
 </div>
+
+### The measurement
+
+<div align="center">
+
+<img src="paper/figures/scale.png" alt="D_sync against model size for each probe. The Vioxx curve stays high and is not monotone, while the Twitter curve falls away." width="640">
+
+**Figure 4 &nbsp;·&nbsp; Does a bigger model fix it?** &nbsp; No. Lower is better.
+The Twitter probe (teal) falls steadily as models grow, which is what resolving
+looks like. The Vioxx probe (red) stays above the dashed failure line and is not
+even ordered by size: the 774M model is **worse** than the 355M one.
+
+<br>
+
+<img src="paper/figures/exposure.png" alt="Nats the corrective document moved the stale answer, per model and probe. The Vioxx bars sit above zero on five of six models." width="640">
+
+**Figure 5 &nbsp;·&nbsp; The exposure trap.** &nbsp; Anything above zero means the
+document that *corrects* the fact made the **wrong** answer more likely. On the
+Vioxx probe that happens on five of the six models. Naming a fact, even in order
+to deny it, strengthens what the model already believes.
+
+<br>
+
+<img src="paper/figures/help.png" alt="Help delivered by the corrective document against help available when the answer is stated outright, per model and probe." width="640">
+
+**Figure 6 &nbsp;·&nbsp; Was the answer even reachable?** &nbsp; The pale bar is how
+far the model *can* be moved, measured by simply stating the answer outright. The
+solid bar is how far the real document moved it. On Twitter the document collects
+nearly everything available. On Vioxx it collects almost none of roughly ten nats,
+and on the largest model it moves the wrong way. The answer was in reach; the
+document did not deliver it.
+
+<br>
+
+<img src="paper/figures/control.png" alt="Context influence from the corrective document against an irrelevant one, log scale on both axes." width="600">
+
+**A fourth chart, not in the paper.** &nbsp; Each point is one measurement. Above
+the line, the corrective document moved the model more than an unrelated
+paragraph about the Danube. Below it, the Danube won. That happens twice in
+eighteen measurements, and one of them is GPT-2 on the headline probe.
+
+</div>
+
+<br>
 
 <a name="read-the-paper"></a>
 ## Read the paper
