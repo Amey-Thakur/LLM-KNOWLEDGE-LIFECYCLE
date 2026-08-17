@@ -48,8 +48,12 @@ jobs:
           root_file: main.tex
           args: -pdf -bibtex -interaction=nonstopmode -file-line-error
 
+      # main.bbl travels with the arXiv upload, so a difference in how apalike
+      # resolves on their machine cannot change the bibliography.
       - name: Upload the manuscript
         uses: actions/upload-artifact@v4
         with:
           name: manuscript
-          path: paper/main.pdf
+          path: |
+            paper/main.pdf
+            paper/main.bbl
