@@ -717,8 +717,12 @@ To demonstrate that lifecycle failures are not hypothetical, we trace a document
   % one: the CONFLICT row wraps to three lines where the rest take two, and
   % letting content decide left one box 29.1 pt against 21.2 pt for its
   % neighbours in a column that should read as a single stack.
-  stage/.style={draw, rounded corners=4pt, minimum width=3.9cm, text width=3.55cm,
-                minimum height=1.05cm, font=\sffamily\scriptsize, align=center,
+  % 4.4 cm of measure, because the two bold rows are the longest: at 3.55 cm
+  % "4. Update: Weights NOT edited" broke after "Weights" and ran to three lines
+  % where every other row took two. The height floor then follows from two lines
+  % rather than three, so the column is both uniform and no taller than it needs.
+  stage/.style={draw, rounded corners=4pt, minimum width=4.7cm, text width=4.4cm,
+                minimum height=0.9cm, font=\sffamily\scriptsize, align=center,
                 line width=0.7pt,
                 execute at begin node={\hyphenpenalty=10000\exhyphenpenalty=10000}},
   % The failing rows are marked by weight and by the red arrows feeding them, not
@@ -742,8 +746,8 @@ To demonstrate that lifecycle failures are not hypothetical, we trace a document
 \draw[farr] (upd) -- (conf);
 \draw[farr] (conf) -- (fgt);
 
-\node[font=\sffamily\tiny, text=muted, align=right] at (-3.05, -0.6) {Normal\\flow};
-\node[font=\sffamily\tiny, text=update, align=right] at (-3.05, -4.2) {Failure\\cascade};
+\node[font=\sffamily\tiny, text=muted, align=right] at (-3.45, -0.6) {Normal\\flow};
+\node[font=\sffamily\tiny, text=update, align=right] at (-3.45, -4.2) {Failure\\cascade};
 
 \end{tikzpicture}
 \caption{A lifecycle failure cascade applied to the Rofecoxib (Vioxx) withdrawal. The parametric weights encode an outdated drug approval from pre-training data (Stages 1--2). The RAG index is updated with the FDA withdrawal notice (Stage 3), but no weight edit is applied (Stage 4). The resulting conflict produces a dangerous output (Stage 5), and cannot be resolved without costly retraining (Stage 6). No single-stage benchmark detects this failure.}

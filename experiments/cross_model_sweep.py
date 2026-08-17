@@ -94,6 +94,17 @@ def run_probe(model, tokenizer, probe):
         model, tokenizer, probe["context"] + "\n" + probe["query"])
 
     ids = tokenizer.encode(probe["answer"], add_special_tokens=False)
+
+    # SentencePiece tokenizers, Llama's among them, can encode the answer's
+    # leading space as a token of its own that decodes to the empty string.
+    # Measuring that token measures whitespace rather than the answer: on Kaggle
+    # this put TinyLlama's Twitter probe at 8.62 nats with correct_top1 False
+    # while its top continuation was in fact the correct "X", and the same run
+    # on another machine gave 0.17 nats and True. Dropping leading pieces that
+    # carry no characters makes the estimator read the same on any tokenizer.
+    while len(ids) > 1 and tokenizer.decode([ids[0]]).strip() == "":
+        ids = ids[1:]
+
     first_piece = tokenizer.decode([ids[0]])
 
     raw_plain = p_plain[ids[0]].item()
