@@ -112,13 +112,28 @@
   \raggedright\hyphenpenalty=10000\exhyphenpenalty=10000\relax}
 
 % -----------------------------------------------------------------------------
-% The identity band. Drawn 58 units wide so it scales like every figure.
+% The identity band, drawn 58 units wide so it scales like every figure.
+%
+% Two things here are deliberate, and the first proof got both wrong.
+%
+% The target is \textwidth, not \linewidth. A minipage sets \linewidth and the
+% author cards above are built from minipages, so by the time the divider was
+% reached \linewidth read 38.0 cm rather than the 82.5 cm measure, and the band
+% came out at 46 percent width while the identical band at the top of the page
+% came out correct.
+%
+% Every coordinate is a literal. Written as \i*11.6 + 5.8, the arithmetic
+% resolved for the fills but not for the labels, which landed on y = 0 instead
+% of y = 0.95 and so straddled the bottom edge of their own band, half of each
+% word in white on white. Spelling the numbers out removes the parser from the
+% question entirely.
 % -----------------------------------------------------------------------------
 \newcommand{\stageband}[1]{%
-  \resizebox{\linewidth}{!}{%
+  \resizebox{\textwidth}{!}{%
     \begin{tikzpicture}
-      \foreach \c [count=\i from 0] in {acquire, store, retrieve, update, forget}
-        \fill[\c] (\i*11.6, 0) rectangle (\i*11.6 + 11.6, #1);
+      \foreach \c/\a/\b in {acquire/0/11.6, store/11.6/23.2, retrieve/23.2/34.8,
+                            update/34.8/46.4, forget/46.4/58}
+        {\fill[\c] (\a, 0) rectangle (\b, #1);}
     \end{tikzpicture}}%
 }
 
@@ -127,12 +142,14 @@
 % 11.6 units and the longest name, RETRIEVE, is about 4.0 units, so no name can
 % reach its neighbor.
 \newcommand{\stagebandnamed}{%
-  \resizebox{\linewidth}{!}{%
+  \resizebox{\textwidth}{!}{%
     \begin{tikzpicture}
-      \foreach \c/\n [count=\i from 0] in
-        {acquire/ACQUIRE, store/STORE, retrieve/RETRIEVE, update/UPDATE, forget/FORGET}
-        {\fill[\c] (\i*11.6, 0) rectangle (\i*11.6 + 11.6, 1.9);
-         \node[text=white, font=\bfseries] at (\i*11.6 + 5.8, 0.95) {\n};}
+      \foreach \c/\a/\b in {acquire/0/11.6, store/11.6/23.2, retrieve/23.2/34.8,
+                            update/34.8/46.4, forget/46.4/58}
+        {\fill[\c] (\a, 0) rectangle (\b, 1.9);}
+      \foreach \n/\x in {ACQUIRE/5.8, STORE/17.4, RETRIEVE/29.0, UPDATE/40.6,
+                         FORGET/52.2}
+        {\node[text=white, font=\bfseries, anchor=center] at (\x, 0.95) {\n};}
     \end{tikzpicture}}%
 }
 
@@ -174,6 +191,9 @@
 
 \settitle{
   \centering
+  % The class leaves 1.3 cm above this band and 2.29 cm below the closing one.
+  % This lead evens the two at 1.8 cm.
+  \vspace*{5mm}
   \stageband{0.9}
   \vspace{8mm}
 
