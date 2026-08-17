@@ -41,12 +41,17 @@ body {
   font: 16px/1.55 -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   color: var(--ink);
   background:
+    /* Stage-colour wash across the whole page, not only the header. */
     linear-gradient(180deg,
-      rgba(74,127,212,.13) 0%, rgba(42,157,143,.10) 22%,
-      rgba(224,138,46,.085) 44%, rgba(208,83,83,.07) 66%,
-      rgba(143,95,184,.055) 84%, rgba(255,255,255,0) 100%) no-repeat 0 0 / 100% 460px,
-    repeating-linear-gradient(0deg, transparent 0 23px, rgba(26,26,26,.06) 23px 24px),
-    repeating-linear-gradient(90deg, transparent 0 23px, rgba(26,26,26,.06) 23px 24px),
+      rgba(74,127,212,.075) 0%, rgba(42,157,143,.055) 20%,
+      rgba(224,138,46,.045) 40%, rgba(208,83,83,.04) 62%,
+      rgba(143,95,184,.045) 82%, rgba(74,127,212,.04) 100%),
+    /* Measurement grid: a major line every fifth cell, so the ground has
+       structure at reading distance instead of an even hairline hum. */
+    repeating-linear-gradient(0deg, transparent 0 119px, rgba(26,26,26,.10) 119px 120px),
+    repeating-linear-gradient(90deg, transparent 0 119px, rgba(26,26,26,.10) 119px 120px),
+    repeating-linear-gradient(0deg, transparent 0 23px, rgba(26,26,26,.055) 23px 24px),
+    repeating-linear-gradient(90deg, transparent 0 23px, rgba(26,26,26,.055) 23px 24px),
     var(--bg);
 }
 
@@ -400,3 +405,11 @@ footer { margin-top: 4rem; padding-top: 2rem; }
 .preset.active { background: #fff; }
 textarea, input[type=text], select { background: rgba(255,255,255,.94); }
 textarea:focus, input:focus, select:focus { background: #fff; }
+
+/* Panels are opaque against the tinted ground, which is what separates
+   content from page now that the ground is visible. */
+.narrative, #bars, .temp-block { background: #fff; }
+.alert { background: rgba(255,255,255,.82); }
+.preset { background: rgba(255,255,255,.92); }
+table { background: rgba(255,255,255,.55); }
+.grid2 th { background: rgba(250,250,250,.95); }
