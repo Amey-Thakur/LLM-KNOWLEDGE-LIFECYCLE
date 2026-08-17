@@ -11,15 +11,13 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{amsthm}
-\usepackage{nicefrac}
 \usepackage{microtype}
 \usepackage{graphicx}
-\usepackage{multirow}
 \usepackage{natbib}
 \usepackage{doi}
 \usepackage{xcolor}
 \usepackage{tikz}
-\usetikzlibrary{arrows.meta, positioning, shapes.geometric, calc, decorations.pathmorphing, fit, backgrounds}
+\usetikzlibrary{arrows.meta, positioning, calc}
 
 % -----------------------------------------------------------------------------
 % The five lifecycle colours, shared by every figure here and by the poster, the
@@ -30,12 +28,9 @@
 \definecolor{retrieve}{HTML}{E08A2E}
 \definecolor{update}  {HTML}{D05353}
 \definecolor{forget}  {HTML}{8F5FB8}
-\definecolor{ink}     {HTML}{1A1A1C}
 \definecolor{muted}   {HTML}{4A4A55}
-\definecolor{hairline}{HTML}{C8CAD2}
 \usepackage{enumitem}
 \usepackage{caption}
-\usepackage{subcaption}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
 
@@ -121,7 +116,7 @@ Current responses to these challenges are fragmented. General surveys on LLMs~\c
 
 Each subfield has its own dedicated surveys~\citep{gao2023ragsurvey, mialon2023augmented, hu2025agentmemory, wu2025humanmemory}. They rarely integrate their methodologies. Optimizing a RAG retriever seldom includes an evaluation of what happens when retrieved facts contradict the model's parametric memory. A team building a knowledge editor rarely checks whether their edits survive continual fine-tuning. These isolated evaluations obscure cross-stage system failures.
 
-This paper proposes an integrated approach. Rather than treating these problems in isolation, we formalize them as stages of a single unified architecture: the \textbf{Knowledge Lifecycle} of large language models. The lifecycle defines five structural stages: how knowledge is \textit{acquired} and \textit{stored} (\S\ref{sec:legacy_pipeline}), how it is \textit{retrieved} when needed (\S\ref{sec:retrieval}), how it is \textit{updated} as the world changes (\S\ref{sec:update}), and how it is \textit{forgotten}, whether deliberately or by accident (\S\ref{sec:forgetting}).
+This paper proposes an integrated approach. Rather than treating these problems in isolation, we formalize them as stages of a single unified architecture: the \textbf{Knowledge Lifecycle} of large language models. The lifecycle defines five structural stages: how knowledge is \textit{acquired}, \textit{stored}, and \textit{retrieved} (\S\ref{sec:legacy_pipeline}), how it is \textit{updated} as the world changes (\S\ref{sec:update}), and how it is \textit{forgotten}, whether deliberately or by accident (\S\ref{sec:forgetting}).
 
 \paragraph{Contributions.} We make three contributions:
 
@@ -296,15 +291,15 @@ Before examining how inference-time scaling alters the lifecycle, we formally de
 \label{sec:acquisition}
 \label{sec:storage}
 
-Pre-training and fine-tuning serve as the primary mechanisms for eager knowledge acquisition. Unlike adversarial generative training, in which a discriminator supplies the learning signal~\citep{thakur2021gan}, autoregressive language models learn by maximum likelihood: the model compresses factual, linguistic, and procedural information into its weights by minimizing the cross-entropy loss over a training corpus $\mathcal{D}$:
+Pre-training and fine-tuning serve as the primary mechanisms for eager knowledge acquisition. Autoregressive language models learn by maximum likelihood: the model compresses factual, linguistic, and procedural information into its weights by minimizing the cross-entropy loss over a training corpus $\mathcal{D}$:
 \begin{equation}
   \label{eq:ce}
   \mathcal{L}_{\text{CE}}(\theta) = -\mathbb{E}_{x \sim \mathcal{D}} \left[ \sum_{t=1}^T \log P_\theta(x_t \mid x_{<t}) \right]
 \end{equation}
 
-\paragraph{Intuition.} This is a mimicry objective. The model predicts the next token in a sequence and receives a penalty when its prediction deviates from the ground truth. The process forces factual knowledge into the parameters $\theta$, but it does so without any metadata: the model learns \textit{what} is true, but not \textit{when} or \textit{why} it is true. This absence of provenance is the root cause of the failures analyzed in \S\ref{sec:contributions}.
+\paragraph{Intuition.} This is a mimicry objective. The model predicts the next token in a sequence and receives a penalty when its prediction deviates from the ground truth. The comparison with adversarially trained generators locates the problem in the objective rather than in the architecture: there a second network supplies the learning signal~\citep{thakur2021gan}, and a second network is somewhere information about the source could in principle be carried, whereas Equation~\ref{eq:ce} sees only the next token over an undifferentiated corpus. The process forces factual knowledge into the parameters $\theta$, but it does so without any metadata: the model learns \textit{what} is true, but not \textit{when} or \textit{why} it is true. This absence of provenance is the root cause of the failures analyzed in \S\ref{sec:contributions}.
 
-Once acquired, this knowledge resides implicitly within the feed-forward networks (FFNs), the classical dense building blocks of neural computation~\citep{thakur2021fundamentals}. \citet{geva2021kv} established that Transformer FFNs operate as associative key-value memories. For an input representation $x$, the FFN computation is:
+Once acquired, this knowledge resides implicitly within the feed-forward networks (FFNs). Nothing in the construction of a dense layer~\citep{thakur2021fundamentals} marks it as a memory: it is a weight matrix, a bias, and a nonlinearity, with no field in which to record anything about the data that shaped it. The memory reading is emergent. \citet{geva2021kv} established that Transformer FFNs operate as associative key-value memories. For an input representation $x$, the FFN computation is:
 \begin{equation}
   \label{eq:ffn}
   \text{FFN}(x) = f(x K^\top)V = \sum_{i=1}^{d_m} f(x \cdot k_i)\, v_i
@@ -898,7 +893,7 @@ Current RAG pipelines are modular but non-differentiable: the retriever and the 
 
 \subsection{Multi-Modal Knowledge Lifecycles}
 
-This paper focuses on text, but each new modality brings its own lifecycle challenges. Visual generative systems encode domain knowledge in their learned representations just as language models do; our earlier work on GAN-based stylization and cross-domain synthesis~\citep{thakur2021whitebox, thakur2021aoda} depended on exactly such learned visual priors, and zero-shot vision-language pipelines for safety-critical video understanding~\citep{thakur2026accident} inherit the currency of the pre-trained models they compose. A vision-language model whose textual weights encode a drug's approval while an image in context shows its withdrawal notice faces the same boundary conflict measured in \S\ref{sec:case_study}, with the added complication that text priors are known to override visual evidence. Extending the $\mathcal{D}_{sync}$ protocol to controlled text-image conflict pairs on open VLMs is an experiment we have scoped and intend to report separately; the measurement requires token-probability access to the fused decoder, which open models such as LLaVA provide.
+This paper focuses on text, but each new modality brings its own lifecycle challenges. Visual generative systems encode domain knowledge in their learned representations just as language models do, and they inherit the same staleness: stylization and cross-domain synthesis models generate from priors fixed at training time~\citep{thakur2021whitebox, thakur2021aoda}, with no mechanism to revise them when the domain moves. Zero-shot vision-language pipelines compound the problem, because a pipeline assembled from frozen components is only as current as the least current of them~\citep{thakur2026accident}. A vision-language model whose textual weights encode a drug's approval while an image in context shows its withdrawal notice faces the same boundary conflict measured in \S\ref{sec:case_study}, with the further question of which modality wins when they disagree. Extending the $\mathcal{D}_{sync}$ protocol to controlled text-image conflict pairs on open VLMs is an experiment we have scoped and intend to report separately; the measurement requires token-probability access to the fused decoder, which open models such as LLaVA provide.
 
 \subsection{Knowledge Lifecycles for Multi-Agent Systems}
 
