@@ -58,7 +58,7 @@
 % and hyperref fails there whether loaded before or after \usetheme. At A0 a
 % clickable link buys nothing, so URLs are plain text.
 
-\documentclass[25pt, a0paper, portrait, blockverticalspace=10mm, colspace=18mm,
+\documentclass[25pt, a0paper, portrait, blockverticalspace=12mm, colspace=18mm,
                subcolspace=8mm]{tikzposter}
 
 \usepackage{amsmath}
@@ -223,12 +223,12 @@
       {acquire/retrieval-augmented generation, store/knowledge editing,
        retrieve/continual learning, update/context engineering,
        forget/agent memory}
-      {\fill[panel] (0, -\i*1.75) rectangle (23.2, -\i*1.75 + 1.35);
-       \fill[\c]    (0, -\i*1.75) rectangle (0.55, -\i*1.75 + 1.35);
-       \node[anchor=west, text=ink] at (1.5, -\i*1.75 + 0.675) {\n};}
-    \useasboundingbox (0, -7.0) rectangle (23.2, 1.35);
+      {\fill[panel] (0, -\i*1.58) rectangle (23.2, -\i*1.58 + 1.25);
+       \fill[\c]    (0, -\i*1.58) rectangle (0.55, -\i*1.58 + 1.25);
+       \node[anchor=west, text=ink] at (1.5, -\i*1.58 + 0.625) {\n};}
+    \useasboundingbox (0, -6.32) rectangle (23.2, 1.25);
   \end{tikzpicture}}
-  \vspace{7mm}
+  \vspace{6mm}
 
   Each has its own benchmarks, and each passes them. A system can pass
   \textbf{all five} and still fail, because nothing tests what happens
@@ -286,10 +286,14 @@
   \end{tikzpicture}}
   \vspace{7mm}
 
-  The failure below sits between \textcolor{retrieve}{\textbf{Retrieve}} and
-  \textcolor{update}{\textbf{Update}}: the document arrives, and nothing tells
-  the model which copy of the fact to trust. That boundary belongs to neither
-  field beside it, which is why nobody tests it.
+  % Set as a callout rather than as running text, so that the two columns of
+  % this row end level and so that the sentence handing off to the finding
+  % below is given the weight it carries.
+  \callout{update}{The failure below sits between
+    \textcolor{retrieve}{\textbf{Retrieve}} and
+    \textcolor{update}{\textbf{Update}}: the document arrives, and nothing
+    tells the model which copy of the fact to trust. That boundary belongs to
+    neither field beside it, which is why nobody tests it.}
 }
 \end{columns}
 
@@ -399,7 +403,8 @@
 
   A companion number, \textbf{context influence}, asks whether the document
   moved the model at all. Here it is \textbf{0.033} nats: the evidence is
-  present, and \textbf{inert}.
+  present, and \textbf{inert}. The notice is placed in the prompt by
+  construction, so nothing was lost in retrieval.
 }
 
 \column{0.34}
