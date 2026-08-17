@@ -35,6 +35,10 @@ DIM = (150, 154, 164)             # tertiary text
 ACCENT = (26, 79, 138)            # Acquire blue, darkened for a light ground
 RULE = (222, 224, 230)            # chip and portrait outlines
 
+# Author block geometry, needed early so the text column can be checked
+# against it before anything is drawn.
+BLOCK_L_CHECK = W - MARGIN - 178 * 2 - 40    # block left edge, less a gutter
+
 # The five stage colours, matching Figure 1 of the paper and the demo.
 STAGES = [(74, 127, 212), (42, 157, 143), (224, 138, 46), (208, 83, 83), (143, 95, 184)]
 NAMES = ["Acquire", "Store", "Retrieve", "Update", "Forget"]
@@ -83,15 +87,28 @@ d.text((end + 14, 74), "·", font=f_eyebrow_l, fill=DIM)
 d.text((end + 36, 74), "Preprint 2026", font=f_eyebrow_l, fill=MUT)
 
 # --- title -----------------------------------------------------------------
-d.text((MARGIN, 128), "The Knowledge Lifecycle", font=f_title, fill=INK)
-d.text((MARGIN, 200), "of Large Language Models", font=f_title, fill=INK)
+# The two title lines are set to one width: the longer line defines the
+# column, and the shorter one is tracked out to meet it. Everything below
+# then aligns to the same right edge, which is what makes the block read as
+# a single object rather than three ragged rows.
+TITLE_1, TITLE_2 = "The Knowledge Lifecycle", "of Large Language Models"
+w1 = d.textlength(TITLE_1, font=f_title)
+w2 = d.textlength(TITLE_2, font=f_title)
+COLUMN_W = max(w1, w2)
+
+# Spread the deficit across the gaps between characters, not after the last one.
+track_1 = (COLUMN_W - w1) / (len(TITLE_1) - 1)
+track_2 = (COLUMN_W - w2) / (len(TITLE_2) - 1)
+tracked(d, (MARGIN, 128), TITLE_1, f_title, INK, track_1)
+tracked(d, (MARGIN, 200), TITLE_2, f_title, INK, track_2)
 
 # --- the five stages, named in their own colours ----------------------------
 # These are the framework, so they are shown rather than listed as prose.
 # Every chip takes the width of the longest name, so the row reads as one
 # object rather than five differently sized ones.
-CHIP_W = max(d.textlength(n, font=f_stage) for n in NAMES) + 34
+# Five equal chips that together span exactly the title column.
 CHIP_GAP = 13
+CHIP_W = (COLUMN_W - CHIP_GAP * 4) / 5
 x = MARGIN
 for name, colour in zip(NAMES, STAGES):
     d.rounded_rectangle([x, 292, x + CHIP_W, 332], radius=6, fill=colour)
@@ -111,13 +128,18 @@ for label, value in rows:
     y += 44
 
 # --- chips -----------------------------------------------------------------
+# Three equal chips, spanning the same column as the title and the stages.
 chips = ["MEASURED ON GPT-2", "D-SYNC 12.05 NATS", "FULLY REPRODUCIBLE"]
+FACT_GAP = 14
+FACT_W = (COLUMN_W - FACT_GAP * 2) / 3
 x = MARGIN
 for text in chips:
-    w = d.textlength(text, font=f_chip)
-    d.rounded_rectangle([x, 500, x + w + 34, 538], radius=4, outline=RULE, width=1)
-    d.text((x + 17, 509), text, font=f_chip, fill=MUT)
-    x += w + 34 + 14
+    d.rounded_rectangle([x, 500, x + FACT_W, 538], radius=4, outline=RULE, width=1)
+    d.text((x + (FACT_W - d.textlength(text, font=f_chip)) / 2, 509),
+           text, font=f_chip, fill=MUT)
+    x += FACT_W + FACT_GAP
+
+assert MARGIN + COLUMN_W < BLOCK_L_CHECK, "title column must clear the author block"
 
 
 def portrait(source, size):
