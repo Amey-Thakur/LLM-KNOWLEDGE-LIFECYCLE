@@ -41,6 +41,18 @@
 \setbeamercolor{frametitle}{fg=ink}
 \setbeamercolor{normal text}{fg=ink}
 \setbeamerfont{frametitle}{size=\Large, series=\bfseries}
+
+% Beamer's default puts the frame title 9.65 pt down a 255 pt slide, hard against
+% the colour band along the top edge, so every title reads as though it is
+% sliding off. This template states the space above and below the title
+% outright, giving each slide the same 24 pt of air under the band.
+\setbeamertemplate{frametitle}{%
+  \vspace{16pt}%
+  \usebeamerfont{frametitle}\usebeamercolor[fg]{frametitle}%
+  \insertframetitle\par
+  \vspace{6pt}%
+}
+
 \setbeamertemplate{itemize item}{\color{muted}\textbullet}
 \setbeamertemplate{itemize subitem}{\color{muted}--}
 \setbeamertemplate{caption}{\insertcaption}

@@ -376,9 +376,13 @@
     \node[anchor=west, font=\bfseries, text=update] at (54.8, 4.1) {42.58\%};
 
     % --- the correct answer --------------------------------------------------
-    % At this scale the correct answer's bar is 1/70,967 the width of the one
+    % At this scale the correct answer's bar is 1/72,582 the width of the one
     % above it, far below a printed pixel, so a tick marks its origin. Drawing a
     % visible sliver would overstate the result by three orders of magnitude.
+    % The ratio is 0.425749748945 / 0.000005865763 taken at full precision. An
+    % earlier draft printed 70,967, which is what the rounded 0.0006 percent
+    % gives, and rounding a denominator that small moves the answer by 2.3
+    % percent.
     % These two values sit beside their own ticks rather than under the values
     % above, so that neither number can be read against the wrong bar.
     \node[anchor=west, font=\bfseries, text=ok, text width=10.5cm] at (0, 1.7)
@@ -390,7 +394,7 @@
 
     \node[anchor=north west, text=muted, font=\small, text width=57cm, align=left]
       at (0, -0.4)
-      {Bars are true to scale. The correct answer's bar would be 1/70{,}967 the
+      {Bars are true to scale. The correct answer's bar would be 1/72{,}582 the
        width of the bar above it, so a tick marks where it begins.};
     \useasboundingbox (0, -2.4) rectangle (58, 6.4);
   \end{tikzpicture}}
