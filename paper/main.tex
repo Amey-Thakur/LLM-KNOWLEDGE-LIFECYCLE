@@ -554,7 +554,7 @@ We now state the conditions under which provenance gating provably resolves a pa
 
 \begin{assumption}
 \label{as:stale_support}
-For query $q$, every FFN slot whose value vector contributes to the outdated answer has age $\Delta\tau_i > \gamma / \beta$, and every slot contributing to other necessary computation (syntax, style, task format) has age $\Delta\tau_i < \gamma / \beta$.
+There exists a threshold $\tau^{\ast} > 0$ such that, for query $q$, every FFN slot whose value vector contributes to the outdated answer has age $\Delta\tau_i > \tau^{\ast}$, and every slot contributing to other necessary computation (syntax, style, task format) has age $\Delta\tau_i < \tau^{\ast}$.
 \end{assumption}
 
 \begin{assumption}
@@ -564,14 +564,16 @@ The retrieved context $\mathcal{M}_{now}$ contains the updated fact, and with th
 
 \begin{proposition}
 \label{prop:consistency}
-Under Assumptions~\ref{as:stale_support} and \ref{as:context_sufficiency}, as $\beta \to \infty$ the gated model's output distribution converges to $P_{ctx}$, and consequently
+Under Assumptions~\ref{as:stale_support} and \ref{as:context_sufficiency}, and with the freshness threshold tied to the sensitivity as $\gamma = \beta\tau^{\ast}$ so that the gate's decision boundary stays at $\tau^{\ast}$ while the gate sharpens, the gated model's output distribution converges to $P_{ctx}$ as $\beta \to \infty$, and consequently
 \begin{equation}
   \lim_{\beta \to \infty} D_{KL}\!\left( P_{ctx} \,\|\, P_{steered} \right) = 0.
 \end{equation}
 \end{proposition}
 
 \begin{proof}
-For any slot with $\Delta\tau_i > \gamma/\beta$, the gate argument $\gamma - \beta\Delta\tau_i \to -\infty$ as $\beta \to \infty$, so $S(\Delta\tau_i) \to \sigma(-\infty) = 0$; for any slot with $\Delta\tau_i < \gamma/\beta$, the argument tends to $+\infty$ and $S \to 1$. By Assumption~\ref{as:stale_support}, exactly the slots supporting the outdated answer are suppressed in Equation~\ref{eq:steering} while all others pass unchanged. By Assumption~\ref{as:context_sufficiency}, the resulting output distribution is $P_{ctx}$, and $D_{KL}(P_{ctx} \| P_{ctx}) = 0$.
+Equation~\ref{eq:gate} places the gate's decision boundary at $\Delta\tau_i = \gamma/\beta$, so the coupling $\gamma = \beta\tau^{\ast}$ fixes that boundary at $\tau^{\ast}$ and reduces the gate to $S(\Delta\tau_i) = \sigma\!\left(\beta(\tau^{\ast} - \Delta\tau_i)\right)$. For a slot with $\Delta\tau_i > \tau^{\ast}$ the argument $\beta(\tau^{\ast} - \Delta\tau_i) \to -\infty$ as $\beta \to \infty$, so $S(\Delta\tau_i) \to 0$; for a slot with $\Delta\tau_i < \tau^{\ast}$ the argument tends to $+\infty$ and $S \to 1$. The gate therefore converges pointwise to the indicator $\mathbf{1}\!\left[\Delta\tau_i < \tau^{\ast}\right]$. By Assumption~\ref{as:stale_support}, exactly the slots supporting the outdated answer are suppressed in Equation~\ref{eq:steering} while all others pass unchanged. By Assumption~\ref{as:context_sufficiency}, the resulting output distribution is $P_{ctx}$, and $D_{KL}(P_{ctx} \| P_{ctx}) = 0$.
+
+The coupling is what makes the limit meaningful. Sharpening the gate with $\gamma$ held fixed drives the boundary $\gamma/\beta$ to zero, which suppresses every slot of positive age, including the ones Assumption~\ref{as:stale_support} requires to survive; the limit would then describe a model with no FFN contribution at all rather than a model with its stale facts removed.
 \end{proof}
 
 The assumptions are strong, and stating them is the point. Assumption~\ref{as:stale_support} requires provenance to separate fact slots from infrastructure slots by age, which real training will achieve only approximately; Assumption~\ref{as:context_sufficiency} requires the retriever to have found the updated fact at all. What the proposition establishes is that, given accurate provenance, conflict resolution reduces to a per-slot gating operation with no weight modification, in contrast to static editing where every update risks the specificity bottleneck.

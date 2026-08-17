@@ -25,7 +25,13 @@ const PRESETS = {
     query: "Question: Is Vioxx safe to prescribe? Answer: Vioxx is considered",
     context: "Context: In September 2004, Merck voluntarily withdrew Vioxx after trials revealed increased cardiovascular risks.",
     answer: " withdrawn",
-    reading: "The headline case. The withdrawal notice is in the prompt and the model still answers “safe”. At full precision the paper measures 12.05 nats, far past the 9.2 failure threshold.",
+    // Stated as the direction of the change rather than as the winning token.
+    // At full precision "safe" is the top answer, but this page runs 8-bit
+    // weights, under which a function word takes first place, and a reader
+    // watching "safe" lose the top slot would take the sentence for a mistake.
+    // What holds in both builds is that the corrective document pushes "safe"
+    // up and leaves "withdrawn" nowhere.
+    reading: "The headline case. The withdrawal notice is in the prompt, and the model's confidence in “safe” goes up rather than down: 37.53% to 42.58% at full precision, where the paper measures 12.05 nats, far past the 9.2 failure threshold.",
   },
   monarch: {
     query: "Question: Who is the current British monarch? Answer: The current British monarch is",

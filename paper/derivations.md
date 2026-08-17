@@ -38,13 +38,15 @@ In the residual stream at layer $L$:
 
 $$ z_{L} = z_{L-1} + \text{Attention}(z_{L-1}) + \text{FFN}_{steered}(z_{L-1}) $$
 
-**Assumption 1 (stale support).** Every slot contributing to the outdated answer has $\Delta\tau_i > \gamma/\beta$; every slot contributing to other necessary computation has $\Delta\tau_i < \gamma/\beta$.
+**Assumption 1 (stale support).** There is a threshold $\tau^\ast > 0$ such that every slot contributing to the outdated answer has $\Delta\tau_i > \tau^\ast$, and every slot contributing to other necessary computation has $\Delta\tau_i < \tau^\ast$.
 
 **Assumption 2 (context sufficiency).** The retrieved context contains the updated fact, and with the conflicting parametric contribution suppressed, the output distribution on the query is determined by attention over that context; call it $P_{ctx}$.
 
-**Proposition.** Under Assumptions 1 and 2, as $\beta \to \infty$ the gated model's output distribution converges to $P_{ctx}$, hence $D_{KL}(P_{ctx} \| P_{steered}) \to 0$.
+**Proposition.** Under Assumptions 1 and 2, with $\gamma = \beta\tau^\ast$ so that the decision boundary stays at $\tau^\ast$ while the gate sharpens, the gated model's output distribution converges to $P_{ctx}$ as $\beta \to \infty$, hence $D_{KL}(P_{ctx} \| P_{steered}) \to 0$.
 
-*Proof sketch.* For slots with $\Delta\tau_i > \gamma/\beta$ the gate argument $\gamma - \beta\Delta\tau_i \to -\infty$, so $S \to 0$; for slots with $\Delta\tau_i < \gamma/\beta$ it tends to $+\infty$, so $S \to 1$. Exactly the stale slots are removed from the FFN sum; by Assumption 2 the output distribution is then $P_{ctx}$, and the KL of a distribution against itself is zero.
+*Proof sketch.* The gate's decision boundary sits at $\Delta\tau_i = \gamma/\beta$, so setting $\gamma = \beta\tau^\ast$ pins it to $\tau^\ast$ and reduces the gate to $\sigma(\beta(\tau^\ast - \Delta\tau_i))$. For slots with $\Delta\tau_i > \tau^\ast$ that argument tends to $-\infty$ and $S \to 0$; for slots with $\Delta\tau_i < \tau^\ast$ it tends to $+\infty$ and $S \to 1$, so the gate converges pointwise to $\mathbf{1}[\Delta\tau_i < \tau^\ast]$. Exactly the stale slots are removed from the FFN sum; by Assumption 2 the output distribution is then $P_{ctx}$, and the KL of a distribution against itself is zero.
+
+The coupling is not cosmetic. Sharpening the gate with $\gamma$ held fixed sends the boundary $\gamma/\beta$ to zero, suppressing every slot of positive age, including the ones Assumption 1 needs to survive: the limit would describe a model with no FFN contribution rather than one with its stale facts removed.
 
 The assumptions are strong by design: they state exactly what a real implementation must approximate, namely provenance that separates fact slots from infrastructure slots (Assumption 1), and a retriever that found the update at all (Assumption 2).
 
