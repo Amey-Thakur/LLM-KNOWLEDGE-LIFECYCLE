@@ -42,11 +42,11 @@ body {
   color: var(--ink);
   background:
     linear-gradient(180deg,
-      rgba(74,127,212,.07) 0%, rgba(42,157,143,.055) 22%,
-      rgba(224,138,46,.045) 44%, rgba(208,83,83,.038) 66%,
-      rgba(143,95,184,.03) 84%, rgba(255,255,255,0) 100%) no-repeat 0 0 / 100% 340px,
-    repeating-linear-gradient(0deg, transparent 0 23px, rgba(26,26,26,.035) 23px 24px),
-    repeating-linear-gradient(90deg, transparent 0 23px, rgba(26,26,26,.035) 23px 24px),
+      rgba(74,127,212,.13) 0%, rgba(42,157,143,.10) 22%,
+      rgba(224,138,46,.085) 44%, rgba(208,83,83,.07) 66%,
+      rgba(143,95,184,.055) 84%, rgba(255,255,255,0) 100%) no-repeat 0 0 / 100% 460px,
+    repeating-linear-gradient(0deg, transparent 0 23px, rgba(26,26,26,.06) 23px 24px),
+    repeating-linear-gradient(90deg, transparent 0 23px, rgba(26,26,26,.06) 23px 24px),
     var(--bg);
 }
 
@@ -362,3 +362,41 @@ footer { margin-top: 4rem; padding-top: 2rem; }
   color: var(--muted);
 }
 .paper-line em { color: var(--ink); font-style: italic; }
+
+/* ---------------------------------------------------------------------------
+   Measure row.
+
+   The repetition label is wider than its select, which left a gap of dead
+   space before the button and made the button look adrift. The select now
+   fills its label, so the three controls sit in one continuous run.
+   --------------------------------------------------------------------------- */
+
+.row { align-items: flex-end; gap: .9rem; margin-bottom: 1.1rem; }
+/* flex-end aligns margin boxes, so a bottom margin on these labels would push
+   the button below the controls it sits beside. The row carries it instead. */
+.row > label { flex: 0 0 auto; margin-bottom: 0; }
+.row > label.grow { flex: 1 1 auto; }
+.row select { width: 100%; height: 2.5rem; }
+.row input[type=text] { height: 2.5rem; }
+
+#run {
+  /* Flex centring rather than padding arithmetic, so the label sits on the
+     optical centre whatever the text or font size. */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.5rem;
+  min-width: 8.5rem;
+  padding: 0 1.6rem;
+  font-weight: 600;
+  letter-spacing: .01em;
+  line-height: 1;
+}
+
+/* With a more present ground, the panels need an edge to sit on rather than
+   dissolving into it. */
+.narrative, #bars, .temp-block, .alert { box-shadow: 0 1px 2px rgba(26,26,26,.05); }
+.preset { background: rgba(255,255,255,.86); }
+.preset.active { background: #fff; }
+textarea, input[type=text], select { background: rgba(255,255,255,.94); }
+textarea:focus, input:focus, select:focus { background: #fff; }
