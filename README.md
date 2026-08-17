@@ -66,6 +66,8 @@ Every stage has its own benchmarks, and a system can pass all of them separately
 
 Mapping twenty representative papers onto the five stages, the median covers **two**. The boundaries are where deployment breaks, and where almost nobody is looking.
 
+<br>
+
 <a name="the-evidence"></a>
 ## What the framework exposes
 
@@ -81,9 +83,16 @@ Put that withdrawal notice directly into GPT-2's prompt, then ask whether the dr
 
 The correction is sitting in front of the model, and its confidence that the drug is safe **goes up**. The correct answer is left at roughly six chances in a million.
 
+> [!CAUTION]
+> A model in this state does not look broken. It answers fluently, cites the document it was given, and is wrong. In medicine, law, or finance, the failure is invisible until someone acts on it.
+
+<br>
+
 This is not a hallucination in the usual sense. Retrieval worked perfectly: the right document was found and delivered. What failed is the step after it, where the model must decide which of its two memories to believe. No benchmark for retrieval, editing, or memory tests that step, because it belongs to none of them.
 
 The root cause is what training throws away. A model learns *what* is true but never *when* it learned it or *where the claim came from*, so at inference it has no principled basis for preferring fresh evidence over a confident old memory.
+
+<br>
 
 <a name="what-we-contribute"></a>
 ## What we contribute
@@ -95,6 +104,8 @@ The root cause is what training throws away. A model learns *what* is true but n
 > [!NOTE]
 > The metric is measured. The architecture is a proposal supported by an idealized proof, not a trained system, and the paper says so in its limitations rather than leaving you to discover it.
 
+<br>
+
 <a name="try-it"></a>
 ## Try it
 
@@ -104,6 +115,8 @@ GPT-2 runs inside your own browser, so nothing you type leaves your machine and 
 
 Vioxx is the outright failure. The British monarch case is stranger: after the 2022 succession, telling the model that Elizabeth II has died mostly makes it *more* likely to answer "Queen". The Twitter rename shows a document shifting the model hard and still losing.
 
+<br>
+
 <a name="reproduce-it-yourself"></a>
 ## Reproduce it yourself
 
@@ -112,14 +125,19 @@ pip install torch transformers
 python experiments/dsync_experiment.py
 ```
 
-Every figure quoted above comes out of that one script. There is no sampling anywhere in it, so the digits are identical on every machine and every run. A laptop is enough: the model is GPT-2 base at 124M parameters, chosen because it is small, completely open, and free of the instruction tuning that would muddy the result.
+Every number above comes out of that script. Nothing samples, so the digits are identical on every machine and every run. A laptop is enough: GPT-2 base at 124M parameters, chosen because it is small, fully open, and free of the instruction tuning that would confound the result.
 
 A [Kaggle notebook](https://www.kaggle.com/code/ameythakur20/cross-model-lifecycle-desynchronization) extends the same measurement across six models, testing whether scale or instruction tuning makes the problem go away.
+
+<br>
 
 <a name="read-the-paper"></a>
 ## Read the paper
 
-The manuscript is [`paper/main.tex`](paper/main.tex), with a poster and slide deck alongside it. Start at Section 7.5 for the metric and the measurement without the survey.
+The manuscript is [`paper/main.tex`](paper/main.tex), with a poster and slide deck alongside it.
+
+> [!TIP]
+> Short on time? **Section 7.5** defines the metric and **Section 7.7** is the measurement. Those two sections stand alone without the survey around them.
 
 ```
 .
@@ -129,6 +147,8 @@ The manuscript is [`paper/main.tex`](paper/main.tex), with a poster and slide de
 ├── CITATION.cff    How to cite this work
 └── LICENSE         CC BY 4.0
 ```
+
+<br>
 
 <a name="citation"></a>
 ## Citation
