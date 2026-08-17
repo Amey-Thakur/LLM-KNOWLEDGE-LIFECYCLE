@@ -203,10 +203,10 @@
   % assignment is global because tikzposter typesets the title inside a node,
   % and a local length would revert before the footer band is reached.
   \global\bandw=\linewidth\relax
-  % The class leaves 1.30 cm above this band. With the air added around the
-  % author strip and the divider pulled in below it, the page carries 5.79 cm of
-  % slack, so this lead puts 2.90 cm at the top and leaves the same at the foot.
-  \vspace*{16mm}
+  % The class leaves 1.30 cm above this band. With the air around the author
+  % strip and the divider pulled in below it, the page carries 4.99 cm of slack,
+  % so this lead puts 2.50 cm at the top and leaves 2.49 cm at the foot.
+  \vspace*{12mm}
   \atbandwidth{\stageband{\bandw}{0.9}}
   \vspace{8mm}
 
