@@ -81,4 +81,38 @@
     }
 \end{columns}
 
+% -----------------------------------------------------------------------------
+% Authors. Portraits are clipped to circles by a TikZ path so the block matches
+% the author table in the repository and the social card.
+% -----------------------------------------------------------------------------
+\block{}{
+    \centering
+    \begin{tikzpicture}
+        % Amey Thakur
+        \begin{scope}
+            \clip (0, 0) circle (2.6cm);
+            \node at (0, 0) {\includegraphics[width=5.2cm]{amey-thakur.jpg}};
+        \end{scope}
+        \draw[line width=2pt, gray!45] (0, 0) circle (2.6cm);
+        \node[below, font=\bfseries] at (0, -2.9cm) {Amey Thakur};
+        \node[below, font=\small, text=gray!70] at (0, -3.9cm) {ORCID 0000-0001-5644-1575};
+
+        % Sarvesh Talele
+        \begin{scope}
+            \clip (13cm, 0) circle (2.6cm);
+            \node at (13cm, 0) {\includegraphics[width=5.2cm]{sarvesh-talele.jpg}};
+        \end{scope}
+        \draw[line width=2pt, gray!45] (13cm, 0) circle (2.6cm);
+        \node[below, font=\bfseries] at (13cm, -2.9cm) {Sarvesh Talele};
+        \node[below, font=\small, text=gray!70] at (13cm, -3.9cm) {ORCID 0009-0002-0818-461X};
+
+        % The measurement, stated once more between the portraits, so a reader
+        % who only stops at the foot of the poster still leaves with the finding.
+        \node[align=center, font=\large] at (6.5cm, 0.8cm)
+            {\textbf{The correction was in the prompt.}\\[2mm] The model believed its training data.};
+        \node[align=center, font=\small, text=gray!70] at (6.5cm, -2.4cm)
+            {github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE};
+    \end{tikzpicture}
+}
+
 \end{document}
