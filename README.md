@@ -181,8 +181,6 @@ A [Kaggle notebook](https://www.kaggle.com/code/ameythakur20/cross-model-lifecyc
 
 Short on time: **Section 7.5** defines the metric and **Section 7.7** is the measurement. Those two stand alone without the survey around them. The slide deck carries speaker notes throughout, so it reads as a written argument as well as a talk.
 
-The LaTeX source is [`paper/main.tex`](paper/main.tex), and every push rebuilds both documents.
-
 ```
 .
 ├── paper/          Manuscript, slides, bibliography, derivations

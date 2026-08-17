@@ -20,6 +20,7 @@
 \usepackage{amssymb}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta, positioning, calc, fit, backgrounds}
+\usepackage{hyperref}  % every URL in the deck is clickable in the PDF
 
 % --- the five lifecycle colors, identical across every surface ---------------
 \definecolor{acquire} {HTML}{4A7FD4}
@@ -75,6 +76,8 @@
     \node[below, font=\tiny, text=muted] at (#4,-#1-0.55) {\ifnum\pdfstrcmp{#2}{Toronto, Canada}=0 Mumbai, India\else talelesarvesh@gmail.com\fi};
   \end{tikzpicture}%
 }
+
+\hypersetup{colorlinks=true, urlcolor=acquire, linkcolor=acquire}
 
 \title{The Knowledge Lifecycle of Large Language Models}
 \author{Amey Thakur \and Sarvesh Talele}
@@ -421,8 +424,8 @@
   \end{itemize}
   \vspace{1.2em}
   \begin{center}\footnotesize
-    \textbf{Paper and code}\quad github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE\\[2.5mm]
-    \textbf{Live demonstration}\quad huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle
+    \textbf{Paper and code}\quad \href{https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE}{github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE}\\[2.5mm]
+    \textbf{Live demonstration}\quad \href{https://huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle}{huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle}
   \end{center}
   \note{If there is a screen and a minute to spare, open the demo live and run
   the Vioxx probe. A measurement performed in front of the room is worth more
@@ -487,16 +490,16 @@
         \node at (0,0) {\includegraphics[width=1.6cm]{amey-thakur.jpg}};\end{scope}
       \draw[rule, line width=1pt] (0,0) circle (0.8cm);
       \node[below, font=\footnotesize\bfseries] at (0,-0.95) {Amey Thakur};
-      \node[below, font=\tiny, text=muted] at (0,-1.3) {ameythakur20@gmail.com};
+      \node[below, font=\tiny, text=muted] at (0,-1.3) {\href{mailto:ameythakur20@gmail.com}{ameythakur20@gmail.com}};
 
       \begin{scope}\clip (5.2,0) circle (0.8cm);
         \node at (5.2,0) {\includegraphics[width=1.6cm]{sarvesh-talele.jpg}};\end{scope}
       \draw[rule, line width=1pt] (5.2,0) circle (0.8cm);
       \node[below, font=\footnotesize\bfseries] at (5.2,-0.95) {Sarvesh Talele};
-      \node[below, font=\tiny, text=muted] at (5.2,-1.3) {talelesarvesh@gmail.com};
+      \node[below, font=\tiny, text=muted] at (5.2,-1.3) {\href{mailto:talelesarvesh@gmail.com}{talelesarvesh@gmail.com}};
     \end{tikzpicture}\\[7mm]
 
-    {\scriptsize\color{muted}github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE}
+    {\scriptsize\href{https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE}{github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE}}
   \end{center}
   \note{Leave this slide up for the whole question period so the contact details
   and repository stay visible. The backup slide follows if a question needs it.}

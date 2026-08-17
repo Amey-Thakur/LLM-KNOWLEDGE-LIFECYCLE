@@ -2,6 +2,8 @@
 \usetheme{Desert}
 \usepackage{amsmath}   % equation*, used by the metric and gate blocks below
 \usepackage{amssymb}
+\usepackage{hyperref}  % every URL on the poster is clickable in the PDF
+\hypersetup{colorlinks=true, urlcolor=blue!55!black, linkcolor=blue!55!black}
 \usepackage{booktabs}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta, positioning, shapes.geometric, calc}
@@ -111,7 +113,7 @@
         \node[align=center, font=\large] at (6.5cm, 0.8cm)
             {\textbf{The correction was in the prompt.}\\[2mm] The model believed its training data.};
         \node[align=center, font=\small, text=gray!70] at (6.5cm, -2.4cm)
-            {github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE};
+            {\href{https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE}{github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE}};
     \end{tikzpicture}
 }
 

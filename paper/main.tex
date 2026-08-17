@@ -122,6 +122,8 @@ This paper proposes an integrated approach. Rather than treating these problems 
 
 To our knowledge, no prior work has formalized the knowledge management problem across all five lifecycle stages.
 
+\paragraph{Reproducibility and artifacts.} Every measurement reported in this paper is produced by a single deterministic script: no sampling is used anywhere, so the values reproduce exactly on any machine. The script, the manuscript source, and the cross-model measurement notebook are released as an open repository~\citep{thakur2026code}. We additionally release an interactive demonstration~\citep{thakur2026demo}, which executes GPT-2 entirely in the reader's browser through ONNX, requires no installation or credentials, and reproduces the measurement of \S\ref{sec:case_study} exactly. It accepts arbitrary conflict pairs, so a reader may test the metric against a fact change of their own choosing before reading further.
+
 % ============================================================
 \section{Background and Scope}
 \label{sec:background}
@@ -654,7 +656,7 @@ To demonstrate that lifecycle failures are not hypothetical, we trace a document
 
 \paragraph{Scenario.} Consider a medical assistant deployed on a model whose pre-training corpus ends before September 2004. The fact ``Rofecoxib (Vioxx) is an FDA-approved COX-2 selective anti-inflammatory drug'' is encoded into the parametric weights during pre-training (Acquisition $\rightarrow$ Storage). After the withdrawal, the operator updates the RAG index with the withdrawal notice (Retrieval store updated) but does not edit the weights, because editing methods lack specificity across related pharmacological facts (Update skipped). A clinician asks whether the drug is safe to prescribe. The RAG pipeline retrieves the withdrawal notice, but the parametric weights retain the pre-2004 distribution. Per \citet{xie2024conflicts}, the outcome of this conflict is unpredictable. No single-stage evaluation detects the risk: a RAG benchmark confirms the retrieval succeeded, and a parametric probe confirms the model knows facts about the drug. The failure exists entirely at the boundary.
 
-\paragraph{Measurement.} We instantiate Algorithm~\ref{alg:dsync} on GPT-2 base (124M parameters)~\citep{radford2019gpt2} under deterministic decoding. The query is \textit{``Question: Is Vioxx safe to prescribe? Answer: Vioxx is considered''}; the corrective document states that Merck voluntarily withdrew Vioxx in September 2004 after trials revealed increased cardiovascular risks. Table~\ref{tab:vioxx_results} reports the results. The measurement script is included in the repository and is exactly reproducible: it uses greedy analysis of the next-token distribution with no sampling.
+\paragraph{Measurement.} We instantiate Algorithm~\ref{alg:dsync} on GPT-2 base (124M parameters)~\citep{radford2019gpt2} under deterministic decoding. The query is \textit{``Question: Is Vioxx safe to prescribe? Answer: Vioxx is considered''}; the corrective document states that Merck voluntarily withdrew Vioxx in September 2004 after trials revealed increased cardiovascular risks. Table~\ref{tab:vioxx_results} reports the results. The measurement script is included in the accompanying repository~\citep{thakur2026code} and is exactly reproducible: it uses greedy analysis of the next-token distribution with no sampling. The same probe can be run without installing anything through the interactive demonstration~\citep{thakur2026demo}.
 
 \begin{table}[h]
 \centering
