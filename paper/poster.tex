@@ -58,7 +58,7 @@
 % and hyperref fails there whether loaded before or after \usetheme. At A0 a
 % clickable link buys nothing, so URLs are plain text.
 
-\documentclass[25pt, a0paper, portrait, blockverticalspace=12mm, colspace=18mm,
+\documentclass[25pt, a0paper, portrait, blockverticalspace=13mm, colspace=18mm,
                subcolspace=8mm]{tikzposter}
 
 \usepackage{amsmath}
@@ -210,7 +210,7 @@
 \block{The problem}{\bodyset
   How a language model handles a fact is studied by \textbf{five separate
   communities} that rarely cite one another.
-  \vspace{7mm}
+  \vspace{6mm}
 
   % Full-measure rows rather than a swatch and a word: the tinted band carries
   % the eye to the right edge of the column, where the first proof left 16 cm of
@@ -223,12 +223,12 @@
       {acquire/retrieval-augmented generation, store/knowledge editing,
        retrieve/continual learning, update/context engineering,
        forget/agent memory}
-      {\fill[panel] (0, -\i*1.58) rectangle (23.2, -\i*1.58 + 1.25);
-       \fill[\c]    (0, -\i*1.58) rectangle (0.55, -\i*1.58 + 1.25);
-       \node[anchor=west, text=ink] at (1.5, -\i*1.58 + 0.625) {\n};}
-    \useasboundingbox (0, -6.32) rectangle (23.2, 1.25);
+      {\fill[panel] (0, -\i*1.48) rectangle (23.2, -\i*1.48 + 1.20);
+       \fill[\c]    (0, -\i*1.48) rectangle (0.55, -\i*1.48 + 1.20);
+       \node[anchor=west, text=ink] at (1.5, -\i*1.48 + 0.60) {\n};}
+    \useasboundingbox (0, -5.92) rectangle (23.2, 1.20);
   \end{tikzpicture}}
-  \vspace{6mm}
+  \vspace{5mm}
 
   Each has its own benchmarks, and each passes them. A system can pass
   \textbf{all five} and still fail, because nothing tests what happens
@@ -252,7 +252,7 @@
   % text width, so the 1.2 unit gutter between boxes is never encroached on.
   \resizebox{\linewidth}{!}{%
   \begin{tikzpicture}[
-    lcbox/.style={rounded corners=3pt, minimum width=5.5cm, minimum height=3.0cm,
+    lcbox/.style={rounded corners=3pt, minimum width=5.5cm, minimum height=3.9cm,
                   text=white, font=\bfseries, align=center},
     lccap/.style={text=muted, font=\small, text width=5.5cm, align=center},
     lcflow/.style={-{Stealth[length=5mm, width=3.5mm]}, line width=2.5pt, muted}
@@ -276,13 +276,13 @@
 
     % The conflict spans two stages, so it is a brace beneath them rather than a
     % label on the arrow between them, where it collided with the Update box.
-    % Captions bottom out near y = -3.0; the brace sits at -3.8 and its label at
-    % -5.1, so neither can touch them.
+    % Captions bottom out near y = -3.35; the brace sits at -3.8 and its label
+    % at -5.1, so neither can touch them.
     \draw[update, line width=2.5pt, decorate,
           decoration={brace, mirror, amplitude=5mm}]
       (10.65, -3.8) -- (22.85, -3.8);
     \node[text=update, font=\bfseries] at (16.75, -5.1) {conflict};
-    \useasboundingbox (-3.0, -6.0) rectangle (29.6, 1.8);
+    \useasboundingbox (-3.0, -6.4) rectangle (29.6, 2.3);
   \end{tikzpicture}}
   \vspace{7mm}
 
