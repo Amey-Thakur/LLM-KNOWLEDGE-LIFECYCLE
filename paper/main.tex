@@ -20,6 +20,24 @@
 \usepackage{xcolor}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta, positioning, shapes.geometric, calc, decorations.pathmorphing, fit, backgrounds}
+
+% -----------------------------------------------------------------------------
+% The five lifecycle colours, defined once and shared by every figure, and
+% identical to the poster, the slides and the demonstration, so a stage is the
+% same colour wherever the reader meets it.
+%
+% Fills are the light tint (!12) and strokes are the full colour. Solid saturated
+% boxes would fight the text they carry; the tint identifies the stage and the
+% stroke does the separating, which is the convention already used on the poster.
+% -----------------------------------------------------------------------------
+\definecolor{acquire} {HTML}{4A7FD4}
+\definecolor{store}   {HTML}{2A9D8F}
+\definecolor{retrieve}{HTML}{E08A2E}
+\definecolor{update}  {HTML}{D05353}
+\definecolor{forget}  {HTML}{8F5FB8}
+\definecolor{ink}     {HTML}{1A1A1C}
+\definecolor{muted}   {HTML}{4A4A55}
+\definecolor{hairline}{HTML}{C8CAD2}
 \usepackage{enumitem}
 \usepackage{caption}
 \usepackage{subcaption}
@@ -235,13 +253,6 @@ The lifecycle has five stages. Each one maps to a well-defined set of research q
                     align=center, inner sep=1pt}
 ]
 
-% The five lifecycle colours, identical to the poster, the slides and the
-% demonstration, so the framework is recognisable across every surface.
-\definecolor{acquire} {HTML}{4A7FD4}
-\definecolor{store}   {HTML}{2A9D8F}
-\definecolor{retrieve}{HTML}{E08A2E}
-\definecolor{update}  {HTML}{D05353}
-\definecolor{forget}  {HTML}{8F5FB8}
 
 \def\R{4.2}   % stage centres
 \def\L{5.3}   % boundary labels
@@ -381,28 +392,36 @@ The most routine form of forgetting is structural: context window eviction. Desp
 \begin{figure}[t]
 \centering
 \begin{tikzpicture}[
-  box/.style={draw, rounded corners=4pt, minimum width=2.2cm, minimum height=0.7cm, font=\sffamily\scriptsize, align=center, line width=0.7pt},
-  parrow/.style={-{Stealth[length=2mm]}, line width=0.9pt, color=blue!60},
-  nparrow/.style={-{Stealth[length=2mm]}, line width=0.9pt, color=orange!70},
-  plabel/.style={font=\sffamily\scriptsize\bfseries, color=blue!60},
-  nlabel/.style={font=\sffamily\scriptsize\bfseries, color=orange!70}
+  % Shares the lifecycle palette with Figures 1 and 3: the parametric path takes
+  % the Acquire blue and the non-parametric path the Retrieve orange, tinted for
+  % fills and full strength for strokes.
+  box/.style={draw, rounded corners=4pt, minimum width=2.2cm, minimum height=0.7cm,
+              font=\sffamily\scriptsize, align=center, line width=0.7pt},
+  parrow/.style={-{Stealth[length=2mm]}, line width=0.9pt, color=acquire},
+  nparrow/.style={-{Stealth[length=2mm]}, line width=0.9pt, color=retrieve},
+  plabel/.style={font=\sffamily\scriptsize\bfseries, color=acquire},
+  nlabel/.style={font=\sffamily\scriptsize\bfseries, color=retrieve},
+  % The property lines were set at 50 percent of their hue, which prints as a
+  % smudge rather than as quiet text. They are the same hue at full strength.
+  pprop/.style={font=\sffamily\tiny, text=acquire, align=center},
+  nprop/.style={font=\sffamily\tiny, text=retrieve, align=center}
 ]
 
 % --- Left: Knowledge source ---
-\node[box, fill=gray!10] (src) at (0,0) {Knowledge\\Source};
+\node[box, draw=muted, fill=black!5] (src) at (0,0) {Knowledge\\Source};
 
 % --- Parametric path (top) ---
-\node[box, fill=blue!10] (ptrain) at (3, 1.5) {Pre-train /\\Fine-tune};
-\node[box, fill=blue!10] (pstore) at (6, 1.5) {Weights\\(parametric)};
-\node[box, fill=blue!10] (pret)   at (9, 1.5) {Attention\\(implicit)};
+\node[box, draw=acquire, fill=acquire!12] (ptrain) at (3, 1.5) {Pre-train /\\Fine-tune};
+\node[box, draw=acquire, fill=acquire!12] (pstore) at (6, 1.5) {Weights\\(parametric)};
+\node[box, draw=acquire, fill=acquire!12] (pret)   at (9, 1.5) {Attention\\(implicit)};
 
 % --- Non-parametric path (bottom) ---
-\node[box, fill=orange!10] (nindex) at (3, -1.5) {Index /\\Embed};
-\node[box, fill=orange!10] (nstore) at (6, -1.5) {Vector DB\\(external)};
-\node[box, fill=orange!10] (nret)   at (9, -1.5) {RAG pipeline\\(explicit)};
+\node[box, draw=retrieve, fill=retrieve!12] (nindex) at (3, -1.5) {Index /\\Embed};
+\node[box, draw=retrieve, fill=retrieve!12] (nstore) at (6, -1.5) {Vector DB\\(external)};
+\node[box, draw=retrieve, fill=retrieve!12] (nret)   at (9, -1.5) {RAG pipeline\\(explicit)};
 
 % --- Merge point ---
-\node[box, fill=green!10] (gen) at (12, 0) {Generate\\Output};
+\node[box, draw=store, fill=store!12] (gen) at (12, 0) {Generate\\Output};
 
 % --- Parametric arrows ---
 \draw[parrow] (src) -- (ptrain);
@@ -417,15 +436,18 @@ The most routine form of forgetting is structural: context window eviction. Desp
 \draw[nparrow] (nret) -- (gen);
 
 % --- Conflict zone ---
-\draw[densely dashed, red!50, line width=0.8pt] (pret) -- (nret) node[midway, right, font=\sffamily\tiny, text=red!60, align=center] {conflict\\zone};
+% The Update red, which is the colour this conflict carries in Figure 1, on the
+% poster and in the demonstration.
+\draw[densely dashed, update, line width=0.8pt] (pret) -- (nret)
+  node[midway, right, font=\sffamily\tiny\bfseries, text=update, align=center] {conflict\\zone};
 
 % --- Path labels ---
 \node[plabel] at (6, 2.3) {Parametric path};
 \node[nlabel] at (6, -2.3) {Non-parametric path};
 
 % --- Properties ---
-\node[font=\sffamily\tiny, text=blue!50, align=center] at (6, 0.7) {Update: hard | Forget: hard\\Latency: low | Audit: low};
-\node[font=\sffamily\tiny, text=orange!50, align=center] at (6, -0.7) {Update: trivial | Forget: trivial\\Latency: higher | Audit: high};
+\node[pprop] at (6, 0.7) {Update: hard | Forget: hard\\Latency: low | Audit: low};
+\node[nprop] at (6, -0.7) {Update: trivial | Forget: trivial\\Latency: higher | Audit: high};
 
 \end{tikzpicture}
 \caption{Two paths through the knowledge lifecycle. The parametric path (top, blue) bakes knowledge into weights during training; it is fast at inference but hard to update or forget. The non-parametric path (bottom, orange) stores knowledge externally; it is easy to modify but depends on retrieval quality. When both paths are active, the ``conflict zone'' (dashed red) produces the knowledge conflict problem discussed in \S\ref{sec:update}.}
@@ -683,18 +705,28 @@ To demonstrate that lifecycle failures are not hypothetical, we trace a document
 \begin{figure}[h]
 \centering
 \begin{tikzpicture}[
-  stage/.style={draw, rounded corners=4pt, minimum width=3.4cm, minimum height=0.65cm, font=\sffamily\scriptsize, align=center, line width=0.7pt},
-  fail/.style={draw, rounded corners=4pt, minimum width=3.4cm, minimum height=0.65cm, font=\sffamily\scriptsize\bfseries, align=center, line width=0.9pt, fill=red!8, draw=red!50},
-  arr/.style={-{Stealth[length=2mm]}, line width=0.7pt, color=gray!70},
-  farr/.style={-{Stealth[length=2mm]}, line width=0.9pt, color=red!60}
+  % A text width, not just a minimum width. Sized to the content alone, these six
+  % boxes came out between 96.4 and 115.4 pt wide, so a stack that should read as
+  % one column had ragged edges on both sides. A fixed measure makes all six
+  % identical, and hyphenation is off so an overlong line shows itself.
+  stage/.style={draw, rounded corners=4pt, minimum width=3.9cm, text width=3.55cm,
+                minimum height=0.65cm, font=\sffamily\scriptsize, align=center,
+                line width=0.7pt,
+                execute at begin node={\hyphenpenalty=10000\exhyphenpenalty=10000}},
+  % The failing rows are marked by weight and by the red arrows feeding them, not
+  % by overriding their stage colour: each box keeps the colour its stage carries
+  % in Figure 1, so the cascade can be followed stage by stage.
+  fail/.style={stage, font=\sffamily\scriptsize\bfseries, line width=0.9pt},
+  arr/.style={-{Stealth[length=2mm]}, line width=0.7pt, color=muted},
+  farr/.style={-{Stealth[length=2mm]}, line width=0.9pt, color=update}
 ]
 
-\node[stage, fill=blue!8] (acq) at (0, 0) {1. Acquire: Vioxx approved\\(pre-training, pre-2004 data)};
-\node[stage, fill=teal!8] (sto) at (0, -1.2) {2. Store: ``Vioxx is an approved\\COX-2 inhibitor'' in weights $\theta$};
-\node[stage, fill=orange!8] (ret) at (0, -2.4) {3. Retrieve: RAG returns\\FDA withdrawal notice (2004)};
-\node[fail] (upd) at (0, -3.6) {4. Update: Weights NOT edited\\$\theta$ still encodes ``approved''};
-\node[fail] (conf) at (0, -4.8) {5. CONFLICT: $\theta$ says ``approved''\\$\mathcal{M}$ says ``withdrawn''};
-\node[fail] (fgt) at (0, -6.0) {6. Forget: Cannot unlearn\\``approved'' without retraining};
+\node[stage, draw=acquire,  fill=acquire!12]  (acq)  at (0,  0)    {1. Acquire: Vioxx approved\\(pre-training, pre-2004 data)};
+\node[stage, draw=store,    fill=store!12]    (sto)  at (0, -1.2)  {2. Store: ``Vioxx is an approved\\COX-2 inhibitor'' in weights $\theta$};
+\node[stage, draw=retrieve, fill=retrieve!12] (ret)  at (0, -2.4)  {3. Retrieve: RAG returns\\FDA withdrawal notice (2004)};
+\node[fail,  draw=update,   fill=update!12]   (upd)  at (0, -3.6)  {4. Update: Weights NOT edited\\$\theta$ still encodes ``approved''};
+\node[fail,  draw=update,   fill=update!20]   (conf) at (0, -4.8)  {5. CONFLICT: $\theta$ says ``approved''\\$\mathcal{M}$ says ``withdrawn''};
+\node[fail,  draw=forget,   fill=forget!12]   (fgt)  at (0, -6.0)  {6. Forget: Cannot unlearn\\``approved'' without retraining};
 
 \draw[arr] (acq) -- (sto);
 \draw[arr] (sto) -- (ret);
@@ -702,8 +734,8 @@ To demonstrate that lifecycle failures are not hypothetical, we trace a document
 \draw[farr] (upd) -- (conf);
 \draw[farr] (conf) -- (fgt);
 
-\node[font=\sffamily\tiny, text=green!50!black, align=right] at (-2.8, -0.6) {Normal\\flow};
-\node[font=\sffamily\tiny, text=red!60, align=right] at (-2.8, -4.2) {Failure\\cascade};
+\node[font=\sffamily\tiny, text=muted, align=right] at (-3.05, -0.6) {Normal\\flow};
+\node[font=\sffamily\tiny, text=update, align=right] at (-3.05, -4.2) {Failure\\cascade};
 
 \end{tikzpicture}
 \caption{A lifecycle failure cascade applied to the Rofecoxib (Vioxx) withdrawal. The parametric weights encode an outdated drug approval from pre-training data (Stages 1--2). The RAG index is updated with the FDA withdrawal notice (Stage 3), but no weight edit is applied (Stage 4). The resulting conflict produces a dangerous output (Stage 5), and cannot be resolved without costly retraining (Stage 6). No single-stage benchmark detects this failure.}
