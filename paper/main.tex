@@ -284,7 +284,7 @@ The lifecycle has five stages. Each one maps to a well-defined set of research q
 
 \paragraph{Stage 4: Update.} The world changes, and the system's knowledge must change with it. Knowledge editing rewrites individual facts in the weights~\citep{meng2022rome, meng2023memit}. Continual learning extends the model to new domains over time~\citep{kirkpatrick2017ewc}. Agent memory consolidation turns raw interaction logs into distilled insights~\citep{park2023generative}. Knowledge conflict resolution decides what to do when the weights say one thing and the retrieved document says another~\citep{xie2024conflicts, longpre2021entity}.
 
-\paragraph{Stage 5: Forgetting.} Knowledge leaves the system, on purpose or by accident. Machine unlearning removes specific facts to comply with privacy law~\citep{jang2023unlearning, maini2024tofu}. Catastrophic forgetting destroys old knowledge as a side effect of learning new knowledge~\citep{kirkpatrick2017ewc, luo2024catastrophic}. Selective pruning trims bloated agent memory stores. KV-cache eviction drops tokens that no longer fit in the context window~\citep{xiao2024streamingllm}.
+\paragraph{Stage 5: Forgetting.} Knowledge leaves the system, on purpose or by accident. Machine unlearning removes specific facts to comply with privacy law~\citep{jang2023unlearning, maini2024tofu}. Catastrophic forgetting destroys old knowledge as a side effect of learning new knowledge~\citep{kirkpatrick2017ewc, luo2023catastrophic}. Selective pruning trims bloated agent memory stores. KV-cache eviction drops tokens that no longer fit in the context window~\citep{xiao2024streamingllm}.
 
 \subsection{Cross-Stage Dependencies}
 
@@ -364,7 +364,7 @@ Machine unlearning attempts to remove specific data points from the weights, oft
 
 \subsection{Structural Forgetting}
 
-The most routine form of forgetting is structural: context window eviction. Despite advances in streaming attention~\citep{xiao2024streamingllm} and selective state-space models~\citep{gu2023mamba}, active context is bounded, and when an agent's memory stream exceeds it, tokens are dropped. Agent memory hierarchies such as MemGPT~\citep{packer2023memgpt} mitigate this by paging critical information back into active context, which transforms structural forgetting into a recursive retrieval problem. Catastrophic forgetting during continual training~\citep{kirkpatrick2017ewc, luo2024catastrophic} completes the picture: knowledge can leave the system as an unintended side effect of acquisition itself.
+The most routine form of forgetting is structural: context window eviction. Despite advances in streaming attention~\citep{xiao2024streamingllm} and selective state-space models~\citep{gu2023mamba}, active context is bounded, and when an agent's memory stream exceeds it, tokens are dropped. Agent memory hierarchies such as MemGPT~\citep{packer2023memgpt} mitigate this by paging critical information back into active context, which transforms structural forgetting into a recursive retrieval problem. Catastrophic forgetting during continual training~\citep{kirkpatrick2017ewc, luo2023catastrophic} completes the picture: knowledge can leave the system as an unintended side effect of acquisition itself.
 
 % ============================================================
 \section{Cross-Cutting Analysis}
@@ -464,7 +464,7 @@ Edge et al.\ (GraphRAG, 2024) & -- & \checkmark & \checkmark & -- & -- & 2 \\
 \end{tabular}
 \end{table*}
 
-The pattern is quantitatively clear. Of the 20 representative works mapped, 5 address only a single lifecycle stage, 10 address exactly two, 3 address three, and only 2 (Generative Agents and MemGPT) touch four or more. The median coverage is 2 stages. No prior work provides a unified formalism across all five. The Update--Forgetting boundary and the Acquisition--Forgetting boundary are the least studied intersections, despite being the source of the most damaging real-world failures, such as fine-tuning that silently overwrites earlier alignment.
+The pattern is quantitatively clear. Of the 20 representative works mapped, 5 address only a single lifecycle stage, 10 address exactly two, 3 address three, and only 2 (Generative Agents and MemGPT) touch four or more. The median coverage is 2 stages. No prior work provides a unified formalism across all five. Pairwise coverage is thinner still. Counting how often two stages are addressed by the same work, the Acquisition--Update and Retrieval--Forgetting pairs are the least studied at 2 works each, and the Acquisition--Forgetting and Update--Forgetting pairs follow at 3, the last two despite being the source of damaging real-world failures such as fine-tuning that silently overwrites earlier alignment. The two most studied pairs, Storage--Retrieval and Storage--Update at 6 works each, are precisely the ones that sit inside an established subfield rather than across two.
 
 \subsection{Parametric vs.\ Non-Parametric: A Unified View}
 

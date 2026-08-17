@@ -17,12 +17,12 @@ The paper shows that when a fact changes after a model's training data was colle
 4. Watch two gates:
    - **The notebook's Section 6, reproduction check.** The gpt2/vioxx row must match the paper (D_sync = 12.0464, tolerance 0.05). If the assert fails, stop and report the numbers you got; do not continue.
    - **The notebook's Section 4, tokenization.** For each model, the printed `answer_first_piece` should be the expected word piece. If a tokenizer splits an answer strangely, note it; the row is still valid but the note matters for the paper.
-5. Write the notebook's Section 8 (Findings): one short paragraph per question, each sentence backed by a number from the tables in its Section 7. If something looks wrong or surprising, say so plainly; a strange result honestly reported is worth more than a clean-looking one.
+5. Write the notebook's Section 9 (Findings): one short paragraph per question, each sentence backed by a number from the tables in its Section 7 and the chart in its Section 8. If something looks wrong or surprising, say so plainly; a strange result honestly reported is worth more than a clean-looking one.
 6. Save the notebook version on Kaggle (Save Version, Save and Run All), and send back: the Kaggle notebook link, the written findings, and `cross_model_dsync.csv` from the output.
 
 ## Rules that apply
 
-- Nothing in the notebook is edited above its Section 8 without flagging it first; the probes and protocol must stay byte-identical to the paper or the comparison collapses.
+- Nothing in the notebook is edited above its Section 9 without flagging it first; the probes and protocol must stay byte-identical to the paper or the comparison collapses.
 - Every claim in the findings carries its number.
 - Nothing that failed is deleted. If a model errors out or gives a bizarre distribution, that is a finding, not a blemish.
 
