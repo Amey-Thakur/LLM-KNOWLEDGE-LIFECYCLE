@@ -199,22 +199,29 @@ The lifecycle has five stages. Each one maps to a well-defined set of research q
 % boundary, and nothing is drawn twice.
 %
 % The geometry is stated rather than eyeballed. Stage centres sit on a circle of
-% radius 4.0 cm at 72 degree intervals from the top, running clockwise so the
+% radius 4.2 cm at 72 degree intervals from the top, running clockwise so the
 % numbering reads in the direction a reader scans. Boundary labels sit on the
-% same circle's bisectors at radius 5.0 cm, which puts each one radially outside
+% same circle's bisectors at radius 5.3 cm, which puts each one radially outside
 % the gap between the two boxes it joins. The closest approach between a label
 % and a neighbouring box centre is
-%   sqrt(5.0^2 + 4.0^2 - 2*5.0*4.0*cos 36) = 2.93 cm,
-% against a box half-diagonal of 1.72 cm plus a label half-width of about
-% 1.0 cm, so 2.72 cm is occupied and 0.21 cm is clear. Every label is set on two
+%   sqrt(5.3^2 + 4.2^2 - 2*5.3*4.2*cos 36) = 3.12 cm,
+% against a box half-diagonal of 1.84 cm plus a label half-width of about
+% 1.0 cm, so 2.84 cm is occupied and 0.28 cm is clear. Every label is set on two
 % lines to hold that half-width, which also makes the five read as one set.
 % -----------------------------------------------------------------------------
 \begin{figure*}[t]
 \centering
 \begin{tikzpicture}[
+  % Hyphenation is off inside the boxes. At a 2.75 cm measure the Update box
+  % broke "continual" across lines and ran to four lines where the others take
+  % three, which made one box taller than its neighbours and cost the ring its
+  % symmetry. The measure is now 3.0 cm, which holds every stage's longest line,
+  % and a word too long to fit would now overflow visibly rather than hyphenate
+  % quietly.
   stage/.style={
-    draw, rounded corners=8pt, minimum width=3.1cm, text width=2.75cm,
-    minimum height=1.3cm, font=\sffamily, align=center, line width=1pt
+    draw, rounded corners=8pt, minimum width=3.35cm, text width=3.0cm,
+    minimum height=1.3cm, font=\sffamily, align=center, line width=1pt,
+    execute at begin node={\hyphenpenalty=10000\exhyphenpenalty=10000}
   },
   flow/.style={-{Stealth[length=3mm,width=2mm]}, line width=1.1pt, color=black!65},
   edgelabel/.style={font=\sffamily\footnotesize\itshape, text=black!65,
@@ -229,8 +236,8 @@ The lifecycle has five stages. Each one maps to a well-defined set of research q
 \definecolor{update}  {HTML}{D05353}
 \definecolor{forget}  {HTML}{8F5FB8}
 
-\def\R{4.0}   % stage centres
-\def\L{5.0}   % boundary labels
+\def\R{4.2}   % stage centres
+\def\L{5.3}   % boundary labels
 
 % --- the five stages, clockwise from the top ---------------------------------
 \node[stage, draw=acquire,  fill=acquire!12]  (acq) at ( 90:\R)
