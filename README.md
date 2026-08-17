@@ -226,7 +226,21 @@ Short on time: **Section 8.4** defines the metric and **Section 8.5** is the mea
 
 <div align="center">
 
-**Amey Thakur** &nbsp;·&nbsp; [GitHub](https://github.com/Amey-Thakur) &nbsp;·&nbsp; [ORCID](https://orcid.org/0000-0001-5644-1575) &nbsp;·&nbsp; [Amey's Arc](https://amey-thakur.github.io)
+Copyright © 2026 Amey Thakur, Sarvesh Talele
+
+<br>
+
+**[Amey Thakur](https://github.com/Amey-Thakur)** &nbsp;·&nbsp; [ORCID](https://orcid.org/0000-0001-5644-1575) &nbsp;·&nbsp; [Amey's Arc](https://amey-thakur.github.io)
+
+**[Sarvesh Talele](https://github.com/sarveshtalele)** &nbsp;·&nbsp; [ORCID](https://orcid.org/0009-0002-0818-461X)
+
+<br>
+
+**[Demo](https://huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle)** &nbsp;·&nbsp;
+**[Notebook](https://www.kaggle.com/code/ameythakur20/cross-model-lifecycle-desynchronization)** &nbsp;·&nbsp;
+**[Paper](paper/main.pdf)** &nbsp;·&nbsp;
+**[Slides](paper/presentation.pdf)** &nbsp;·&nbsp;
+**[Poster](paper/poster.pdf)**
 
 <br>
 
