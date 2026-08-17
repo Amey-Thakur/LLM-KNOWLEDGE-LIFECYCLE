@@ -171,7 +171,7 @@ A [Kaggle notebook](https://www.kaggle.com/code/ameythakur20/cross-model-lifecyc
 
 <div align="center">
 
-[![Download the paper](https://img.shields.io/badge/Download-Paper_(PDF,_18_pages)-B31B1B?logo=adobeacrobatreader&logoColor=white)](paper/main.pdf)
+[![Download the paper](https://img.shields.io/badge/Download-Paper_(PDF,_19_pages)-B31B1B?logo=adobeacrobatreader&logoColor=white)](paper/main.pdf)
 &nbsp;
 [![Download the slides](https://img.shields.io/badge/Download-Slides_(PDF,_18_slides)-4A7FD4?logo=adobeacrobatreader&logoColor=white)](paper/presentation.pdf)
 

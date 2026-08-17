@@ -734,9 +734,12 @@ from 12.05 to 10.96 and then rises again to 11.91, so the 774M model is worse at
 this probe than the 355M one.
 
 \paragraph{Some conflicts do resolve, which is what makes the metric useful.}
-The Twitter probe behaves in the opposite way. $\widehat{\mathcal{D}}_{sync}$
-falls monotonically from 2.09 to 0.09 across the ladder, and every model at 494M
-or above answers `` X'' correctly. The Monarch probe sits between the two and is
+The Twitter probe behaves in the opposite way. Within the GPT-2 family
+$\widehat{\mathcal{D}}_{sync}$ falls monotonically with size, from 2.09 to 1.19
+to 0.71, it reaches 0.09 at the largest model measured, and every model at 494M
+or above answers `` X'' correctly. Ordered by parameter count the six values are
+not monotone, because the 494M instruction-tuned model beats the 774M base one;
+the within-family column is the comparison that holds size as the only variable. The Monarch probe sits between the two and is
 also non-monotone within the GPT-2 family: the 355M model answers `` Charles''
 correctly and the 774M model regresses to `` Queen''. A metric that reported
 failure everywhere would be measuring its own construction; these three probes
@@ -744,10 +747,11 @@ separate cleanly, which is the evidence that it measures the conflict rather
 than the difficulty of the question.
 
 \paragraph{Attending to the document is not the same as being governed by it.}
-$\mathcal{I}_{ctx}$ rises with scale on the Twitter probe, from 0.90 to 7.69
-nats, and the models that move most are the ones that answer correctly. On the
-Vioxx probe it stays low for every GPT-2 model and for TinyLlama, between 0.03
-and 0.12 nats, while the answer stays wrong. The pairing is the point: a large
+$\mathcal{I}_{ctx}$ rises with size on the Twitter probe within the GPT-2
+family, from 0.90 to 1.43 to 3.66 nats, and reaches 7.82 at TinyLlama; the
+models that move most on this probe are the ones that answer it correctly. On
+the Vioxx probe it stays low for every GPT-2 model and for TinyLlama, between
+0.03 and 0.12 nats, while the answer stays wrong. The pairing is the point: a large
 $\mathcal{I}_{ctx}$ with a large $\widehat{\mathcal{D}}_{sync}$ is a model that
 read the document and still lost to its weights, and no single-stage benchmark
 distinguishes that from a retriever that failed.
