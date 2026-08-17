@@ -2,30 +2,30 @@
 
 # The Knowledge Lifecycle of Large Language Models
 
-**A unified framework for how language models acquire, store, retrieve, update, and forget knowledge, and a reproducible measurement of what breaks at the boundaries.**
+**A unified framework for how a language model acquires, stores, retrieves, updates, and forgets knowledge, and a reproducible measurement of what breaks where those stages meet.**
 
 <br>
 
 [![Demo](https://img.shields.io/badge/Demo-Hugging_Face_Space-FFD21E?logo=huggingface&logoColor=black)](https://huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle)
 [![Notebook](https://img.shields.io/badge/Notebook-Kaggle-20BEFF?logo=kaggle&logoColor=white)](https://www.kaggle.com/code/ameythakur20/cross-model-lifecycle-desynchronization)
 [![Authors](https://img.shields.io/badge/Authors-Amey_Thakur_%26_Sarvesh_Talele-0969DA)](https://github.com/Amey-Thakur)
-[![Technology](https://img.shields.io/badge/Technology-Python_%7C_PyTorch_%7C_LaTeX-8250DF)](#reproducing-the-measurement)
-[![Status](https://img.shields.io/badge/Status-Preprint_in_preparation-2EA043)](#the-paper)
+[![Technology](https://img.shields.io/badge/Technology-Python_%7C_PyTorch_%7C_LaTeX-8250DF)](#reproduce-it-yourself)
+[![Status](https://img.shields.io/badge/Status-Preprint_in_preparation-2EA043)](#read-the-paper)
 [![License](https://img.shields.io/badge/License-CC_BY_4.0-lightgrey)](LICENSE)
 
 <br>
 
-<img src=".github/social-preview.png" alt="The Knowledge Lifecycle of Large Language Models. GPT-2, asked about Vioxx with the 2004 withdrawal notice in its prompt, answers safe with 42.6% probability while the correct answer receives 0.0006%." width="760">
+<img src=".github/social-preview.png" alt="The Knowledge Lifecycle of Large Language Models. Five stages: acquire, store, retrieve, update, forget. Retrieval succeeds, resolution fails." width="820">
 
 <br><br>
 
 [Authors](#authors) &nbsp;·&nbsp;
-[The paper](#the-paper) &nbsp;·&nbsp;
-[Contributions](#contributions) &nbsp;·&nbsp;
-[The measurement](#the-measurement) &nbsp;·&nbsp;
-[Live demonstration](#live-demonstration) &nbsp;·&nbsp;
-[Reproducing](#reproducing-the-measurement) &nbsp;·&nbsp;
-[Repository layout](#repository-layout) &nbsp;·&nbsp;
+[The framework](#the-framework) &nbsp;·&nbsp;
+[What it exposes](#the-evidence) &nbsp;·&nbsp;
+[What we contribute](#what-we-contribute) &nbsp;·&nbsp;
+[Try it](#try-it) &nbsp;·&nbsp;
+[Reproduce it](#reproduce-it-yourself) &nbsp;·&nbsp;
+[Read the paper](#read-the-paper) &nbsp;·&nbsp;
 [Citation](#citation)
 
 </div>
@@ -49,74 +49,85 @@
 
 ---
 
-<a name="the-paper"></a>
-## The paper
+<a name="the-framework"></a>
+## The framework
 
-Research on how language models handle knowledge is split across five subfields that rarely cite one another: retrieval-augmented generation, knowledge editing, continual learning, context engineering, and agent memory. Each optimizes one stage in isolation, and each has its own benchmarks that pass while the assembled system fails.
+This paper's contribution is a single frame for a problem the field has split five ways. A fact inside a language model passes through five stages, and each one is studied by a different research community that rarely cites the others.
 
-This paper organizes the five as stages of a single **Knowledge Lifecycle**, then shows that the boundaries between stages are where deployed systems break. Mapping twenty representative works onto the five stages gives a median coverage of two: the interactions nobody tests are precisely the ones that cause harm in production.
+| | Stage | What happens to the fact |
+| :---: | :--- | :--- |
+| **1** | **Acquire** | Training compresses a corpus into the weights |
+| **2** | **Store** | It lives in the weights, in an external index, or in both |
+| **3** | **Retrieve** | Attention recalls it, or a search pipeline fetches a document |
+| **4** | **Update** | The world changes, and the stored copies must change with it |
+| **5** | **Forget** | It is removed on purpose, or lost by accident |
 
-The manuscript is [`paper/main.tex`](paper/main.tex), accompanied by a poster and a slide deck.
+Every stage has its own benchmarks, and a system can pass all of them separately while failing exactly where they meet. Those boundaries are what the lifecycle frame makes visible, and the failure below sits on one of them, between **Retrieve** and **Update**.
 
-<a name="contributions"></a>
-## Contributions
+Mapping twenty representative papers onto the five stages, the median covers **two**. The boundaries are where deployment breaks, and where almost nobody is looking.
 
-**Lifecycle Desynchronization ($\mathcal{D}_{sync}$)** turns the boundary failure into a number. For a fact with a verified answer it reduces to the surprisal of that answer with the corrective document present in context. The unit is the nat, a measure of information based on natural logarithms, and it converts straight back to probability: $n$ nats means the model assigns the correct answer probability $e^{-n}$. A companion diagnostic, $\mathcal{I}_{ctx}$, measures how far the document moves the model's output distribution at all. Together they separate a retrieval failure from a resolution failure, which no single-stage benchmark can do.
+<a name="the-evidence"></a>
+## What the framework exposes
 
-**The Provenance Vector ($p$)** addresses the root cause: parametric storage discards when and from where a fact was learned, so a model has no principled basis for preferring fresh evidence over a confident stale memory. Each feed-forward memory slot gains a metadata embedding of acquisition time and source reliability, and a gate attenuates stale activations at inference. Weights are never modified, so the specificity bottleneck that limits static editing does not apply. The paper gives the forward pass as an algorithm, derives the parameter cost, and proves an idealized consistency result under explicitly stated assumptions.
+A boundary failure, measured. Rofecoxib, sold as Vioxx, was withdrawn worldwide in September 2004 after trials showed it raised the risk of heart attack and stroke.
 
-<a name="the-measurement"></a>
-## The measurement
+Put that withdrawal notice directly into GPT-2's prompt, then ask whether the drug is safe to prescribe.
 
-Rofecoxib, marketed as Vioxx, was withdrawn in September 2004 after trials showed elevated cardiovascular risk. Put that withdrawal notice in GPT-2's prompt and ask whether the drug is safe to prescribe:
-
-| Quantity | Without the document | With the document |
+| | Without the notice | With the notice in the prompt |
 | :--- | ---: | ---: |
-| P(" safe"), the incorrect answer | 37.53% | **42.58%** |
-| P(" withdrawn"), the correct answer | 0.0004% | 0.0006% |
-| Top-ranked token | " safe" | " safe" |
+| Answers **"safe"** | 37.53% | **42.58%** |
+| Answers **"withdrawn"** | 0.0004% | 0.0006% |
+| Most likely next word | "safe" | "safe" |
 
-The correction is in the prompt, and the model's confidence that the drug is safe **rises**. The correct answer sits at $5.9 \times 10^{-6}$, giving $\widehat{\mathcal{D}}_{sync} = 12.05$ nats, well past the 9.2-nat threshold beyond which no realistic decoding recovers it. The document shifts the full output distribution by $\mathcal{I}_{ctx} = 0.033$ nats: retrieval worked, resolution failed.
+The correction is sitting in front of the model, and its confidence that the drug is safe **goes up**. The correct answer is left at roughly six chances in a million.
+
+This is not a hallucination in the usual sense. Retrieval worked perfectly: the right document was found and delivered. What failed is the step after it, where the model must decide which of its two memories to believe. No benchmark for retrieval, editing, or memory tests that step, because it belongs to none of them.
+
+The root cause is what training throws away. A model learns *what* is true but never *when* it learned it or *where the claim came from*, so at inference it has no principled basis for preferring fresh evidence over a confident old memory.
+
+<a name="what-we-contribute"></a>
+## What we contribute
+
+**A metric that makes the failure visible.** Lifecycle Desynchronization measures how far the correct answer has been pushed down while the corrective document is present. It is reported in nats, a unit that converts straight back to probability: 12.05 nats means the right answer holds about six chances in a million. A companion number measures whether the document moved the model at all, which separates a retrieval failure from a resolution failure. No single-stage benchmark can tell those two apart.
+
+**An architecture that targets the cause.** The Provenance Vector attaches metadata to each stored fact recording when it was learned and how reliable its source was. At inference, a gate reads that metadata and turns down facts that have gone stale, so a fresh document can win without anyone editing the weights. The paper gives the forward pass as an algorithm, derives the cost at under 0.02% extra parameters, and proves the idealized case under assumptions it states openly.
 
 > [!NOTE]
-> A cross-model extension of this measurement, spanning the GPT-2 family and instruction-tuned models, is prepared in [`experiments/`](experiments/) and runs on free Kaggle hardware.
+> The metric is measured. The architecture is a proposal supported by an idealized proof, not a trained system, and the paper says so in its limitations rather than leaving you to discover it.
 
-<a name="live-demonstration"></a>
-## Live demonstration
+<a name="try-it"></a>
+## Try it
 
-[**huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle**](https://huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle)
+**[Open the live demonstration →](https://huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle)**
 
-GPT-2 runs entirely in the visitor's browser, so no server sees the input and identical inputs always give identical numbers. Three preset probes cover three distinct failure regimes, and any fact change with a single-word answer can be entered directly. Two parameters are adjustable: sampling temperature, which controls how randomly the model chooses among candidates, and document repetition, which tests whether stating the correction more than once helps.
+GPT-2 runs inside your own browser, so nothing you type leaves your machine and the same input always returns the same number. Three worked examples cover three different ways the failure appears, and you can enter any fact change of your own.
 
-<a name="reproducing-the-measurement"></a>
-## Reproducing the measurement
+Vioxx is the outright failure. The British monarch case is stranger: after the 2022 succession, telling the model that Elizabeth II has died mostly makes it *more* likely to answer "Queen". The Twitter rename shows a document shifting the model hard and still losing.
+
+<a name="reproduce-it-yourself"></a>
+## Reproduce it yourself
 
 ```bash
 pip install torch transformers
 python experiments/dsync_experiment.py
 ```
 
-Prints the top tokens under both conditions, the probabilities of the correct and incorrect continuations, the full-vocabulary KL between conditions, and the surprisal estimator. There is no sampling anywhere, so the numbers above reproduce exactly. CPU is sufficient.
+Every figure quoted above comes out of that one script. There is no sampling anywhere in it, so the digits are identical on every machine and every run. A laptop is enough: the model is GPT-2 base at 124M parameters, chosen because it is small, completely open, and free of the instruction tuning that would muddy the result.
 
-<a name="repository-layout"></a>
-## Repository layout
+A [Kaggle notebook](https://www.kaggle.com/code/ameythakur20/cross-model-lifecycle-desynchronization) extends the same measurement across six models, testing whether scale or instruction tuning makes the problem go away.
+
+<a name="read-the-paper"></a>
+## Read the paper
+
+The manuscript is [`paper/main.tex`](paper/main.tex), with a poster and slide deck alongside it. Start at Section 7.5 for the metric and the measurement without the survey.
 
 ```
 .
-├── paper/                    # Manuscript, bibliography, poster, slides, derivations
-│   ├── main.tex              #   The manuscript
-│   ├── references.bib        #   Every entry verified against source metadata
-│   ├── poster.tex            #   Conference poster
-│   ├── presentation.tex      #   Slide deck
-│   └── derivations.md        #   Extended mathematical derivations
-├── experiments/              # Runnable measurements
-│   ├── dsync_experiment.py   #   The paper's measurement, deterministic
-│   ├── cross_model_dsync.ipynb  # Cross-model sweep, runs on Kaggle
-│   └── README.md             #   How to run it and what to report
-├── space/                    # The live demonstration
-├── CITATION.cff              # How to cite this work
-├── codemeta.json             # Machine-readable project metadata
-└── LICENSE                   # CC BY 4.0
+├── paper/          Manuscript, bibliography, poster, slides, derivations
+├── experiments/    The measurement script and the cross-model notebook
+├── space/          The live demonstration
+├── CITATION.cff    How to cite this work
+└── LICENSE         CC BY 4.0
 ```
 
 <a name="citation"></a>

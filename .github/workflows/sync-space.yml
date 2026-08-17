@@ -44,6 +44,9 @@ jobs:
       - name: Install huggingface_hub
         run: pip install --quiet --upgrade huggingface_hub
 
+      # Fails loudly when the token is absent rather than reporting a success
+      # it did not achieve. The repository always holds the exact copy of what
+      # the Space serves, so a failed sync costs visibility, never content.
       - name: Mirror space/ to the Space
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}

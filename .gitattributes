@@ -1,0 +1,19 @@
+# Notebooks are exported artefacts: never line-ending converted, never merged
+*.ipynb -text -diff -merge
+
+# Web sources keep LF so the deployed Space matches the repository byte for byte
+*.html text eol=lf
+*.css  text eol=lf
+*.js   text eol=lf
+
+# LaTeX and Python keep LF, which is what the build containers expect
+*.tex text eol=lf
+*.bib text eol=lf
+*.py  text eol=lf
+*.yml text eol=lf
+
+# Binary assets
+*.png binary
+*.jpg binary
+*.pdf binary
+*.svg binary
