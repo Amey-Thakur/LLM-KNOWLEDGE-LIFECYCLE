@@ -8,8 +8,8 @@
 % License     : CC BY 4.0
 % =============================================================================
 %
-% GEOMETRY. A0 portrait is 84.1 x 118.9 cm; with the class margin the usable
-% width is about 81 cm.
+% GEOMETRY. A0 portrait is 84.1 x 118.9 cm; the class margin leaves a measure of
+% about 82.5 cm, confirmed by measuring the rendered PDF rather than assumed.
 %
 % TYPE SIZE. Every figure is drawn in arbitrary units and wrapped in
 % \resizebox{\linewidth}{!}{...}. That fixes the width exactly, but it also
@@ -17,29 +17,38 @@
 % container renders its labels at a different size from the body text. Earlier
 % drafts read as a page assembled from several documents for that reason. Each
 % figure below is therefore drawn at a natural width of (container / 1.4), so
-% every one lands on the same 1.4x scale and every label is the same size:
-% about 35 pt against 25 pt body text, which is the right relationship for
+% every one lands on the same 1.4x scale and every label comes out the same
+% size: about 35 pt against 25 pt body text, which is the right relationship for
 % something read standing up.
 %
 %   full width  81.0 cm  ->  58.0 units      0.34 column  25.5 cm  ->  18.2
 %   0.58 column 45.5 cm  ->  32.5 units      0.32 column  24.0 cm  ->  17.1
 %   0.42 column 32.5 cm  ->  23.2 units
 %
+% FULL MEASURE. A figure whose content stops short of its own bounding box
+% leaves white down the right side of the block, which reads as a mistake rather
+% than as air. The lane plans below are set so that the rightmost element of
+% each figure lands on the right edge of its natural width.
+%
 % NO OVERLAP. Free text placed at hand-picked tikz coordinates is where words
 % collide, because the width of a label is not known when its neighbor is
 % positioned. Two defenses are used. Anything that is really a list, a callout
 % or a code sample is built from LaTeX boxes, which cannot overlap by
 % construction. Where geometry genuinely is needed, every text node is given an
-% explicit text width and the clearance to its neighbor is worked out from the
-% average character advance of about 0.45 units at body size.
+% explicit text width, and the clearance to its neighbor is worked out from the
+% average character advance of about 0.45 units at body size. The rendered PDF
+% is then checked for intersecting text boxes, which is the only way to know.
 %
-% VERTICAL BUDGET. About 112 cm of height after margins. tikzposter silently
-% drops anything that runs past the bottom of the page, so content that does not
-% fit disappears without an error. Two earlier drafts lost their footer that way.
+% VERTICAL BUDGET. About 116 cm of height inside the margins. tikzposter
+% silently drops anything that runs past the bottom of the page, so content that
+% does not fit disappears without an error. Two earlier drafts lost their footer
+% that way, and the only reliable check is to measure the lowest ink in the
+% output. An empty block title still reserves its full height, which is what
+% pushed the footer off the page; the negative lead below cancels it.
 %
 % COLUMN BALANCE. Blocks in a row are independent, so a short column leaves
 % visible dead space beside a long one. The coverage statistic sits in the left
-% column of row 1, and the limits note closes the right column of row 3,
+% column of row 1, and the replication note closes the right column of row 3,
 % specifically so the two rows come out level.
 %
 % READING ORDER runs down the page, not down each column: problem, framework,
@@ -49,13 +58,17 @@
 % and hyperref fails there whether loaded before or after \usetheme. At A0 a
 % clickable link buys nothing, so URLs are plain text.
 
-\documentclass[25pt, a0paper, portrait, blockverticalspace=14mm, colspace=18mm,
+\documentclass[25pt, a0paper, portrait, blockverticalspace=10mm, colspace=18mm,
                subcolspace=8mm]{tikzposter}
 
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta, positioning, calc, decorations.pathreplacing}
+
+% Removes the "LaTeX TikZposter" mark the class prints in the bottom right
+% corner, where it sat on top of the footer and read as stray text.
+\tikzposterlatexaffectionproofoff
 
 % Sans throughout. The figures are drawn in sans, and an earlier draft left the
 % body in the default serif, so the page read as two documents pasted together.
@@ -90,6 +103,13 @@
 \colorlet{blocktitlefgcolor}{ink}
 \colorlet{blockbodybgcolor}{white}
 \colorlet{blockbodyfgcolor}{ink}
+
+% Ragged right, and hyphenation switched off outright. Justified setting in a
+% 25 cm column at this size broke eight words across lines in the first proof
+% (commu-, cor-, bottle-, deter-), and a reader standing two meters back has to
+% reassemble every one of them.
+\newcommand{\bodyset}{%
+  \raggedright\hyphenpenalty=10000\exhyphenpenalty=10000\relax}
 
 % -----------------------------------------------------------------------------
 % The identity band. Drawn 58 units wide so it scales like every figure.
@@ -132,6 +152,22 @@
   \end{tikzpicture}%
 }
 
+% An author: portrait, name, city, ORCID. Both cards are built from the same
+% macro at the same width, so the pair is symmetric about the center of the page
+% by construction. The text measure is 10.2 cm because the widest line in either
+% card is the ORCID line at about 9.9 cm, which leaves the two cards carrying
+% the same 0.3 cm of trailing white rather than the 5.7 cm the first proof had.
+\newcommand{\authorcard}[4]{%  #1 portrait, #2 name, #3 city, #4 ORCID
+  \begin{minipage}[c]{3.8cm}\includegraphics[width=3.6cm]{#1}\end{minipage}%
+  \hspace{6mm}%
+  \begin{minipage}[c]{10.2cm}\raggedright
+    {\fontsize{36}{42}\selectfont\bfseries\color{ink} #2\par}
+    \vspace{1mm}
+    {\fontsize{26}{32}\selectfont\color{muted} #3\par}
+    {\fontsize{24}{30}\selectfont\color{muted} ORCID #4\par}
+  \end{minipage}%
+}
+
 \title{The Knowledge Lifecycle of Large Language Models}
 \author{Amey Thakur \quad Sarvesh Talele}
 \institute{Independent Research}
@@ -139,43 +175,23 @@
 \settitle{
   \centering
   \stageband{0.9}
-  \vspace{11mm}
+  \vspace{8mm}
 
   % Scaled to the measure rather than set at a fixed point size. This is what
   % keeps the title on one line: the size follows from the width instead of the
   % line breaking wherever a guessed size happens to run out.
   \resizebox{\linewidth}{!}{\bfseries\color{ink}%
     The Knowledge Lifecycle of Large Language Models}
-  \vspace{9mm}
+  \vspace{7mm}
 
   {\fontsize{40}{50}\selectfont\color{muted}
    A model holds two memories. When they disagree, training usually wins.\par}
-  \vspace{12mm}
+  \vspace{9mm}
 
-  % Two equal bays with a fixed gutter, so the author strip is symmetric about
-  % the center of the page whatever the two names measure.
-  \begin{minipage}[c]{0.44\linewidth}\raggedleft
-    \begin{minipage}[c]{3.8cm}\includegraphics[width=3.6cm]{amey-circle.png}\end{minipage}%
-    \hspace{6mm}%
-    \begin{minipage}[c]{16cm}\raggedright
-      {\fontsize{36}{42}\selectfont\bfseries\color{ink} Amey Thakur\par}
-      \vspace{1mm}
-      {\fontsize{26}{32}\selectfont\color{muted} Toronto, Canada\par}
-      {\fontsize{24}{30}\selectfont\color{muted} ORCID 0000-0001-5644-1575\par}
-    \end{minipage}
-  \end{minipage}%
-  \hspace{0.04\linewidth}%
-  \begin{minipage}[c]{0.44\linewidth}\raggedright
-    \begin{minipage}[c]{3.8cm}\includegraphics[width=3.6cm]{sarvesh-circle.png}\end{minipage}%
-    \hspace{6mm}%
-    \begin{minipage}[c]{16cm}\raggedright
-      {\fontsize{36}{42}\selectfont\bfseries\color{ink} Sarvesh Talele\par}
-      \vspace{1mm}
-      {\fontsize{26}{32}\selectfont\color{muted} Mumbai, India\par}
-      {\fontsize{24}{30}\selectfont\color{muted} ORCID 0009-0002-0818-461X\par}
-    \end{minipage}
-  \end{minipage}
-  \vspace{12mm}
+  \authorcard{amey-circle.png}{Amey Thakur}{Toronto, Canada}{0000-0001-5644-1575}%
+  \hspace{22mm}%
+  \authorcard{sarvesh-circle.png}{Sarvesh Talele}{Mumbai, India}{0009-0002-0818-461X}
+  \vspace{9mm}
 
   \stagebandnamed
   \vspace{2mm}
@@ -191,27 +207,33 @@
 \begin{columns}
 \column{0.42}
 \colorlet{framecolor}{update}
-\block{The problem}{
+\block{The problem}{\bodyset
   How a language model handles a fact is studied by \textbf{five separate
   communities} that rarely cite one another.
-  \vspace{8mm}
+  \vspace{7mm}
 
-  % A tabular, not a tikzpicture: the swatch and its label sit in separate
-  % cells, so no amount of text can push one into the other.
-  \noindent
-  \begin{tabular}{@{}l@{\hspace{8mm}}l@{}}
-    \textcolor{acquire} {\rule[-1mm]{16mm}{10mm}} & retrieval-augmented generation \\[6mm]
-    \textcolor{store}   {\rule[-1mm]{16mm}{10mm}} & knowledge editing              \\[6mm]
-    \textcolor{retrieve}{\rule[-1mm]{16mm}{10mm}} & continual learning             \\[6mm]
-    \textcolor{update}  {\rule[-1mm]{16mm}{10mm}} & context engineering            \\[6mm]
-    \textcolor{forget}  {\rule[-1mm]{16mm}{10mm}} & agent memory                   \\
-  \end{tabular}
-  \vspace{9mm}
+  % Full-measure rows rather than a swatch and a word: the tinted band carries
+  % the eye to the right edge of the column, where the first proof left 16 cm of
+  % white. Natural width 23.2 units against a 32.5 cm column: the 1.4x scale.
+  % The longest name is about 13.5 units and the text starts at 1.5, so nothing
+  % can reach the 23.2 edge.
+  \resizebox{\linewidth}{!}{%
+  \begin{tikzpicture}
+    \foreach \c/\n [count=\i from 0] in
+      {acquire/retrieval-augmented generation, store/knowledge editing,
+       retrieve/continual learning, update/context engineering,
+       forget/agent memory}
+      {\fill[panel] (0, -\i*1.75) rectangle (23.2, -\i*1.75 + 1.35);
+       \fill[\c]    (0, -\i*1.75) rectangle (0.55, -\i*1.75 + 1.35);
+       \node[anchor=west, text=ink] at (1.5, -\i*1.75 + 0.675) {\n};}
+    \useasboundingbox (0, -7.0) rectangle (23.2, 1.35);
+  \end{tikzpicture}}
+  \vspace{7mm}
 
   Each has its own benchmarks, and each passes them. A system can pass
   \textbf{all five} and still fail, because nothing tests what happens
   \textbf{between} them.
-  \vspace{9mm}
+  \vspace{7mm}
 
   \callout{acquire}{Across \textbf{20 representative papers}, the median work
     covers \textbf{two} of the five stages. The boundaries are where deployment
@@ -220,12 +242,12 @@
 
 \column{0.58}
 \colorlet{framecolor}{acquire}
-\block{The framework}{
+\block{The framework}{\bodyset
   A fact passes through five stages. Naming them as one lifecycle is what makes
   the boundaries between them visible.
-  \vspace{8mm}
+  \vspace{7mm}
 
-  % Natural width 32.3 units against a 45.5 cm column: the 1.4x figure scale.
+  % Natural width 32.6 units against a 45.5 cm column: the 1.4x figure scale.
   % Boxes are 5.5 wide on a 6.7 pitch. Each caption is confined to a 5.5 unit
   % text width, so the 1.2 unit gutter between boxes is never encroached on.
   \resizebox{\linewidth}{!}{%
@@ -254,7 +276,7 @@
 
     % The conflict spans two stages, so it is a brace beneath them rather than a
     % label on the arrow between them, where it collided with the Update box.
-    % Captions bottom out near y = -2.8; the brace sits at -3.8 and its label at
+    % Captions bottom out near y = -3.0; the brace sits at -3.8 and its label at
     % -5.1, so neither can touch them.
     \draw[update, line width=2.5pt, decorate,
           decoration={brace, mirror, amplitude=5mm}]
@@ -262,7 +284,7 @@
     \node[text=update, font=\bfseries] at (16.75, -5.1) {conflict};
     \useasboundingbox (-3.0, -6.0) rectangle (29.6, 1.8);
   \end{tikzpicture}}
-  \vspace{9mm}
+  \vspace{7mm}
 
   The failure below sits between \textcolor{retrieve}{\textbf{Retrieve}} and
   \textcolor{update}{\textbf{Update}}: the document arrives, and nothing tells
@@ -275,59 +297,61 @@
 % ROW 2  |  the finding, full width, the largest figure on the page
 % =============================================================================
 \colorlet{framecolor}{update}
-\block{The finding}{
+\block{The finding}{\bodyset
   Vioxx was withdrawn worldwide in September 2004 for raising the risk of heart
   attack and stroke. Put that withdrawal notice \textbf{directly into GPT-2's
   prompt}, then ask whether the drug is safe to prescribe.
-  \vspace{8mm}
+  \vspace{6mm}
 
   % Natural width 58 units against the 81 cm measure: the 1.4x figure scale.
   % Lane plan, in units, with every reserved span written down so that no two
-  % pieces of text can be placed on top of one another:
+  % pieces of text can be placed on top of one another, and so that the second
+  % panel finishes on the right edge instead of 9 cm short of it:
   %   row label   0.0 - 10.5   longest is ``withdrawn'' at 6.6
-  %   panel A     12.0 - 33.0  header 8.1 wide, bar at most 11.3, value 3.0
-  %   panel B     35.0 - 56.0  header 13.1 wide, bar at most 12.8, value 3.0
-  % Bar scale is 0.30 units per percentage point.
+  %   panel A    12.0 - 33.5   header 8.1 wide, bar at most 17.5, value 3.2
+  %   panel B    36.5 - 58.0   header 13.1 wide, bar at most 17.5, value 3.2
+  % Bar scale is 0.411 units per percentage point, chosen so that panel B's
+  % largest bar plus its value label ends exactly on 58.
   \resizebox{\linewidth}{!}{%
   \begin{tikzpicture}
-    \node[anchor=west, text=muted, text width=20cm] at (12, 5.7)
+    \node[anchor=west, text=muted, text width=21cm] at (12,   5.7)
       {without the notice};
-    \node[anchor=west, text=muted, text width=21cm] at (35, 5.7)
+    \node[anchor=west, text=muted, text width=21cm] at (36.5, 5.7)
       {with the notice in the prompt};
 
-    % --- the model's answer, wrong ------------------------------------------
+    % --- the model's answer, which is wrong ----------------------------------
     \node[anchor=west, font=\bfseries, text=update, text width=10.5cm] at (0, 4.1)
       {``safe''};
-    \fill[update!45] (12, 3.4) rectangle (23.26, 4.8);
-    \node[anchor=west, font=\bfseries, text=update] at (24.0, 4.1) {37.53\%};
-    \fill[update]    (35, 3.4) rectangle (47.77, 4.8);
-    \node[anchor=west, font=\bfseries, text=update] at (48.5, 4.1) {42.58\%};
+    \fill[update!45] (12,   3.4) rectangle (27.43, 4.8);
+    \node[anchor=west, font=\bfseries, text=update] at (28.2, 4.1) {37.53\%};
+    \fill[update]    (36.5, 3.4) rectangle (54.00, 4.8);
+    \node[anchor=west, font=\bfseries, text=update] at (54.8, 4.1) {42.58\%};
 
     % --- the correct answer --------------------------------------------------
     % At this scale the correct answer's bar is 1/70,967 the width of the one
     % above it, far below a printed pixel, so a tick marks its origin. Drawing a
     % visible sliver would overstate the result by three orders of magnitude.
-    % The two values sit beside their own ticks rather than under the values
+    % These two values sit beside their own ticks rather than under the values
     % above, so that neither number can be read against the wrong bar.
     \node[anchor=west, font=\bfseries, text=ok, text width=10.5cm] at (0, 1.7)
       {``withdrawn''};
-    \draw[ok, line width=2.5pt] (12, 1.0) -- (12, 2.4);
+    \draw[ok, line width=2.5pt] (12,   1.0) -- (12,   2.4);
     \node[anchor=west, font=\bfseries, text=ok] at (12.8, 1.7) {0.0004\%};
-    \draw[ok, line width=2.5pt] (35, 1.0) -- (35, 2.4);
-    \node[anchor=west, font=\bfseries, text=ok] at (35.8, 1.7) {0.0006\%};
+    \draw[ok, line width=2.5pt] (36.5, 1.0) -- (36.5, 2.4);
+    \node[anchor=west, font=\bfseries, text=ok] at (37.3, 1.7) {0.0006\%};
 
-    \node[anchor=north west, text=muted, font=\small, text width=56cm, align=left]
+    \node[anchor=north west, text=muted, font=\small, text width=57cm, align=left]
       at (0, -0.4)
       {Bars are true to scale. The correct answer's bar would be 1/70{,}967 the
        width of the bar above it, so a tick marks where it begins.};
     \useasboundingbox (0, -2.4) rectangle (58, 6.4);
   \end{tikzpicture}}
-  \vspace{9mm}
+  \vspace{7mm}
 
   \callout{update}{%
     {\Large\bfseries The correction is sitting in the prompt, and confidence
      that the drug is safe \textcolor{update}{goes up}.\par}
-    \vspace{6mm}
+    \vspace{5mm}
     {\color{muted}Retrieval worked. What failed is the step after it, where the
      model has to decide which of its two memories to believe.\par}}
 }
@@ -338,40 +362,40 @@
 \begin{columns}
 \column{0.34}
 \colorlet{framecolor}{retrieve}
-\block{A metric}{
+\block{A metric}{\bodyset
   \textbf{Lifecycle Desynchronization} is the surprisal of the \textbf{correct}
   answer while the corrective document is present:
-  \vspace{5mm}
+  \vspace{4mm}
   \begin{equation*}
     \widehat{\mathcal{D}}_{sync}
       = -\ln P\!\left(y^{*} \mid q,\, \theta_{stale},\, \mathcal{M}_{now}\right)
   \end{equation*}
-  \vspace{3mm}
+  \vspace{2mm}
 
   It is read in nats: $n$ nats means probability $e^{-n}$. Past \textbf{9.2} the
   correct answer is below one chance in ten thousand.
-  \vspace{9mm}
+  \vspace{8mm}
 
-  % Natural width 17.2 units against a 25.5 cm column: the 1.4x figure scale.
-  % 1.214 units per nat. Tick labels are about 1.1 units wide and the closest
-  % pair, 9.2 and the 12.05 marker, are 3.5 units apart.
+  % Natural width 18.2 units against a 25.5 cm column: the 1.4x figure scale.
+  % 1.3 units per nat over a 0 to 14 range. Tick labels are about 1.1 units wide
+  % and the closest pair, 9.2 and the 12.05 marker, are 3.7 units apart.
   \resizebox{\linewidth}{!}{%
   \begin{tikzpicture}
-    \fill[ok!30]     (0,     0) rectangle (0.85,  1.5);
-    \fill[yellow!45] (0.85,  0) rectangle (5.58,  1.5);
-    \fill[orange!45] (5.58,  0) rectangle (11.17, 1.5);
-    \fill[update!45] (11.17, 0) rectangle (17.00, 1.5);
+    \fill[ok!30]     (0,     0) rectangle (0.91,  1.5);
+    \fill[yellow!45] (0.91,  0) rectangle (5.98,  1.5);
+    \fill[orange!45] (5.98,  0) rectangle (11.96, 1.5);
+    \fill[update!45] (11.96, 0) rectangle (18.20, 1.5);
 
-    \draw[ink, line width=4pt] (14.63, -0.4) -- (14.63, 1.9);
-    \node[anchor=south, text=muted, font=\small] at (14.63, 2.0) {measured};
+    \draw[ink, line width=4pt] (15.67, -0.4) -- (15.67, 1.9);
+    \node[anchor=south east, text=muted, font=\small] at (18.2, 2.0) {measured};
 
-    \node[text=muted, font=\small] at (0.85,  -1.0) {0.7};
-    \node[text=muted, font=\small] at (5.58,  -1.0) {4.6};
-    \node[text=muted, font=\small] at (11.17, -1.0) {9.2};
-    \node[font=\bfseries]          at (14.63, -1.0) {12.05};
-    \useasboundingbox (0, -1.8) rectangle (17.2, 3.2);
+    \node[text=muted, font=\small] at (0.91,  -1.0) {0.7};
+    \node[text=muted, font=\small] at (5.98,  -1.0) {4.6};
+    \node[text=muted, font=\small] at (11.96, -1.0) {9.2};
+    \node[font=\bfseries]          at (15.67, -1.0) {12.05};
+    \useasboundingbox (0, -1.8) rectangle (18.2, 3.2);
   \end{tikzpicture}}
-  \vspace{9mm}
+  \vspace{8mm}
 
   A companion number, \textbf{context influence}, asks whether the document
   moved the model at all. Here it is \textbf{0.033} nats: the evidence is
@@ -380,40 +404,41 @@
 
 \column{0.34}
 \colorlet{framecolor}{store}
-\block{An architecture}{
+\block{An architecture}{\bodyset
   Storage records \textbf{what} is true but never \textbf{when} it was learned,
   so nothing lets the model prefer fresh evidence over a confident old memory.
-  \vspace{9mm}
+  \vspace{8mm}
 
-  % Natural width 18.0 units against a 25.5 cm column: the 1.4x figure scale.
-  % Slots are 5.0 wide on a 6.5 pitch, so the gutter is 1.5 and each label is
-  % held inside a 4.2 unit text width, well clear of it.
+  % Natural width 18.2 units against a 25.5 cm column: the 1.4x figure scale.
+  % Slots are 5.1 wide on a 6.55 pitch, so the gutter is 1.45 and every label is
+  % held inside a 4.3 unit text width, well clear of it. The row spans the full
+  % 18.2 so the figure finishes on the right edge of the column.
   \resizebox{\linewidth}{!}{%
   \begin{tikzpicture}[
-    lcslot/.style={rounded corners=3pt, minimum width=5.0cm, minimum height=3.2cm,
-                 align=center, draw=hairline, line width=2pt,
-                 font=\small, text width=4.2cm}
+    lcslot/.style={rounded corners=3pt, minimum width=5.1cm, minimum height=3.2cm,
+                   align=center, draw=hairline, line width=2pt,
+                   font=\small, text width=4.3cm}
   ]
-    \node[lcslot] (k) at (0,0)   {key\\ $k_i$};
-    \node[lcslot] (v) at (6.5,0) {value\\ $v_i$};
-    \node[lcslot, draw=acquire, fill=acquire!12, text=acquire] (p) at (13.0,0)
+    \node[lcslot] (k) at (2.55,  0) {key\\ $k_i$};
+    \node[lcslot] (v) at (9.10,  0) {value\\ $v_i$};
+    \node[lcslot, draw=acquire, fill=acquire!12, text=acquire] (p) at (15.65, 0)
       {\textbf{provenance}\\ $p_i$};
 
     \draw[-{Stealth[length=4mm]}, muted,   line width=2pt] (k) -- (v);
     \draw[-{Stealth[length=4mm]}, acquire, line width=3pt] (v) -- (p);
-    \node[below=4mm of p, text=acquire, font=\small, text width=5.0cm,
+    \node[below=4mm of p, text=acquire, font=\small, text width=5.1cm,
           align=center] {what we add};
-    \useasboundingbox (-2.5, -3.4) rectangle (15.5, 1.8);
+    \useasboundingbox (0, -3.4) rectangle (18.2, 1.8);
   \end{tikzpicture}}
-  \vspace{9mm}
+  \vspace{8mm}
 
   The \textbf{Provenance Vector} attaches acquisition time to every memory slot.
   A gate reads it at inference and mutes facts that have gone stale:
-  \vspace{4mm}
+  \vspace{3mm}
   \begin{equation*}
     S(\Delta\tau_i) = \sigma\!\left(\gamma - \beta\,\Delta\tau_i\right)
   \end{equation*}
-  \vspace{4mm}
+  \vspace{3mm}
 
   \textbf{Weights are never modified}, so the specificity bottleneck that limits
   static editing does not apply. Under \textbf{0.02\%} extra parameters.
@@ -421,28 +446,28 @@
 
 \column{0.32}
 \colorlet{framecolor}{forget}
-\block{Reproduce it}{
+\block{Reproduce it}{\bodyset
   Every number on this poster comes from \textbf{one deterministic script}.
   Nothing is sampled, so the digits come out identical on any machine.
-  \vspace{9mm}
+  \vspace{8mm}
 
   \callout{forget}{\ttfamily
     pip install torch transformers\par
     \vspace{4mm}
     python dsync\_experiment.py}
-  \vspace{9mm}
+  \vspace{8mm}
 
   It runs on \textbf{GPT-2 base}, 124M parameters: small, fully open, and with
   no instruction tuning to confound the result. A laptop is enough.
-  \vspace{9mm}
+  \vspace{8mm}
 
   The metric is \textbf{measured}. The architecture is \textbf{proposed} and has
   not been trained.
-  \vspace{9mm}
+  \vspace{8mm}
 
   \callout{muted}{\color{muted}One model, one fact, one prompt. The size of the
-    effect is what needs replication across models, and the repository carries
-    the notebook for doing it.}
+    effect is what needs replication, and the repository carries the notebook
+    for doing it.}
 }
 
 \end{columns}
@@ -452,13 +477,18 @@
 % =============================================================================
 \colorlet{framecolor}{hairline}
 \block{}{
+  % An empty block title still reserves its full height in tikzposter, which put
+  % 4.8 cm of white above this rule and pushed the closing band 3.3 cm off the
+  % bottom of the page, where the class dropped it without a word. The lead
+  % below cancels that reserved height and leaves a deliberate 1.8 cm gap.
+  \vspace*{-30mm}
   \textcolor{hairline}{\rule{\linewidth}{2pt}}
-  \vspace{9mm}
+  \vspace{6mm}
 
   % Three bays of equal width separated by equal gutters, so the row is
   % symmetric about the center of the page by construction rather than by
   % coordinates that happen to be evenly spaced. Each bay is a heading and two
-  % short lines, so the three also come out level.
+  % short lines, so the three come out level as well.
   \noindent
   \begin{minipage}[t]{0.30\linewidth}\centering
     {\bfseries Paper and code}\par\vspace{3mm}
@@ -472,10 +502,10 @@
     {\bfseries ORCID}\par\vspace{3mm}
     {\small\color{muted} Thakur 0000-0001-5644-1575\par Talele 0009-0002-0818-461X\par}
   \end{minipage}
-  \vspace{9mm}
+  \vspace{6mm}
 
   {\centering\small\color{muted} Released under CC BY 4.0\par}
-  \vspace{7mm}
+  \vspace{5mm}
 
   \stageband{0.9}
 }
