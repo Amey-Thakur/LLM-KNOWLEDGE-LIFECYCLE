@@ -12,7 +12,6 @@
 *.nav
 *.snm
 *.vrb
-paper/poster.pdf
 
 # The built paper and deck are committed on purpose, under their LaTeX names,
 # which is what arXiv and latexmk expect: a reader can download either without

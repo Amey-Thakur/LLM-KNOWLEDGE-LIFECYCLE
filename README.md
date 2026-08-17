@@ -190,6 +190,8 @@ The estimator, and both controls, are Sarvesh Talele's.
 [![Download the paper](https://img.shields.io/badge/Download-Paper_(PDF,_20_pages)-B31B1B?logo=adobeacrobatreader&logoColor=white)](paper/main.pdf)
 &nbsp;
 [![Download the slides](https://img.shields.io/badge/Download-Slides_(PDF,_18_slides)-4A7FD4?logo=adobeacrobatreader&logoColor=white)](paper/presentation.pdf)
+&nbsp;
+[![Download the poster](https://img.shields.io/badge/Download-Poster_(PDF,_A0)-8F5FB8?logo=adobeacrobatreader&logoColor=white)](paper/poster.pdf)
 
 </div>
 
