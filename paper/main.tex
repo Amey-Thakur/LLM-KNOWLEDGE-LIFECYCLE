@@ -66,7 +66,7 @@
 \maketitle
 
 \begin{abstract}
-The emergence of reasoning models and inference-time scaling has altered how large language models (LLMs) process knowledge. Earlier systems relied on static pipelines built from retrieval-augmented generation (RAG), knowledge editing, and continual learning; modern systems resolve conflicts during test-time compute. This shift exposes a methodological gap: there is currently no unified formalism for how knowledge persists, evolves, and is computed over across a model's lifespan. This paper introduces the \textbf{Knowledge Lifecycle}, a framework that organizes LLM knowledge management into five structural stages: \textit{Acquisition}, \textit{Storage}, \textit{Retrieval}, \textit{Update}, and \textit{Forgetting}. We make three contributions. First, we formalize the five stages and their cross-stage failure modes, showing that the fragmented subfields addressing each stage in isolation leave the boundaries between stages unstudied. Second, we propose the \textbf{Provenance Vector} ($p$), an architectural modification that stores temporal and source metadata alongside parametric memories, enabling a gating mechanism that suppresses stale parametric activations during test-time conflict resolution. Third, we introduce \textbf{Lifecycle Desynchronization} ($\mathcal{D}_{sync}$), a metric based on Kullback-Leibler (KL) divergence that quantifies the predictive failure occurring when parametric weights and non-parametric context conflict. In a reproducible probe of a documented pharmaceutical withdrawal, GPT-2 assigns the correct continuation a probability of $5.9 \times 10^{-6}$ even when the withdrawal notice is present in context ($\mathcal{D}_{sync} = 12.05$ nats), while the context shifts the model's full output distribution by only $0.03$ nats. These measurements demonstrate near-total parametric dominance and motivate lifecycle-aware architectures for reliable deployment.
+The emergence of reasoning models and inference-time scaling has altered how large language models (LLMs) process knowledge. Earlier systems relied on static pipelines built from retrieval-augmented generation (RAG), knowledge editing, and continual learning; modern systems resolve conflicts during test-time compute. This shift exposes a methodological gap: there is currently no unified formalism for how knowledge persists, evolves, and is computed over across a model's lifespan. This paper introduces the \textbf{Knowledge Lifecycle}, a framework that organizes LLM knowledge management into five structural stages: \textit{Acquisition}, \textit{Storage}, \textit{Retrieval}, \textit{Update}, and \textit{Forgetting}. We make three contributions. First, we formalize the five stages and their cross-stage failure modes, showing that the fragmented subfields addressing each stage in isolation leave the boundaries between stages unstudied. Second, we propose the \textbf{Provenance Vector} ($p$), an architectural modification that stores temporal and source metadata alongside parametric memories, enabling a gating mechanism that suppresses stale parametric activations during test-time conflict resolution. Third, we introduce \textbf{Lifecycle Desynchronization} ($\mathcal{D}_{sync}$), a metric based on Kullback-Leibler (KL) divergence that quantifies the predictive failure occurring when parametric weights and non-parametric context conflict. In a reproducible probe of a documented pharmaceutical withdrawal, GPT-2 assigns the correct continuation a probability of $5.9 \times 10^{-6}$ even when the withdrawal notice is present in context ($\mathcal{D}_{sync} = 12.05$ nats), while the context shifts the model's full output distribution by only $0.03$ nats. Extending the same protocol to six open models from 124M to 1.5B parameters and three documented fact changes, we find that this conflict does not resolve with scale: no model answers the withdrawal probe correctly, and within a single model family the measurement is not even monotone in size. Other conflicts in the same set do resolve, which is what shows the metric tracks the conflict rather than the difficulty of the question. These measurements demonstrate near-total parametric dominance on the unresolved cases and motivate lifecycle-aware architectures for reliable deployment.
 \end{abstract}
 
 \section*{List of Abbreviations}
@@ -682,7 +682,85 @@ $\widehat{\mathcal{D}}_{sync}$ (Equation~\ref{eq:estimator}) & \multicolumn{2}{c
 
 \paragraph{Findings.} Three observations follow. First, the correct continuation `` withdrawn'' receives probability $5.9 \times 10^{-6}$ even with the withdrawal notice present, placing $\widehat{\mathcal{D}}_{sync} = 12.05$ nats deep in the failure regime: no realistic decoding strategy recovers the correct answer. Second, the context is essentially inert: it shifts the full output distribution by only $\mathcal{I}_{ctx} = 0.033$ nats, so the failure is localized to conflict resolution, not retrieval. Third, the corrective context slightly \textit{increases} the probability of the incorrect answer `` safe'' (37.53\% to 42.58\%) and decreases that of `` unsafe''; merely mentioning the drug in a safety-related passage reinforces the dominant parametric association rather than overriding it. This last effect is a concrete, measurable instance of the failure mode that provenance gating (\S\ref{sec:gating}) is designed to eliminate: the stale parametric activation, not the retrieved evidence, controls the output.
 
-\paragraph{Scope of the measurement.} GPT-2 base is a deliberately small, fully open model: it makes the probe exactly reproducible on commodity hardware and free of instruction-tuning confounds. The measured numbers characterize this model and probe, not frontier systems; instruction-tuned models follow context more readily, and quantifying how $\widehat{\mathcal{D}}_{sync}$ falls with scale, instruction tuning, and reasoning-mode inference is the immediate next experiment (\S\ref{sec:open_problems}). What the probe establishes is the existence and measurability of the failure mode, and that the metric cleanly separates its two possible causes.
+\paragraph{Scope of the measurement.} GPT-2 base is a deliberately small, fully open model: it makes the probe exactly reproducible on commodity hardware and free of instruction-tuning confounds. The measured numbers characterize this model and probe, not frontier systems; \S\ref{sec:crossmodel} carries the same protocol across five further models, including instruction-tuned ones, and finds that this probe does not resolve at any scale tested. What the probe establishes is the existence and measurability of the failure mode, and that the metric cleanly separates its two possible causes.
+
+
+\subsection{Cross-Model Measurement}
+\label{sec:crossmodel}
+
+The single-model probe establishes that the failure exists. Whether it survives
+scale and instruction tuning is a separate question, and one the metric is built
+to answer. We therefore ran the protocol of Algorithm~\ref{alg:dsync} unchanged
+across six open models spanning 124M to 1.5B parameters and three documented
+fact changes: the Vioxx withdrawal of 2004, the British royal succession of
+2022, and the renaming of Twitter to X in 2023. Every model is evaluated in
+float32 on identical prompts, with no sampling, so the eighteen measurements
+reproduce exactly.
+
+\begin{table}[t]
+\centering
+\caption{Cross-model measurement. $\widehat{\mathcal{D}}_{sync}$ and
+$\mathcal{I}_{ctx}$ in nats, both with the corrective document present.
+\textbf{Bold} marks the cases where the model's most likely continuation is the
+correct answer. $^{\dagger}$ marks a first-token lower bound: TinyLlama's
+tokenizer splits `` withdrawn'' into three pieces, and the chain rule over all
+three gives 9.22 nats against the 9.18 reported here, so the bound is tight.}
+\label{tab:crossmodel}
+\small
+\begin{tabular}{lrrrrrrr}
+\toprule
+& & \multicolumn{3}{c}{$\widehat{\mathcal{D}}_{sync}$ (nats)}
+& \multicolumn{3}{c}{$\mathcal{I}_{ctx}$ (nats)} \\
+\cmidrule(lr){3-5} \cmidrule(lr){6-8}
+Model & Params (M) & Vioxx & Monarch & Twitter & Vioxx & Monarch & Twitter \\
+\midrule
+GPT-2 base & 124 & 12.05 & 2.91 & 2.09 & 0.03 & 0.16 & 0.90 \\
+GPT-2 medium & 355 & 10.96 & \textbf{1.41} & 1.19 & 0.12 & 0.76 & 1.43 \\
+GPT-2 large & 774 & 11.91 & 3.99 & \textbf{0.71} & 0.10 & 0.14 & 3.66 \\
+Qwen2.5-0.5B-Instruct & 494 & 7.03 & 3.32 & \textbf{0.32} & 0.42 & 0.18 & 7.69 \\
+TinyLlama-1.1B-Chat & 1100 & 9.18$^{\dagger}$ & 1.78 & \textbf{0.17} & 0.05 & 2.05 & 7.82 \\
+Qwen2.5-1.5B-Instruct & 1544 & 8.85 & \textbf{0.64} & \textbf{0.09} & 0.44 & 2.28 & 3.43 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{The conflict does not resolve with scale.} No model in the ladder
+answers the Vioxx probe correctly. The most likely continuation is `` safe'' for
+all three GPT-2 models and for TinyLlama, and $\widehat{\mathcal{D}}_{sync}$
+stays above 7 nats everywhere, so even the best case leaves the correct answer
+below one chance in a thousand while the withdrawal notice sits in the prompt.
+Scale does not move it monotonically: within the GPT-2 family the value falls
+from 12.05 to 10.96 and then rises again to 11.91, so the 774M model is worse at
+this probe than the 355M one.
+
+\paragraph{Some conflicts do resolve, which is what makes the metric useful.}
+The Twitter probe behaves in the opposite way. $\widehat{\mathcal{D}}_{sync}$
+falls monotonically from 2.09 to 0.09 across the ladder, and every model at 494M
+or above answers `` X'' correctly. The Monarch probe sits between the two and is
+also non-monotone within the GPT-2 family: the 355M model answers `` Charles''
+correctly and the 774M model regresses to `` Queen''. A metric that reported
+failure everywhere would be measuring its own construction; these three probes
+separate cleanly, which is the evidence that it measures the conflict rather
+than the difficulty of the question.
+
+\paragraph{Attending to the document is not the same as being governed by it.}
+$\mathcal{I}_{ctx}$ rises with scale on the Twitter probe, from 0.90 to 7.69
+nats, and the models that move most are the ones that answer correctly. On the
+Vioxx probe it stays low for every GPT-2 model and for TinyLlama, between 0.03
+and 0.12 nats, while the answer stays wrong. The pairing is the point: a large
+$\mathcal{I}_{ctx}$ with a large $\widehat{\mathcal{D}}_{sync}$ is a model that
+read the document and still lost to its weights, and no single-stage benchmark
+distinguishes that from a retriever that failed.
+
+\paragraph{Two honest qualifications.} Qwen2.5-1.5B-Instruct answers ``
+unsafe'' on the Vioxx probe. That is the right direction and the wrong token,
+and the point-mass estimator scores it as a failure because it is defined
+against one verified continuation; the estimator measures lexical recovery of a
+specific answer, not semantic correctness, and this is the clearest case in the
+data where the two come apart. Separately, comparisons across model families are
+confounded by tokenization, as the TinyLlama row shows. The GPT-2 column is the
+clean scale comparison because family, tokenizer and training data are held
+fixed and only size changes.
 
 % ============================================================
 \section{Open Problems and Future Directions}
@@ -695,7 +773,7 @@ The field needs benchmarks that test \textit{sequences} of lifecycle operations,
 
 \subsection{Scaling the Desynchronization Measurement}
 
-The single-probe measurement in this paper should become a benchmark: a curated set of documented fact changes (drug withdrawals, leadership changes, API deprecations, boundary revisions) paired with corrective documents, evaluated across model families and scales. Two axes matter most: how $\widehat{\mathcal{D}}_{sync}$ varies with model scale and instruction tuning, and whether reasoning-mode inference~\citep{openai2024o1, guo2025deepseekr1} reduces it, as the test-time resolution hypothesis (\S\ref{sec:update}) predicts it should. A measurement notebook accompanying this paper extends the protocol of Algorithm~\ref{alg:dsync} across six open models spanning both axes; its results will be incorporated in a revision.
+The single-probe measurement in this paper should become a benchmark: a curated set of documented fact changes (drug withdrawals, leadership changes, API deprecations, boundary revisions) paired with corrective documents, evaluated across model families and scales. Two axes matter most: how $\widehat{\mathcal{D}}_{sync}$ varies with model scale and instruction tuning, and whether reasoning-mode inference~\citep{openai2024o1, guo2025deepseekr1} reduces it, as the test-time resolution hypothesis (\S\ref{sec:update}) predicts it should. That sweep is reported in \S\ref{sec:crossmodel}: across six open models and three probes, the conflict resolves readily on one probe, not at all on another, and non-monotonically with scale on the third. Whether reasoning-mode inference reduces $\widehat{\mathcal{D}}_{sync}$ where scale does not remains open.
 
 \subsection{End-to-End Differentiable Knowledge Systems}
 
@@ -718,7 +796,7 @@ We state the limitations of this work directly.
 
 First, the Provenance Vector is an architectural proposal supported by an idealized analysis, not a trained system. Proposition~\ref{prop:consistency} holds under strong assumptions, stated explicitly in \S\ref{sec:analysis_proof}, and the auxiliary provenance loss may interact with the language modeling objective in ways only a full pre-training run can reveal. We present it as a principled architectural direction, not a validated method.
 
-Second, the empirical measurement covers one probe scenario on one small model. It establishes that the failure mode exists, is measurable, and is separable into retrieval and resolution components; it does not establish prevalence across domains, models, or scales. The point-mass estimator additionally assumes a single verifiable correct continuation, which fits factual probes but not open-ended queries.
+Second, the empirical measurement covers three probe scenarios across six models from 124M to 1.5B parameters (\S\ref{sec:crossmodel}). It establishes that the failure mode exists, is measurable, is separable into retrieval and resolution components, and does not disappear with scale on the Vioxx probe; it does not establish prevalence across domains, nor behaviour at frontier scale, nor under reasoning-mode inference. The point-mass estimator additionally assumes a single verifiable correct continuation, which fits factual probes but not open-ended queries.
 
 Third, the coverage analysis (Table~\ref{tab:coverage}) maps twenty representative works chosen to span the five subfields. A comprehensive bibliometric analysis would strengthen the fragmentation claim, though the qualitative pattern is consistent with the dedicated surveys of each subfield.
 

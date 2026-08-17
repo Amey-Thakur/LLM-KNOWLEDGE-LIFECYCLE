@@ -34,6 +34,7 @@ output so that every such row can be read as the bound it is.
 """
 
 import argparse
+import csv
 import gc
 import json
 import math
@@ -131,8 +132,7 @@ def main():
             tokenizer = AutoTokenizer.from_pretrained(name)
             # float32 everywhere, on every device, so the digits do not depend
             # on the hardware the sweep happened to run on.
-            model = AutoModelForCausalLM.from_pretrained(
-                name, torch_dtype=torch.float32)
+            model = AutoModelForCausalLM.from_pretrained(name, dtype=torch.float32)
             model.eval()
         except Exception as error:
             print(f"   could not load: {error}", flush=True)
@@ -158,12 +158,20 @@ def main():
         with open(args.out.replace(".csv", ".json"), "w", encoding="utf-8") as f:
             json.dump(rows, f, indent=2)
 
-    header = list(rows[0].keys())
+    # csv.DictWriter, not a join. A model's most likely token is sometimes a
+    # punctuation mark: TinyLlama's is a bare double quote on one probe, and
+    # writing it unquoted opened a CSV field that swallowed the three rows after
+    # it, so the file parsed as 15 measurements instead of 18 without erroring.
     with open(args.out, "w", encoding="utf-8", newline="") as f:
-        f.write(",".join(header) + "\n")
-        for r in rows:
-            f.write(",".join(str(r[h]) for h in header) + "\n")
-    print(f"\n{len(rows)} measurements written to {args.out}")
+        w = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
+        w.writeheader()
+        w.writerows(rows)
+
+    with open(args.out, encoding="utf-8", newline="") as f:
+        back = list(csv.DictReader(f))
+    assert len(back) == len(rows), \
+        f"wrote {len(rows)} rows but the file parses as {len(back)}"
+    print(f"\n{len(rows)} measurements written to {args.out}, and read back intact")
 
 
 if __name__ == "__main__":
