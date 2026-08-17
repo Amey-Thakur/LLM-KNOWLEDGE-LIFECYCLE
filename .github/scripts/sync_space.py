@@ -8,7 +8,7 @@ TECH STACK   : Python 3, huggingface_hub
 AUTHORS      : Amey Thakur (https://github.com/Amey-Thakur)
                Sarvesh Talele (https://github.com/sarveshtalele)
 REPOSITORY   : https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE
-RELEASE DATE : August 16, 2026
+RELEASE DATE : August 18, 2026
 LICENSE      : CC BY 4.0
 ===============================================================================
 

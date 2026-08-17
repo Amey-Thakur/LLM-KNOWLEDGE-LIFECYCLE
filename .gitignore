@@ -38,3 +38,9 @@ experiments/sweep.log
 # Operating system
 .DS_Store
 Thumbs.db
+
+# The arXiv upload package is assembled on demand and lives in its own private
+# repository, Amey-Thakur/ARXIV. Keeping a second copy here duplicated main.tex
+# and every figure it loads.
+arxiv-submission/
+arxiv-submission.tar.gz
