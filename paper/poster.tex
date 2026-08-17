@@ -112,45 +112,52 @@
   \raggedright\hyphenpenalty=10000\exhyphenpenalty=10000\relax}
 
 % -----------------------------------------------------------------------------
-% The identity band, drawn 58 units wide so it scales like every figure.
+% The identity band. It opens the page and closes it at full weight, and divides
+% the header from the content at a third of that weight. Three strips of equal
+% thickness would read as a repeating pattern rather than as a frame with a
+% rule inside it, so the divider is deliberately thin.
 %
-% Two things here are deliberate, and the first proof got both wrong.
+% Three rules learned from proofs that came out wrong.
 %
-% The target is \textwidth, not \linewidth. A minipage sets \linewidth and the
-% author cards above are built from minipages, so by the time the divider was
-% reached \linewidth read 38.0 cm rather than the 82.5 cm measure, and the band
-% came out at 46 percent width while the identical band at the top of the page
-% came out correct.
+% The band is drawn 58 units wide and scaled to a width passed in by the caller.
+% An earlier version targeted \textwidth, which is the 84.1 cm paper width, not
+% the 82.5 cm measure, so both bands ran off the right edge of the sheet.
 %
 % Every coordinate is a literal. Written as \i*11.6 + 5.8, the arithmetic
 % resolved for the fills but not for the labels, which landed on y = 0 instead
 % of y = 0.95 and so straddled the bottom edge of their own band, half of each
-% word in white on white. Spelling the numbers out removes the parser from the
-% question entirely.
+% word in white on white.
+%
+% The bounding box is stated outright. Without it one stray node stretched a
+% picture that should have been 58 units wide to 126, and since \resizebox fixes
+% the width of the whole box, the visible part came out at 46 percent size in a
+% band that was nominally full width.
 % -----------------------------------------------------------------------------
-\newcommand{\stageband}[1]{%
-  \resizebox{\textwidth}{!}{%
+\newcommand{\stageband}[2]{%  #1 = target width, #2 = height in band units
+  \resizebox{#1}{!}{%
     \begin{tikzpicture}
       \foreach \c/\a/\b in {acquire/0/11.6, store/11.6/23.2, retrieve/23.2/34.8,
                             update/34.8/46.4, forget/46.4/58}
-        {\fill[\c] (\a, 0) rectangle (\b, #1);}
+        {\fill[\c] (\a, 0) rectangle (\b, #2);}
+      \useasboundingbox (0, 0) rectangle (58, #2);
     \end{tikzpicture}}%
 }
 
-% The band below the authors also names the stages, so it divides the header
-% from the content and teaches the framework in the same stroke. Each cell is
-% 11.6 units and the longest name, RETRIEVE, is about 4.0 units, so no name can
-% reach its neighbor.
-\newcommand{\stagebandnamed}{%
-  \resizebox{\textwidth}{!}{%
-    \begin{tikzpicture}
-      \foreach \c/\a/\b in {acquire/0/11.6, store/11.6/23.2, retrieve/23.2/34.8,
-                            update/34.8/46.4, forget/46.4/58}
-        {\fill[\c] (\a, 0) rectangle (\b, 1.9);}
-      \foreach \n/\x in {ACQUIRE/5.8, STORE/17.4, RETRIEVE/29.0, UPDATE/40.6,
-                         FORGET/52.2}
-        {\node[text=white, font=\bfseries, anchor=center] at (\x, 0.95) {\n};}
-    \end{tikzpicture}}%
+% The three bands have to be the same width and sit on the same axis, but they
+% are drawn from two different boxes: the title, whose measure is 82.5 cm, and
+% the footer block, whose measure is 80.9 cm and which starts 0.8 cm further in.
+% Left alone, the closing band would be 1.6 cm narrower than the opening one.
+% \bandw is captured once from the title and every band is drawn at that width,
+% shifted by half the difference so all three land on the same page axis. The
+% enclosing \makebox is exactly the local measure, so the overhang does not
+% report as an overfull line.
+\newlength{\bandw}
+% A fallback, so that a band is never asked to scale itself to zero width if the
+% title is ever moved after something that draws one.
+\AtBeginDocument{\ifdim\bandw=0pt \global\bandw=\textwidth\fi}
+\newcommand{\atbandwidth}[1]{%
+  \noindent\makebox[\linewidth][l]{%
+    \hspace*{\dimexpr(\linewidth-\bandw)/2\relax}#1}%
 }
 
 % -----------------------------------------------------------------------------
@@ -191,10 +198,15 @@
 
 \settitle{
   \centering
+  % Captured here, at the top of the title, where \linewidth is the 82.5 cm
+  % measure. Every band on the page is then drawn at this one width. The
+  % assignment is global because tikzposter typesets the title inside a node,
+  % and a local length would revert before the footer band is reached.
+  \global\bandw=\linewidth\relax
   % The class leaves 1.3 cm above this band and 2.29 cm below the closing one.
   % This lead evens the two at 1.8 cm.
   \vspace*{5mm}
-  \stageband{0.9}
+  \atbandwidth{\stageband{\bandw}{0.9}}
   \vspace{8mm}
 
   % Scaled to the measure rather than set at a fixed point size. This is what
@@ -213,7 +225,9 @@
   \authorcard{sarvesh-circle.png}{Sarvesh Talele}{Mumbai, India}{0009-0002-0818-461X}
   \vspace{9mm}
 
-  \stagebandnamed
+  % A third of the weight of the opening and closing bands: enough to divide the
+  % header from the content, not enough to compete with them.
+  \atbandwidth{\stageband{\bandw}{0.3}}
   \vspace{2mm}
 }
 
@@ -512,27 +526,28 @@
 
   % Three bays of equal width separated by equal gutters, so the row is
   % symmetric about the center of the page by construction rather than by
-  % coordinates that happen to be evenly spaced. Each bay is a heading and two
-  % short lines, so the three come out level as well.
+  % coordinates that happen to be evenly spaced. Each address sits on one line:
+  % a bay is 25.9 cm and the longest of the three sets to about 22.7 cm, so
+  % breaking them was never necessary, and a wrapped URL reads as two things.
   \noindent
-  \begin{minipage}[t]{0.30\linewidth}\centering
+  \begin{minipage}[t]{0.32\linewidth}\centering
     {\bfseries Paper and code}\par\vspace{3mm}
-    {\small\color{muted} github.com/Amey-Thakur/\par LLM-KNOWLEDGE-LIFECYCLE\par}
+    {\small\color{muted} github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE\par}
   \end{minipage}\hfill
-  \begin{minipage}[t]{0.30\linewidth}\centering
+  \begin{minipage}[t]{0.32\linewidth}\centering
     {\bfseries Live demonstration}\par\vspace{3mm}
-    {\small\color{muted} huggingface.co/spaces/ameythakur/\par llm-knowledge-lifecycle\par}
+    {\small\color{muted} huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle\par}
   \end{minipage}\hfill
-  \begin{minipage}[t]{0.30\linewidth}\centering
+  \begin{minipage}[t]{0.32\linewidth}\centering
     {\bfseries ORCID}\par\vspace{3mm}
-    {\small\color{muted} Thakur 0000-0001-5644-1575\par Talele 0009-0002-0818-461X\par}
+    {\small\color{muted} Thakur 0000-0001-5644-1575 \quad Talele 0009-0002-0818-461X\par}
   \end{minipage}
   \vspace{6mm}
 
   {\centering\small\color{muted} Released under CC BY 4.0\par}
-  \vspace{5mm}
+  \vspace{6mm}
 
-  \stageband{0.9}
+  \atbandwidth{\stageband{\bandw}{0.9}}
 }
 
 \end{document}
