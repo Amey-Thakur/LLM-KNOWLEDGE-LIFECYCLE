@@ -29,8 +29,8 @@
 <header>
   <h1>LLM Knowledge Lifecycle</h1>
   <p class="subtitle">
-    A language model carries two memories: what it learned in training, and what you place in
-    its prompt. When they disagree, which one wins? Companion demonstration for
+    A model holds two memories: what it learned in training, and what you put in its prompt.
+    When they disagree, which one wins? Companion demonstration for
     <em>The Knowledge Lifecycle of Large Language Models</em>.
   </p>
   <p class="badges">
@@ -41,8 +41,8 @@
   </p>
   <div class="alert a-important">
     <span class="alert-title">Important</span>
-    The model runs entirely in your browser. Every measurement is deterministic and computed
-    locally; nothing leaves your machine. First measurement downloads the model once (128 MB).
+    The model runs in your browser. Nothing leaves your machine, and identical inputs always
+    give identical numbers. The first measurement downloads the model once, 128 MB.
   </div>
 </header>
 
@@ -62,10 +62,8 @@
 <section id="probe" class="panel active">
 
   <p class="lede">
-    Each preset is a real, documented fact change that happened after this model's training
-    data was collected. The model's weights hold the old world; the corrective document in the
-    prompt holds the new one. Pick a case, press Measure, and watch which memory controls the
-    answer.
+    Each preset is a documented fact change from after this model was trained. Its weights hold
+    the old world, the document in the prompt holds the new one. Press Measure to see which wins.
   </p>
 
   <div class="presets">
@@ -102,7 +100,7 @@
     <p id="load-status" class="dim"></p>
   </div>
 
-  <div id="results" hidden>
+  <div id="results" role="region" aria-live="polite" aria-label="Measurement results" hidden>
 
     <div class="verdict-row">
       <span id="verdict-chip" class="chip"></span>
@@ -112,13 +110,13 @@
     <p id="narrative" class="narrative"></p>
 
     <h3>The two distributions, side by side</h3>
-    <p class="dim small">Next-token probability without the document (grey) and with it (blue).
-    The correct answer is outlined in green; if its bar is invisible, that is the finding.</p>
+    <p class="dim small">Probability of each candidate without the document (grey) and with it (blue).
+    The correct answer is outlined in green. If its bar is invisible, that is the finding.</p>
     <div id="bars"></div>
 
     <div class="gauge-block">
       <div class="gauge-label">
-        <span>D<sub>sync</sub> &nbsp;<span class="dim">how lost the correct answer is</span></span>
+        <span>D<sub>sync</sub> &nbsp;<span class="dim">how lost the correct answer is, in nats</span></span>
         <strong id="r-dsync"></strong>
       </div>
       <div class="gauge">
@@ -130,7 +128,7 @@
 
     <div class="gauge-block">
       <div class="gauge-label">
-        <span>I<sub>ctx</sub> &nbsp;<span class="dim">how much the document moved the model</span></span>
+        <span>I<sub>ctx</sub> &nbsp;<span class="dim">how much the document moved the model, in nats</span></span>
         <strong id="r-ictx"></strong>
       </div>
       <div class="gauge slim">
@@ -142,7 +140,7 @@
 
     <div class="temp-block">
       <div class="gauge-label">
-        <span>Sampling temperature <span class="dim">(recomputed live from the measured logits)</span></span>
+        <span>Sampling temperature <span class="dim">(how randomly the model picks its answer)</span></span>
         <strong id="t-value">1.0</strong>
       </div>
       <input id="temp" type="range" min="0.2" max="2.0" step="0.1" value="1.0">
@@ -155,8 +153,8 @@
         <tr><td>P(answer | query alone)</td><td id="r-p0"></td></tr>
         <tr><td>P(answer | context + query)</td><td id="r-p1"></td></tr>
         <tr><td>Answer tokenization</td><td id="r-tok"></td></tr>
-        <tr><td>D<sub>sync</sub> definition</td><td>&minus;ln P(answer | context + query), in nats</td></tr>
-        <tr><td>I<sub>ctx</sub> definition</td><td>KL(with context &Vert; without), full vocabulary</td></tr>
+        <tr><td>D<sub>sync</sub> definition</td><td>&minus;ln P(answer given context and query): the negative natural logarithm of the correct answer's probability</td></tr>
+        <tr><td>I<sub>ctx</sub> definition</td><td>Kullback-Leibler divergence between the with-document and without-document distributions, over all 50,257 tokens</td></tr>
       </table>
     </details>
   </div>
@@ -192,6 +190,19 @@
     <tr><td><span class="chip chip-fail">failure</span></td><td><strong>Vioxx withdrawal.</strong> The notice is in the prompt; the model still says "safe". Paper's fp32 run: D<sub>sync</sub> 12.05, I<sub>ctx</sub> 0.033.</td></tr>
     <tr><td><span class="chip chip-drift">trap</span></td><td><strong>British monarch.</strong> The death announcement's strongest effect is boosting " Queen". Correct context reinforcing the wrong answer.</td></tr>
     <tr><td><span class="chip chip-influence">drift</span></td><td><strong>Twitter rename.</strong> Context lifts the right answer by orders of magnitude and still loses to " Twitter".</td></tr>
+  </table>
+
+
+  <h2>Terms used on this page</h2>
+  <table class="glossary">
+    <tr><td><strong>Token</strong></td><td>The unit a model reads and writes. Roughly a word or word fragment; " withdrawn" is one token, and the leading space is part of it.</td></tr>
+    <tr><td><strong>Parametric memory</strong></td><td>What the model absorbed into its weights during training. Fixed after training, and the model cannot tell you when it learned any of it.</td></tr>
+    <tr><td><strong>Context</strong></td><td>What you put in the prompt right now, including any document retrieved for the model to read.</td></tr>
+    <tr><td><strong>Nat</strong></td><td>A unit of information, measured with natural logarithms. Here it converts directly to probability: a value of <em>n</em> nats means the correct answer holds probability e<sup>&minus;n</sup>. One nat is roughly 37%, nine nats is roughly one in ten thousand.</td></tr>
+    <tr><td><strong>Surprisal</strong></td><td>How surprised the model is by an answer, written as &minus;ln P. Low when the model expected it, high when it did not. D<sub>sync</sub> is the surprisal of the correct answer.</td></tr>
+    <tr><td><strong>KL divergence</strong></td><td>A measure of how far one probability distribution sits from another. I<sub>ctx</sub> uses it to ask whether the document changed the model's mind about anything at all.</td></tr>
+    <tr><td><strong>Temperature</strong></td><td>How randomly a model picks among candidate answers. Low values make it repeat its favorite; high values spread the choice out.</td></tr>
+    <tr><td><strong>Quantized</strong></td><td>Weights stored at reduced precision so the model downloads and runs faster. This page uses 8-bit weights, which shift individual probabilities slightly without changing any conclusion.</td></tr>
   </table>
 
   <h2>Build your own probe</h2>

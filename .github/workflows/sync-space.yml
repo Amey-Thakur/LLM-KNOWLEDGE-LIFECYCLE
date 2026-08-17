@@ -1,0 +1,50 @@
+# =============================================================================
+# Workflow    : Sync Space
+# Project     : The Knowledge Lifecycle of Large Language Models
+# Purpose     : Mirror space/ to the Hugging Face Space whenever it changes, so
+#               the live demonstration and this repository cannot drift apart.
+# Repository  : https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE
+# License     : CC BY 4.0
+# =============================================================================
+#
+# Requires an HF_TOKEN repository secret: a Hugging Face token with write
+# access to the Space. Without it the job fails loudly rather than leaving the
+# Space quietly stale.
+
+name: Sync Space
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'space/**'
+      - '.github/scripts/sync_space.py'
+      - '.github/workflows/sync-space.yml'
+  workflow_dispatch:
+
+# One deployment at a time. Two overlapping runs could otherwise land in the
+# reverse order and leave the Space holding the older commit.
+concurrency:
+  group: sync-space
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    name: Push to Hugging Face
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install huggingface_hub
+        run: pip install --quiet --upgrade huggingface_hub
+
+      - name: Mirror space/ to the Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: python .github/scripts/sync_space.py

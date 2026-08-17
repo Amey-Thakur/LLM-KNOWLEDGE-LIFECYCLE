@@ -1,0 +1,70 @@
+# =============================================================================
+# Workflow    : Build Paper
+# Project     : The Knowledge Lifecycle of Large Language Models
+# Purpose     : Compile the manuscript, poster, and slide deck to PDF on every
+#               change, so broken LaTeX is caught at the commit that introduced
+#               it rather than at submission time.
+# Repository  : https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE
+# License     : CC BY 4.0
+# =============================================================================
+
+name: Build Paper
+
+on:
+  push:
+    paths:
+      - 'paper/**'
+      - '.github/workflows/build-paper.yml'
+  pull_request:
+    paths:
+      - 'paper/**'
+  workflow_dispatch:
+
+jobs:
+  manuscript:
+    name: Manuscript
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      # bibtex runs between the latexmk passes, so citations and the
+      # bibliography resolve instead of rendering as question marks.
+      - name: Compile main.tex
+        uses: xu-cheng/latex-action@v3
+        with:
+          working_directory: paper
+          root_file: main.tex
+          args: -pdf -bibtex -interaction=nonstopmode -file-line-error
+
+      - name: Upload the manuscript
+        uses: actions/upload-artifact@v4
+        with:
+          name: manuscript
+          path: paper/main.pdf
+
+  companions:
+    name: Poster and slides
+    runs-on: ubuntu-latest
+    # Kept independent of the manuscript job: a broken poster should not mask a
+    # successful manuscript build, or the reverse.
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Compile poster.tex and presentation.tex
+        uses: xu-cheng/latex-action@v3
+        with:
+          working_directory: paper
+          root_file: |
+            poster.tex
+            presentation.tex
+          args: -pdf -interaction=nonstopmode -file-line-error
+
+      - name: Upload the companions
+        uses: actions/upload-artifact@v4
+        with:
+          name: poster-and-slides
+          path: |
+            paper/poster.pdf
+            paper/presentation.pdf

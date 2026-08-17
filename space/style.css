@@ -276,3 +276,69 @@ textarea:focus, input:focus, select:focus, #run:focus-visible, .preset:focus-vis
   outline: 2px solid var(--accent); outline-offset: 1px;
 }
 .stagebar { border-radius: 6px; overflow: hidden; }
+
+/* narrow screens: stack the paired bars rather than crushing four columns */
+@media (max-width: 620px) {
+  body { padding: 2rem 1rem 3rem; }
+  .bar-tok { flex: 0 0 5rem; font-size: .78rem; }
+  .bar-pair { grid-template-columns: 1fr 4rem; row-gap: .2rem; }
+  .row { flex-wrap: wrap; }
+  #run { width: 100%; }
+  .authors { gap: 1.5rem; }
+  .stagebar { font-size: .62rem; }
+  .gauge-ticks span { font-size: .66rem; }
+}
+
+/* ---------------------------------------------------------------------------
+   Typographic measure and rhythm.
+
+   Prose is capped near 68 characters. Beyond that the eye loses the line
+   start on the return sweep, which is what made the earlier full-width
+   paragraphs tiring to read. Tables, bars, and gauges stay full width: they
+   are scanned, not read.
+   --------------------------------------------------------------------------- */
+
+body { line-height: 1.65; }
+
+.subtitle { max-width: 38rem; font-size: 1.02rem; }
+.lede,
+.reading,
+#guide p,
+.narrative,
+.note { max-width: 46rem; }
+.alert { max-width: 46rem; line-height: 1.6; }
+.subtitle { max-width: 44rem; }
+
+.lede { margin-bottom: 1.6rem; font-size: 1rem; }
+.reading { margin: 1rem 0 1.8rem; }
+
+header { margin-bottom: 2.2rem; }
+header h1 { font-size: 1.9rem; margin-bottom: .6rem; }
+.badges { margin-bottom: 1.2rem; }
+
+.panel { padding-top: 2.2rem; }
+.inputs { margin-top: 1.8rem; }
+.inputs label { margin-bottom: 1.1rem; }
+#results { margin-top: 2.8rem; }
+.verdict-row { margin-bottom: 1.4rem; }
+.narrative { padding: 1rem 1.2rem; margin-bottom: 2rem; line-height: 1.7; }
+#bars { padding: 1rem 1.2rem; margin-bottom: 2.2rem; }
+.gauge-block { margin-bottom: 2rem; }
+.temp-block { padding: 1rem 1.2rem; margin-bottom: 1.8rem; }
+
+#guide h2 { margin: 2.4rem 0 .8rem; }
+#guide h2:first-child { margin-top: .4rem; }
+#guide p { margin-bottom: 1.2rem; }
+#guide table { margin-bottom: 1.8rem; }
+th, td { padding: .55rem .7rem; }
+
+h3 { margin: 1.8rem 0 .3rem; }
+.cols h3 { margin-top: 0; }
+
+footer { margin-top: 4rem; padding-top: 2rem; }
+.authors { margin-bottom: 1.6rem; }
+
+/* glossary: term column narrow and steady so definitions align */
+.glossary td:first-child { width: 11rem; color: var(--ink); }
+.glossary td:last-child { color: var(--muted); }
+.glossary { max-width: 46rem; }

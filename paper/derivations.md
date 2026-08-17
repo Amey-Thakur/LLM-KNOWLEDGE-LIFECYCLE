@@ -80,4 +80,4 @@ computed over the full vocabulary. Small $\mathcal{I}_{ctx}$ with large $\wideha
 | $\mathcal{I}_{ctx}$ | 0.033 nats |
 | $\widehat{\mathcal{D}}_{sync}$ | 12.05 nats |
 
-All values produced by the deterministic script `dsync_experiment.py` in the repository root.
+All values produced by the deterministic script `experiments/dsync_experiment.py`.

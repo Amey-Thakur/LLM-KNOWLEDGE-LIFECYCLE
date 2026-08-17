@@ -1,9 +1,11 @@
 // =============================================================================
 // File        : main.js
 // Project     : The Knowledge Lifecycle of Large Language Models
-// Purpose     : Browser-side D_sync measurement engine: loads GPT-2, runs both prompt
-// conditions, and renders the narrative, bars, gauges, and diagnostics.
-// Tech Stack  : JavaScript (ES modules), transformers.js 3.4.0, ONNX Runtime Web (WASM)
+// Purpose     : Browser-side measurement engine. Loads GPT-2, runs the two
+//               prompt conditions, and renders the narrative, the paired
+//               distributions, the gauges, and the stage diagnosis.
+// Tech Stack  : JavaScript (ES modules), transformers.js 3.4.0,
+//               ONNX Runtime Web (WASM)
 // Authors     : Amey Thakur (https://github.com/Amey-Thakur)
 //               Sarvesh Talele (https://github.com/sarveshtalele)
 // Repository  : https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE
@@ -23,19 +25,19 @@ const PRESETS = {
     query: "Question: Is Vioxx safe to prescribe? Answer: Vioxx is considered",
     context: "Context: In September 2004, Merck voluntarily withdrew Vioxx after trials revealed increased cardiovascular risks.",
     answer: " withdrawn",
-    reading: "The paper's headline case. The withdrawal notice sits in the prompt, and the model still answers “safe”. Expect D_sync deep past the 9.2-nat failure threshold; the paper's fp32 run measures 12.05 nats with I_ctx = 0.033.",
+    reading: "The headline case. The withdrawal notice is in the prompt and the model still answers “safe”. At full precision the paper measures 12.05 nats, far past the 9.2 failure threshold.",
   },
   monarch: {
     query: "Question: Who is the current British monarch? Answer: The current British monarch is",
     context: "Context: Queen Elizabeth II died in September 2022. Charles III acceded to the throne and is the reigning King of the United Kingdom.",
     answer: " Charles",
-    reading: "A subtler failure. The context raises P(Charles), but its strongest effect is boosting “ Queen”: merely mentioning the late monarch reinforces the stale association. Correct information can strengthen the wrong answer.",
+    reading: "A subtler failure. The document does raise the correct answer, but its strongest effect is boosting “ Queen”. Naming a fact, even to correct it, reinforces the old association.",
   },
   twitter: {
     query: "Question: What is the social network Twitter called today? Answer: Twitter is now called",
     context: "Context: In July 2023, Twitter was rebranded as X under Elon Musk's ownership.",
     answer: " X",
-    reading: "The context moves the distribution hard (the paper's fp32 run: I_ctx = 0.9 nats) and lifts the correct answer by orders of magnitude. The model still answers “Twitter”. Influence without resolution.",
+    reading: "Here the document moves the model hard and lifts the correct answer by orders of magnitude. It still answers “Twitter”. Influence without resolution.",
   },
 };
 
@@ -115,18 +117,24 @@ function softmax(row, temperature = 1.0) {
   return probs;
 }
 
+/**
+ * Indices of the k largest probabilities, highest first.
+ *
+ * One pass over the vocabulary, maintaining a short sorted list. The obvious
+ * alternative, k full scans with a "already taken" set, costs k passes over
+ * 50,257 entries at every call site; this costs one.
+ */
 function topK(probs, k) {
-  const taken = new Set();
-  const idx = [];
-  for (let n = 0; n < k; n++) {
-    let best = -1, bp = -1;
-    for (let i = 0; i < probs.length; i++) {
-      if (!taken.has(i) && probs[i] > bp) { bp = probs[i]; best = i; }
-    }
-    taken.add(best);
-    idx.push(best);
+  const best = [];   // indices, kept sorted by descending probability
+  for (let i = 0; i < probs.length; i++) {
+    const p = probs[i];
+    if (best.length === k && p <= probs[best[k - 1]]) continue;
+    let at = best.length;
+    while (at > 0 && probs[best[at - 1]] < p) at--;
+    best.splice(at, 0, i);
+    if (best.length > k) best.pop();
   }
-  return idx;
+  return best;
 }
 
 // ---------- rendering ----------
@@ -158,24 +166,35 @@ function renderBars(pPlain, pCtx, target) {
     + rows.join("");
 }
 
+/**
+ * Plain-language account of one measurement, written from the numbers.
+ *
+ * The observations are additive rather than exclusive: a single run can be
+ * both "the document helped" and "the document also strengthened the wrong
+ * answer", and an if/else chain would report only the first and hide the
+ * second, which is the more interesting half.
+ */
 function narrative(m) {
-  const s = [];
-  const topCtxTok = fmtTok(m.topCtx);
-  const ansTok = fmtTok(m.answerPiece).trim();
-  s.push(`With the corrective document in its prompt, the model's most likely continuation is “${topCtxTok}” at ${fmtPct(m.pTopCtx)}.`);
+  const answerWon = m.topCtx === m.answerPiece;
   const odds = Math.round(1 / m.pt1);
-  s.push(`The correct answer “${ansTok}” receives ${fmtPct(m.pt1)}: about one chance in ${odds.toLocaleString()}.`);
-  if (m.topCtx === m.topPlain && m.ictx < 0.05) {
-    s.push(`The document changed almost nothing. The model's whole distribution moved by ${m.ictx.toFixed(3)} nats, and its preferred answer is the same one it gives with no document at all.`);
-  } else if (m.pt1 > m.pt0 * 1.5 && m.topCtx !== fmtTok(m.answerPiece)) {
-    const factor = (m.pt1 / m.pt0).toFixed(1);
-    s.push(`The document helped: it multiplied the correct answer's probability by ${factor}. It still loses.`);
-  } else if (m.pTopCtx > m.pTopPlainSameTok) {
-    s.push(`Counterintuitively, the document made the leading wrong answer stronger, raising it from ${fmtPct(m.pTopPlainSameTok)} to ${fmtPct(m.pTopCtx)}. Mentioning a fact, even to correct it, reinforces the association.`);
+  const s = [
+    `With the corrective document in its prompt, the model's most likely continuation is “${m.topCtx}” at ${fmtPct(m.pTopCtx)}.`,
+    `The correct answer “${m.answerPiece.trim()}” receives ${fmtPct(m.pt1)}: about one chance in ${odds.toLocaleString()}.`,
+  ];
+
+  if (m.ictx < 0.05) {
+    s.push(`The document barely registered: it moved the model's whole distribution by ${m.ictx.toFixed(3)} nats.`);
   }
-  if (m.topCtx === fmtTok(m.answerPiece)) {
-    s.push("Here the document won: the model's top answer is the correct one. This is what synchronization looks like.");
+  if (m.pt1 > m.pt0 * 1.5) {
+    s.push(`It did help the correct answer, multiplying its probability by ${(m.pt1 / m.pt0).toFixed(1)}.`);
   }
+  if (!answerWon && m.pTopCtx > m.pTopPlainSameTok) {
+    s.push(`It also strengthened the leading wrong answer, raising “${m.topCtx}” from ${fmtPct(m.pTopPlainSameTok)} to ${fmtPct(m.pTopCtx)}: mentioning a fact, even to correct it, reinforces the association.`);
+  }
+
+  s.push(answerWon
+    ? "The document won here: the model's top answer is the correct one. This is what synchronization looks like."
+    : "The parametric memory still controls the answer.");
   return s.join(" ");
 }
 
@@ -286,7 +305,7 @@ $("run").addEventListener("click", async () => {
 
     const m = {
       pt0, pt1, dsync, ictx,
-      answerPiece: pieces[0],
+      answerPiece: fmtTok(pieces[0]),
       topPlain: fmtTok(tokenizer.decode([topPlainId])),
       topCtx: fmtTok(tokenizer.decode([topCtxId])),
       pTopCtx: pCtx[topCtxId],
