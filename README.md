@@ -56,11 +56,11 @@ This paper's contribution is a single frame for a problem the field has split fi
 
 <div align="center">
 
-![Acquire](https://img.shields.io/badge/1-Acquire-4A7FD4?style=for-the-badge)
-![Store](https://img.shields.io/badge/2-Store-2A9D8F?style=for-the-badge)
-![Retrieve](https://img.shields.io/badge/3-Retrieve-E08A2E?style=for-the-badge)
-![Update](https://img.shields.io/badge/4-Update-D05353?style=for-the-badge)
-![Forget](https://img.shields.io/badge/5-Forget-8F5FB8?style=for-the-badge)
+![Acquire](https://img.shields.io/badge/1-Acquire-4A7FD4)
+![Store](https://img.shields.io/badge/2-Store-2A9D8F)
+![Retrieve](https://img.shields.io/badge/3-Retrieve-E08A2E)
+![Update](https://img.shields.io/badge/4-Update-D05353)
+![Forget](https://img.shields.io/badge/5-Forget-8F5FB8)
 
 </div>
 
@@ -68,13 +68,13 @@ This paper's contribution is a single frame for a problem the field has split fi
 
 | Stage | What happens to the fact | Studied as |
 | :--- | :--- | :--- |
-| ![](https://img.shields.io/badge/-4A7FD4?style=flat-square) **Acquire** | Training compresses a corpus into the weights | Pre-training, fine-tuning |
-| ![](https://img.shields.io/badge/-2A9D8F?style=flat-square) **Store** | It lives in the weights, in an external index, or in both | Parametric memory, vector databases |
-| ![](https://img.shields.io/badge/-E08A2E?style=flat-square) **Retrieve** | Attention recalls it, or a search pipeline fetches a document | Retrieval-augmented generation |
-| ![](https://img.shields.io/badge/-D05353?style=flat-square) **Update** | The world changes, and the stored copies must change with it | Knowledge editing, continual learning |
-| ![](https://img.shields.io/badge/-8F5FB8?style=flat-square) **Forget** | It is removed on purpose, or lost by accident | Machine unlearning, catastrophic forgetting |
+| ![Acquire](https://img.shields.io/badge/Acquire-4A7FD4) | Training compresses a corpus into the weights | Pre-training, fine-tuning |
+| ![Store](https://img.shields.io/badge/Store-2A9D8F) | It lives in the weights, in an external index, or in both | Parametric memory, vector databases |
+| ![Retrieve](https://img.shields.io/badge/Retrieve-E08A2E) | Attention recalls it, or a search pipeline fetches a document | Retrieval-augmented generation |
+| ![Update](https://img.shields.io/badge/Update-D05353) | The world changes, and the stored copies must change with it | Knowledge editing, continual learning |
+| ![Forget](https://img.shields.io/badge/Forget-8F5FB8) | It is removed on purpose, or lost by accident | Machine unlearning, catastrophic forgetting |
 
-Every stage has its own benchmarks, and a system can pass all of them separately while failing exactly where they meet. Those boundaries are what the lifecycle frame makes visible, and the failure below sits on one of them, between ![](https://img.shields.io/badge/-E08A2E?style=flat-square) **Retrieve** and ![](https://img.shields.io/badge/-D05353?style=flat-square) **Update**.
+Every stage has its own benchmarks, and a system can pass all of them separately while failing exactly where they meet. Those boundaries are what the lifecycle frame makes visible, and the failure below sits on one of them, between ![Retrieve](https://img.shields.io/badge/Retrieve-E08A2E) and ![Update](https://img.shields.io/badge/Update-D05353).
 
 Mapping twenty representative papers onto the five stages, the median covers **two**. The boundaries are where deployment breaks, and where almost nobody is looking.
 
@@ -109,9 +109,13 @@ The root cause is what training throws away. A model learns *what* is true but n
 <a name="what-we-contribute"></a>
 ## What we contribute
 
-![](https://img.shields.io/badge/-E08A2E?style=flat-square)![](https://img.shields.io/badge/-D05353?style=flat-square) &nbsp; **A metric that makes the failure visible.** Lifecycle Desynchronization measures how far the correct answer has been pushed down while the corrective document is present. It is reported in nats, a unit that converts straight back to probability: 12.05 nats means the right answer holds about six chances in a million. A companion number measures whether the document moved the model at all, which separates a retrieval failure from a resolution failure. No single-stage benchmark can tell those two apart.
+![Retrieve](https://img.shields.io/badge/Retrieve-E08A2E) ![Update](https://img.shields.io/badge/Update-D05353)
 
-![](https://img.shields.io/badge/-4A7FD4?style=flat-square)![](https://img.shields.io/badge/-2A9D8F?style=flat-square) &nbsp; **An architecture that targets the cause.** The Provenance Vector attaches metadata to each stored fact recording when it was learned and how reliable its source was. At inference, a gate reads that metadata and turns down facts that have gone stale, so a fresh document can win without anyone editing the weights. The paper gives the forward pass as an algorithm, derives the cost at under 0.02% extra parameters, and proves the idealized case under assumptions it states openly.
+**A metric that makes the failure visible.** Lifecycle Desynchronization measures how far the correct answer has been pushed down while the corrective document is present. It is reported in nats, a unit that converts straight back to probability: 12.05 nats means the right answer holds about six chances in a million. A companion number measures whether the document moved the model at all, which separates a retrieval failure from a resolution failure. No single-stage benchmark can tell those two apart.
+
+![Acquire](https://img.shields.io/badge/Acquire-4A7FD4) ![Store](https://img.shields.io/badge/Store-2A9D8F)
+
+**An architecture that targets the cause.** The Provenance Vector attaches metadata to each stored fact recording when it was learned and how reliable its source was. At inference, a gate reads that metadata and turns down facts that have gone stale, so a fresh document can win without anyone editing the weights. The paper gives the forward pass as an algorithm, derives the cost at under 0.02% extra parameters, and proves the idealized case under assumptions it states openly.
 
 > [!NOTE]
 > The metric is measured. The architecture is a proposal supported by an idealized proof, not a trained system, and the paper says so in its limitations rather than leaving you to discover it.
@@ -129,7 +133,7 @@ The root cause is what training throws away. A model learns *what* is true but n
 
 <div align="center">
 
-[![Open in Hugging Face](https://img.shields.io/badge/Open_the_live_demo-Hugging_Face_Space-FFD21E?style=for-the-badge&logo=huggingface&logoColor=black)](https://huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle)
+[![Open in Hugging Face](https://img.shields.io/badge/Open_the_live_demonstration-Hugging_Face-FFD21E?logo=huggingface&logoColor=black)](https://huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle)
 
 </div>
 
