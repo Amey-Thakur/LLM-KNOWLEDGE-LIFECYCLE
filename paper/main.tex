@@ -833,7 +833,7 @@ this probe than the 355M one.
 \paragraph{Some conflicts do resolve, which is what makes the metric useful.}
 The Twitter probe behaves in the opposite way. Within the GPT-2 family
 $\widehat{\mathcal{D}}_{sync}$ falls monotonically with size, from 2.09 to 1.19
-to 0.71, it reaches 0.09 at the largest model measured, and every model at 494M
+to 0.71. It reaches 0.09 at the largest model measured, and every model at 494M
 or above answers `` X'' correctly. Ordered by parameter count the six values are
 not monotone, because the 494M instruction-tuned model beats the 774M base one;
 the within-family column is the comparison that holds size as the only variable. The Monarch probe sits between the two and is
@@ -854,8 +854,8 @@ read the document and still lost to its weights, and no single-stage benchmark
 distinguishes that from a retriever that failed.
 
 \paragraph{Two controls separate an unreachable answer from an unused document.}
-Every probe is additionally run against two controls, which we owe to the second
-author. An \textit{irrelevant} document, matched to the corrective one in length
+Every probe is additionally run against two controls.
+An \textit{irrelevant} document, matched to the corrective one in length
 and register, establishes how far any document at all moves the model. A
 \textit{leak} document, which states the answer outright, establishes how far the
 model can be moved when the answer is handed to it. The gap between the leak and
@@ -866,7 +866,7 @@ between 7.7 and 10.6 nats to every model on the ladder, so the correct
 continuation is well within reach of all of them. The corrective document, which
 contains the same fact in prose, is worth at most 0.41 nats to any GPT-2 model.
 The failure is not that the model cannot represent the answer; it is that a
-document saying so does not reach it; Figure~\ref{fig:help} shows that gap for
+document saying so does not reach it. Figure~\ref{fig:help} shows that gap for
 every model and probe. Sharper still, on GPT-2 the irrelevant
 document about the Danube moves the output distribution 0.089 nats against the
 withdrawal notice's 0.033, and an irrelevant document has the larger effect in
@@ -878,6 +878,32 @@ document, the document makes the stale answer \textit{more} likely on the Vioxx
 probe for 5 of the 6 models. Naming a fact, even in order to correct it,
 reinforces the association the model already holds. This is the effect that
 \S\ref{sec:case_study} reports for a single model, measured across the ladder.
+
+\paragraph{How much of this is the question, and how much is the wording?} A
+surprisal measured on one sentence may be a fact about that sentence, so we
+re-ran every probe under two further phrasings that ask the same question in
+different words, holding the corrective document and the verified answer fixed.
+The wording matters, and it matters more than we expected. On the Vioxx probe
+$\widehat{\mathcal{D}}_{sync}$ has a median standard deviation of 5.14 nats
+across the three phrasings, and the phrasing used above is the hardest of the
+three for all six models: it averages 10.00 nats where the three-phrasing mean is
+4.44. The Monarch and Twitter probes are steadier, at 0.87 and 1.67 nats
+respectively.
+
+The likely cause is syntactic rather than semantic. ``Vioxx is
+considered~\rule{6mm}{0.4pt}'' invites an adjective, and the verified answer
+`` withdrawn'' is a participle that sits awkwardly in that frame, whereas
+``Vioxx has been~\rule{6mm}{0.4pt}'' licenses it directly. The estimator
+therefore conflates two things: the conflict it is intended to measure, and how
+readily the query frame admits the particular answer string being scored. The
+qualitative findings above are unaffected, because no model answers the Vioxx
+probe correctly under any of the three phrasings and the control results are
+computed within a phrasing rather than across them. The specific value of 12.05
+nats, however, should be read as this probe under this wording, not as a
+property of the fact change alone. Reporting a single phrasing without this
+spread would overstate what the number carries, and a benchmark built on
+$\widehat{\mathcal{D}}_{sync}$ should average over phrasings or report the
+spread alongside the mean.
 
 \begin{figure}[t]
 \centering
@@ -891,7 +917,7 @@ the wrong way.}
 \label{fig:help}
 \end{figure}
 
-\paragraph{Two honest qualifications.} Qwen2.5-1.5B-Instruct answers ``
+\paragraph{Two qualifications.} Qwen2.5-1.5B-Instruct answers ``
 unsafe'' on the Vioxx probe. That is the right direction and the wrong token,
 and the point-mass estimator scores it as a failure because it is defined
 against one verified continuation; the estimator measures lexical recovery of a
@@ -934,7 +960,7 @@ We state the limitations of this work directly.
 
 First, the Provenance Vector is an architectural proposal supported by an idealized analysis, not a trained system. Proposition~\ref{prop:consistency} holds under strong assumptions, stated explicitly in \S\ref{sec:analysis_proof}, and the auxiliary provenance loss may interact with the language modeling objective in ways only a full pre-training run can reveal. We present it as a principled architectural direction, not a validated method.
 
-Second, the empirical measurement covers three probe scenarios across six models from 124M to 1.5B parameters (\S\ref{sec:crossmodel}). It establishes that the failure mode exists, is measurable, is separable into retrieval and resolution components, and does not disappear with scale on the Vioxx probe; it does not establish prevalence across domains, nor behaviour at frontier scale, nor under reasoning-mode inference. The point-mass estimator additionally assumes a single verifiable correct continuation, which fits factual probes but not open-ended queries.
+Second, the empirical measurement covers three probe scenarios across six models from 124M to 1.5B parameters (\S\ref{sec:crossmodel}). It establishes that the failure mode exists, is measurable, is separable into retrieval and resolution components, and does not disappear with scale on the Vioxx probe; it does not establish prevalence across domains, nor behavior at frontier scale, nor under reasoning-mode inference. The point-mass estimator additionally assumes a single verifiable correct continuation, which fits factual probes but not open-ended queries, and it is sensitive to how the query is worded: across three phrasings of each probe the Vioxx measurement has a median standard deviation of 5.14 nats, and the phrasing reported here is the hardest of the three for every model tested (\S\ref{sec:crossmodel}). The estimator measures the conflict together with how readily the query frame admits the answer string, and those two are not separated here.
 
 Third, the coverage analysis (Table~\ref{tab:coverage}) maps twenty representative works chosen to span the five subfields. A comprehensive bibliometric analysis would strengthen the fragmentation claim, though the qualitative pattern is consistent with the dedicated surveys of each subfield.
 
