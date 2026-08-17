@@ -221,12 +221,16 @@
    A model holds two memories. When they disagree, training usually wins.\par}
   % The author strip is given equal and generous air above and below, so the two
   % faces read as their own band rather than as a caption hung off the subtitle.
-  \vspace{14mm}
+  % The \par after the cards matters: without it the following \vspace lands
+  % inside the paragraph as a \vadjust, where interline glue swallowed it and
+  % raising 9 mm to 14 mm moved the divider by 0.4 mm.
+  \vspace*{18mm}
 
   \authorcard{amey-circle.png}{Amey Thakur}{Toronto, Canada}{0000-0001-5644-1575}%
   \hspace{22mm}%
-  \authorcard{sarvesh-circle.png}{Sarvesh Talele}{Mumbai, India}{0009-0002-0818-461X}
-  \vspace{14mm}
+  \authorcard{sarvesh-circle.png}{Sarvesh Talele}{Mumbai, India}{0009-0002-0818-461X}%
+  \par
+  \vspace*{18mm}
 
   % A third of the weight of the opening and closing bands: enough to divide the
   % header from the content, not enough to compete with them.
