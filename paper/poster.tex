@@ -1,9 +1,14 @@
 \documentclass[25pt, a0paper, portrait]{tikzposter}
+
+% hyperref is loaded before \usetheme on purpose. tikzposter applies its theme
+% inside a group, and a package cannot be loaded in a group, so hyperref placed
+% after the theme fails with "Loading a class or package in a group".
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, urlcolor=blue!55!black, linkcolor=blue!55!black}
+
 \usetheme{Desert}
 \usepackage{amsmath}   % equation*, used by the metric and gate blocks below
 \usepackage{amssymb}
-\usepackage{hyperref}  % every URL on the poster is clickable in the PDF
-\hypersetup{colorlinks=true, urlcolor=blue!55!black, linkcolor=blue!55!black}
 \usepackage{booktabs}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta, positioning, shapes.geometric, calc}
