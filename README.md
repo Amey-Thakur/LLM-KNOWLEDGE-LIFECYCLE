@@ -226,7 +226,13 @@ the headline probe.
 
 <br>
 
-Short on time: **Section 8.4** defines the metric and **Section 8.5** is the measurement. Those two stand alone without the survey around them. The slide deck carries speaker notes throughout, so it reads as a written argument as well as a talk.
+> [!TIP]
+> ### 📄 &nbsp; Short on time? Read these two sections
+> **Section 8.4** defines the metric. **Section 8.5** is the measurement. The two stand alone without the survey around them, and together they are about four pages.
+>
+> **Section 8.6** is the cross-model sweep, and it is where the exposure trap sits: on five of six models the document that corrects the fact made the *wrong* answer more likely.
+
+The slide deck carries speaker notes throughout, so it reads as a written argument as well as a talk.
 
 ```
 .
@@ -258,9 +264,6 @@ Short on time: **Section 8.4** defines the metric and **Section 8.5** is the mea
 Released under the [Creative Commons Attribution 4.0 International](LICENSE)
 licence. You are free to share and adapt this material for any purpose,
 including commercially, provided you give appropriate credit.
-
-The arXiv style file under `paper/` is third-party and carries the licence of its
-own authors.
 
 Copyright © 2026 Amey Thakur, Sarvesh Talele
 
