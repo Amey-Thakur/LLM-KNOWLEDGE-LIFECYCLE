@@ -344,3 +344,13 @@ footer { margin-top: 4rem; padding-top: 2rem; }
 .glossary td:first-child { width: 11rem; color: var(--ink); }
 .glossary td:last-child { color: var(--muted); }
 .glossary { max-width: 46rem; }
+
+/* stage table: the label column holds a colored dot and a one-word stage name,
+   so it must never wrap. "Retrieve" was breaking onto its own line. */
+.stages td:first-child { white-space: nowrap; width: 9.5rem; }
+.stages td:nth-child(2) { width: 40%; }
+
+/* tabs: the browser's default focus ring drew a box around the active tab
+   after a mouse click. Replace it with the page's own focus treatment. */
+.tab:focus { outline: none; }
+.tab:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
