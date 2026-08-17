@@ -17,8 +17,6 @@ a surprisal measured on one sentence could be a fact about that sentence. Each
 probe therefore gets two further phrasings that ask the same question in
 different words, keeping the corrective document and the verified answer fixed,
 and the spread across the three is reported.
-
-The paraphrases are Sarvesh Talele's, as is the estimator.
 """
 
 import csv

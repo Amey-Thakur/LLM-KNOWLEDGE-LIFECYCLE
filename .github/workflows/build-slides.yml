@@ -6,8 +6,8 @@
 # License     : CC BY 4.0
 # =============================================================================
 #
-# Independent of the manuscript and the poster: each artefact gets its own badge,
-# and a failure in one does not hide a success in another.
+# Independent of the manuscript and the poster, so a failure in one does not
+# hide a success in another.
 
 name: Slides
 

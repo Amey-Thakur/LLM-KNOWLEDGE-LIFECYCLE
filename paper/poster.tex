@@ -8,55 +8,41 @@
 % License     : CC BY 4.0
 % =============================================================================
 %
-% GEOMETRY. A0 portrait is 84.1 x 118.9 cm; the class margin leaves a measure of
-% about 82.5 cm, confirmed by measuring the rendered PDF rather than assumed.
+% A0 portrait is 84.1 x 118.9 cm. The class margin leaves a measure of 82.5 cm
+% and about 116 cm of height, both measured off the rendered PDF.
 %
-% TYPE SIZE. Every figure is drawn in arbitrary units and wrapped in
-% \resizebox{\linewidth}{!}{...}. That fixes the width exactly, but it also
-% scales the type inside, so a figure whose natural width is far from its
-% container renders its labels at a different size from the body text. Earlier
-% drafts read as a page assembled from several documents for that reason. Each
-% figure below is therefore drawn at a natural width of (container / 1.4), so
-% every one lands on the same 1.4x scale and every label comes out the same
-% size: about 35 pt against 25 pt body text, which is the right relationship for
-% something read standing up.
+% Every figure is drawn in arbitrary units inside \resizebox{\linewidth}{!}{...},
+% which scales the type along with the picture. Each is therefore drawn at a
+% natural width of (container / 1.4), so all of them land on the same 1.4x scale
+% and every label sets at about 35 pt against 25 pt body text.
 %
 %   full width  81.0 cm  ->  58.0 units      0.34 column  25.5 cm  ->  18.2
 %   0.58 column 45.5 cm  ->  32.5 units      0.32 column  24.0 cm  ->  17.1
 %   0.42 column 32.5 cm  ->  23.2 units
 %
-% FULL MEASURE. A figure whose content stops short of its own bounding box
-% leaves white down the right side of the block, which reads as a mistake rather
-% than as air. The lane plans below are set so that the rightmost element of
-% each figure lands on the right edge of its natural width.
+% Each lane plan is set so the rightmost element lands on the right edge of its
+% natural width, leaving no white down the side of the block.
 %
-% NO OVERLAP. Free text placed at hand-picked tikz coordinates is where words
-% collide, because the width of a label is not known when its neighbor is
-% positioned. Two defenses are used. Anything that is really a list, a callout
-% or a code sample is built from LaTeX boxes, which cannot overlap by
-% construction. Where geometry genuinely is needed, every text node is given an
-% explicit text width, and the clearance to its neighbor is worked out from the
-% average character advance of about 0.45 units at body size. The rendered PDF
-% is then checked for intersecting text boxes, which is the only way to know.
+% Overlap is prevented two ways. Lists, callouts and code samples are LaTeX
+% boxes, which cannot overlap. Where geometry is needed, every text node carries
+% an explicit text width and its clearance is worked from the average character
+% advance of 0.45 units at body size. The rendered PDF is then checked for
+% intersecting text boxes.
 %
-% VERTICAL BUDGET. About 116 cm of height inside the margins. tikzposter
-% silently drops anything that runs past the bottom of the page, so content that
-% does not fit disappears without an error. Two earlier drafts lost their footer
-% that way, and the only reliable check is to measure the lowest ink in the
-% output. An empty block title still reserves its full height, which is what
-% pushed the footer off the page; the negative lead below cancels it.
+% tikzposter silently drops anything past the bottom of the page, so the lowest
+% ink in the output is measured rather than assumed. An empty block title still
+% reserves its full height; the negative leads below cancel it.
 %
-% COLUMN BALANCE. Blocks in a row are independent, so a short column leaves
-% visible dead space beside a long one. The coverage statistic sits in the left
-% column of row 1, and the replication note closes the right column of row 3,
-% specifically so the two rows come out level.
+% Blocks in a row are independent. The coverage statistic sits in the left column
+% of row 1 and the replication note closes the right column of row 3, so the two
+% rows come out level.
 %
-% READING ORDER runs down the page, not down each column: problem, framework,
+% Reading order runs down the page, not down each column: problem, framework,
 % evidence, then the contributions and how to check them.
 %
-% hyperref is deliberately absent: tikzposter applies its theme inside a group,
-% and hyperref fails there whether loaded before or after \usetheme. At A0 a
-% clickable link buys nothing, so URLs are plain text.
+% hyperref is absent: tikzposter applies its theme inside a group and hyperref
+% fails there either side of \usetheme. At A0 a link buys nothing, so URLs are
+% plain text.
 
 \documentclass[25pt, a0paper, portrait, blockverticalspace=13mm, colspace=18mm,
                subcolspace=8mm]{tikzposter}
@@ -66,12 +52,10 @@
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta, positioning, calc, decorations.pathreplacing}
 
-% Removes the "LaTeX TikZposter" mark the class prints in the bottom right
-% corner, where it sat on top of the footer and read as stray text.
+% Removes the "LaTeX TikZposter" mark the class prints over the footer.
 \tikzposterlatexaffectionproofoff
 
-% Sans throughout. The figures are drawn in sans, and an earlier draft left the
-% body in the default serif, so the page read as two documents pasted together.
+% Sans throughout, body and figures alike, so the page reads as one document.
 \renewcommand{\familydefault}{\sfdefault}
 
 % --- the five lifecycle colors, identical across every surface ---------------
@@ -81,8 +65,7 @@
 \definecolor{update}  {HTML}{D05353}
 \definecolor{forget}  {HTML}{8F5FB8}
 \definecolor{ink}     {HTML}{1A1A1C}
-% Darkened from the screen palette: at A0 a light gray secondary reads as faint
-% rather than as quiet, and the poster is printed, not backlit.
+% Darker than the screen palette: the poster is printed, not backlit.
 \definecolor{muted}   {HTML}{4A4A55}
 \definecolor{hairline}{HTML}{C8CAD2}
 \definecolor{ok}      {HTML}{2E7D32}
@@ -92,9 +75,8 @@
 \usebackgroundstyle{Empty}
 \usetitlestyle{Empty}
 
-% Minimal is the built-in style that rules under the block title. A custom style
-% was tried first and broke the build: its rule dereferences the blocktitle
-% node, which does not exist for a block with an empty title.
+% Minimal rules under the block title. A custom style cannot be used: its rule
+% dereferences the blocktitle node, which an empty title never creates.
 \useblockstyle{Minimal}
 
 \colorlet{backgroundcolor}{white}
@@ -104,34 +86,23 @@
 \colorlet{blockbodybgcolor}{white}
 \colorlet{blockbodyfgcolor}{ink}
 
-% Ragged right, and hyphenation switched off outright. Justified setting in a
-% 25 cm column at this size broke eight words across lines in the first proof
-% (commu-, cor-, bottle-, deter-), and a reader standing two meters back has to
-% reassemble every one of them.
+% Ragged right with hyphenation off. Justified setting in a 25 cm column at this
+% size breaks words across lines, and the poster is read standing up.
 \newcommand{\bodyset}{%
   \raggedright\hyphenpenalty=10000\exhyphenpenalty=10000\relax}
 
 % -----------------------------------------------------------------------------
-% The identity band. It opens the page and closes it at full weight, and divides
-% the header from the content at a third of that weight. Three strips of equal
-% thickness would read as a repeating pattern rather than as a frame with a
-% rule inside it, so the divider is deliberately thin.
+% The identity band. It opens and closes the page at full weight and divides the
+% header from the content at a third of that weight, so the divider reads as a
+% rule inside a frame rather than as a repeating pattern.
 %
-% Three rules learned from proofs that came out wrong.
+% The band is drawn 58 units wide and scaled to the width the caller passes,
+% which must be the 82.5 cm measure: \textwidth is the 84.1 cm paper width and
+% runs the band off the right edge of the sheet.
 %
-% The band is drawn 58 units wide and scaled to a width passed in by the caller.
-% An earlier version targeted \textwidth, which is the 84.1 cm paper width, not
-% the 82.5 cm measure, so both bands ran off the right edge of the sheet.
-%
-% Every coordinate is a literal. Written as \i*11.6 + 5.8, the arithmetic
-% resolved for the fills but not for the labels, which landed on y = 0 instead
-% of y = 0.95 and so straddled the bottom edge of their own band, half of each
-% word in white on white.
-%
-% The bounding box is stated outright. Without it one stray node stretched a
-% picture that should have been 58 units wide to 126, and since \resizebox fixes
-% the width of the whole box, the visible part came out at 46 percent size in a
-% band that was nominally full width.
+% The bounding box is stated outright. Without it a stray node stretches the
+% picture, and since \resizebox fixes the width of the whole box the visible
+% part then shrinks inside a nominally full-width band.
 % -----------------------------------------------------------------------------
 \newcommand{\stageband}[2]{%  #1 = target width, #2 = height in band units
   \resizebox{#1}{!}{%
@@ -143,14 +114,11 @@
     \end{tikzpicture}}%
 }
 
-% The three bands have to be the same width and sit on the same axis, but they
-% are drawn from two different boxes: the title, whose measure is 82.5 cm, and
-% the footer block, whose measure is 80.9 cm and which starts 0.8 cm further in.
-% Left alone, the closing band would be 1.6 cm narrower than the opening one.
-% \bandw is captured once from the title and every band is drawn at that width,
-% shifted by half the difference so all three land on the same page axis. The
-% enclosing \makebox is exactly the local measure, so the overhang does not
-% report as an overfull line.
+% The three bands are drawn from two boxes of different measure: the title at
+% 82.5 cm and the footer block at 80.9 cm, indented 0.8 cm further in. \bandw is
+% captured once from the title, every band is drawn at that width, and each is
+% shifted by half the difference so all three sit on the same page axis. The
+% enclosing \makebox is the local measure, so the overhang is not overfull.
 \newlength{\bandw}
 % A fallback, so that a band is never asked to scale itself to zero width if the
 % title is ever moved after something that draws one.
@@ -162,9 +130,8 @@
 
 % -----------------------------------------------------------------------------
 % A callout: an accent rule, a tinted panel, and text that wraps inside it.
-% Built from a self-sizing node rather than fixed coordinates, so the panel is
-% always exactly as tall as its content and the text can never spill out of it.
-% The 10 mm inner padding clears the 6 mm accent rule by 4 mm.
+% A self-sizing node, so the panel is exactly as tall as its content. The 10 mm
+% inner padding clears the 6 mm accent rule by 4 mm.
 % -----------------------------------------------------------------------------
 \newlength{\calloutwidth}
 \newcommand{\callout}[2]{%  #1 = accent color, #2 = content
@@ -176,11 +143,9 @@
   \end{tikzpicture}%
 }
 
-% An author: portrait, name, city, ORCID. Both cards are built from the same
-% macro at the same width, so the pair is symmetric about the center of the page
-% by construction. The text measure is 10.2 cm because the widest line in either
-% card is the ORCID line at about 9.9 cm, which leaves the two cards carrying
-% the same 0.3 cm of trailing white rather than the 5.7 cm the first proof had.
+% An author: portrait, name, city, ORCID. Both cards come from this macro at the
+% same width, so the pair is symmetric about the page center by construction.
+% The 10.2 cm measure holds the widest line, the ORCID at about 9.9 cm.
 \newcommand{\authorcard}[4]{%  #1 portrait, #2 name, #3 city, #4 ORCID
   \begin{minipage}[c]{3.8cm}\includegraphics[width=3.6cm]{#1}\end{minipage}%
   \hspace{6mm}%
@@ -210,20 +175,18 @@
   \atbandwidth{\stageband{\bandw}{0.9}}
   \vspace{8mm}
 
-  % Scaled to the measure rather than set at a fixed point size. This is what
-  % keeps the title on one line: the size follows from the width instead of the
-  % line breaking wherever a guessed size happens to run out.
+  % Scaled to the measure rather than set at a point size, so the title holds
+  % one line and its size follows from the width.
   \resizebox{\linewidth}{!}{\bfseries\color{ink}%
     The Knowledge Lifecycle of Large Language Models}
   \vspace{7mm}
 
   {\fontsize{40}{50}\selectfont\color{muted}
    A model holds two memories. When they disagree, training usually wins.\par}
-  % The author strip is given equal and generous air above and below, so the two
-  % faces read as their own band rather than as a caption hung off the subtitle.
-  % The \par after the cards matters: without it the following \vspace lands
-  % inside the paragraph as a \vadjust, where interline glue swallowed it and
-  % raising 9 mm to 14 mm moved the divider by 0.4 mm.
+  % Equal air above and below, so the two faces read as their own band rather
+  % than as a caption on the subtitle. The \par after the cards is required:
+  % without it the \vspace lands inside the paragraph as a \vadjust and the
+  % interline glue absorbs almost all of it.
   \vspace*{18mm}
 
   \authorcard{amey-circle.png}{Amey Thakur}{Toronto, Canada}{0000-0001-5644-1575}%
@@ -256,11 +219,10 @@
   communities} that rarely cite one another.
   \vspace{6mm}
 
-  % Full-measure rows rather than a swatch and a word: the tinted band carries
-  % the eye to the right edge of the column, where the first proof left 16 cm of
-  % white. Natural width 23.2 units against a 32.5 cm column: the 1.4x scale.
-  % The longest name is about 13.5 units and the text starts at 1.5, so nothing
-  % can reach the 23.2 edge.
+  % Full-measure rows rather than a swatch and a word, so the tinted band carries
+  % the eye to the right edge of the column. Natural width 23.2 units against a
+  % 32.5 cm column: the 1.4x scale. The longest name is 13.5 units and the text
+  % starts at 1.5, so nothing reaches the 23.2 edge.
   \resizebox{\linewidth}{!}{%
   \begin{tikzpicture}
     \foreach \c/\n [count=\i from 0] in
@@ -318,10 +280,9 @@
     \node[lccap, below=4mm of u] {editing};
     \node[lccap, below=4mm of f] {unlearning};
 
-    % The conflict spans two stages, so it is a brace beneath them rather than a
-    % label on the arrow between them, where it collided with the Update box.
-    % Captions bottom out near y = -3.35; the brace sits at -3.8 and its label
-    % at -5.1, so neither can touch them.
+    % The conflict spans two stages, so it is braced beneath both rather than
+    % labelled on the arrow between them. Captions bottom out near y = -3.35,
+    % the brace sits at -3.8 and its label at -5.1.
     \draw[update, line width=2.5pt, decorate,
           decoration={brace, mirror, amplitude=5mm}]
       (10.65, -3.8) -- (22.85, -3.8);
@@ -330,9 +291,8 @@
   \end{tikzpicture}}
   \vspace{7mm}
 
-  % Set as a callout rather than as running text, so that the two columns of
-  % this row end level and so that the sentence handing off to the finding
-  % below is given the weight it carries.
+  % A callout rather than running text, so the two columns of this row end level
+  % and the sentence handing off to the finding carries its weight.
   \callout{update}{The failure below sits between
     \textcolor{retrieve}{\textbf{Retrieve}} and
     \textcolor{update}{\textbf{Update}}: the document arrives, and nothing
@@ -377,13 +337,12 @@
 
     % --- the correct answer --------------------------------------------------
     % At this scale the correct answer's bar is 1/72,582 the width of the one
-    % above it, far below a printed pixel, so a tick marks its origin. Drawing a
-    % visible sliver would overstate the result by three orders of magnitude.
-    % The ratio is 0.425749748945 / 0.000005865763 taken at full precision. An
-    % earlier draft divided by the rounded 0.0006 percent instead, which is
-    % wrong by 2.3 percent: rounding a denominator this small moves the answer.
-    % These two values sit beside their own ticks rather than under the values
-    % above, so that neither number can be read against the wrong bar.
+    % above it, below a printed pixel, so a tick marks its origin: a visible
+    % sliver would overstate the result by three orders of magnitude. The ratio
+    % is 0.425749748945 / 0.000005865763 at full precision. Dividing by the
+    % rounded 0.0006 percent gives 1/70,967, which is wrong by 2.3 percent.
+    % Both values sit beside their own ticks, so neither can be read against
+    % the wrong bar.
     \node[anchor=west, font=\bfseries, text=ok, text width=10.5cm] at (0, 1.7)
       {``withdrawn''};
     \draw[ok, line width=2.5pt] (12,   1.0) -- (12,   2.4);
@@ -529,19 +488,16 @@
 % =============================================================================
 \colorlet{framecolor}{hairline}
 \block{}{
-  % An empty block title still reserves its full height in tikzposter, which put
-  % 4.8 cm of white above this rule and pushed the closing band 3.3 cm off the
-  % bottom of the page, where the class dropped it without a word. The lead
-  % below cancels that reserved height and leaves a deliberate 1.8 cm gap.
+  % An empty block title still reserves its full height in tikzposter, 4.8 cm of
+  % white that pushes the closing band off the bottom of the page, where the
+  % class drops it silently. The lead below cancels it and leaves 1.8 cm.
   \vspace*{-30mm}
   \textcolor{hairline}{\rule{\linewidth}{2pt}}
   \vspace{6mm}
 
-  % Three bays of equal width separated by equal gutters, so the row is
-  % symmetric about the center of the page by construction rather than by
-  % coordinates that happen to be evenly spaced. Each address sits on one line:
-  % a bay is 25.9 cm and the longest of the three sets to about 22.7 cm, so
-  % breaking them was never necessary, and a wrapped URL reads as two things.
+  % Three bays of equal width and equal gutters, so the row is symmetric about
+  % the page center by construction. A bay is 25.9 cm and the longest address
+  % sets to 22.7 cm, so every URL holds one line.
   \noindent
   \begin{minipage}[t]{0.32\linewidth}\centering
     {\bfseries Paper and code}\par\vspace{3mm}
@@ -557,8 +513,8 @@
   \end{minipage}
   \vspace{8mm}
 
-  % Far enough below the bays to read as the footer's own line rather than as a
-  % third line of the middle one.
+  % Far enough below the bays to read as its own line, not as a third line of
+  % the middle bay.
   {\centering\small\color{muted} Released under CC BY 4.0\par}
   \vspace{6mm}
 

@@ -15,17 +15,14 @@ Runs documented fact changes against a ladder of models and records, for each
 pair, how far the correct answer sits from the model's output once the
 correcting document is already in the prompt.
 
-The estimator here follows Sarvesh Talele's formulation, which corrects two
-defects in an earlier version of this script and is adopted wholesale.
-
 Answer tokens are obtained by differencing the prompt against the prompt plus
 the answer, not by encoding the answer alone. A SentencePiece vocabulary turns
 the leading space of " Charles" and " Queen" into the same standalone piece, so
 encoding them separately scores the identical token and every comparison between
 them collapses to zero. Whether that happens depends on the installed tokenizer
-build, which is what makes it dangerous: the first Kaggle run of this sweep put
-TinyLlama's Twitter probe at 8.62 nats with the answer marked wrong, while the
-same code on another machine gave 0.17 nats and marked it right.
+build, which is what makes it dangerous. On one build TinyLlama's Twitter probe
+scores 8.62 nats and the answer is marked wrong; on another the same code gives
+0.17 nats and marks it right.
 
 Surprisal is summed over the whole answer under teacher forcing rather than read
 off its first token. Scoring the first token is well defined on GPT-2, where
@@ -34,7 +31,7 @@ splits "withdrawn" into "with", "dra", "wn": the first piece spells a common
 English word and its probability says little about the word. Summing costs one
 extra forward pass and removes the tokenizer from the comparison.
 
-Two controls accompany every probe, also Sarvesh's design. An irrelevant
+Two controls accompany every probe. An irrelevant
 document of matched length and register separates "this document moved the
 model" from "any document moves the model". A leak document that states the
 answer outright gives the upper bound the model is capable of when the answer is

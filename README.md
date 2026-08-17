@@ -175,10 +175,6 @@ The [Kaggle notebook](https://www.kaggle.com/code/ameythakur20/cross-model-lifec
 
 Two controls make that last row possible: an irrelevant document matched in length and register, and a leak document that states the answer outright. On GPT-2 the irrelevant article about the Danube moves the output distribution **0.089** nats against the withdrawal notice's **0.033**, and the corrective document makes the *wrong* answer more likely on five of the six models.
 
-The estimator, and both controls, are Sarvesh Talele's.
-
-<br>
-
 <br>
 
 <a name="more-figures"></a>

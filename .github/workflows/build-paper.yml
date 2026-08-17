@@ -8,17 +8,15 @@
 # License     : CC BY 4.0
 # =============================================================================
 #
-# One workflow per artefact, so the Actions tab shows three independent badges
-# and a broken poster never masks a working manuscript. The paths filters keep
-# a poster edit from rebuilding the paper and the reverse.
+# One workflow per artefact, so a broken poster never masks a working
+# manuscript. The paths filters keep a poster edit from rebuilding the paper.
 
 name: Paper
 
 on:
   push:
-    # Only what main.tex actually reads. An earlier version globbed paper/*.png
-    # and paper/*.jpg, which matched the poster's portraits and the slide
-    # portraits, so every poster edit rebuilt the paper as well.
+    # Only what main.tex reads. Globbing paper/*.png and paper/*.jpg would match
+    # the poster and slide portraits and rebuild the paper on every poster edit.
     paths:
       - 'paper/main.tex'
       - 'paper/references.bib'

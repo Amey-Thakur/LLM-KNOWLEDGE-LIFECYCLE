@@ -1,31 +1,56 @@
-# Cross-Model Experiment: Instructions
+# Experiments
 
-This folder holds the cross-model desynchronization experiment for *The Knowledge Lifecycle of Large Language Models*. The notebook is complete and runs top to bottom on Kaggle; whoever runs it sanity-checks the reproduction gate and writes the findings.
+Everything behind the numbers in *The Knowledge Lifecycle of Large Language
+Models*. Nothing here samples, so every run returns the same digits.
 
-**Expected effort:** one session, roughly an hour including the reading
-**Where the results go:** a new appendix in the paper, "Cross-Model Desynchronization Measurements", added in the next revision, crediting whoever ran and wrote them
+| File | What it does |
+| :--- | :--- |
+| `dsync_experiment.py` | The single-model measurement. Produces every number in the repository README and Section 8.5 of the paper. |
+| `cross_model_sweep.py` | The same measurement across six models and three probes, with both controls. Writes `cross_model_dsync.csv`. |
+| `cross_model_dsync.ipynb` | The sweep as a notebook, with the reasoning around it. Published on [Kaggle](https://www.kaggle.com/code/ameythakur20/cross-model-lifecycle-desynchronization). |
+| `paraphrase_robustness.py` | Re-runs each probe under two further phrasings. Writes `paraphrase_robustness.csv`. |
+| `make_figures.py` | Builds the four charts from `cross_model_dsync.csv`. |
+| `kernel-metadata.json` | Kaggle settings for the notebook: CPU, internet on. |
 
-## Background, in three sentences
+## Running them
 
-The paper shows that when a fact changes after a model's training data was collected, GPT-2 keeps answering from its stale memory even when the correction sits in its prompt: the correct answer gets probability six in a million (D_sync = 12.05 nats), and the corrective document barely moves the output distribution (I_ctx = 0.033 nats). Section 9.2 of the paper asks how these numbers change with model scale and instruction tuning. This notebook is the sweep that answers it, across six models on the same three probes, and its results are reported as Section 8.6.
+```bash
+pip install torch transformers
+python experiments/dsync_experiment.py
+```
 
-## Steps
+A laptop is enough. GPT-2 base at 124M parameters is small, fully open, and
+carries no instruction tuning that would confound the result.
 
-1. Read the paper's Sections 8.4 and 8.5 (the metric and its protocol, then the Vioxx case) and the live demo at https://huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle so the two numbers mean something before you run anything.
-2. Create a new Kaggle notebook. Settings: **CPU**, **Internet on**, latest environment. The notebook runs single forward passes rather than generation, so a GPU buys almost nothing and spends quota; `kernel-metadata.json` sets `enable_gpu: false` to match. Budget about 35 minutes of compute for the six models, plus roughly 13 GB of first-run model downloads.
-3. Upload `cross_model_dsync.ipynb` from this folder (File, Import Notebook) and run all cells, top to bottom, once.
-4. Watch two gates:
-   - **The notebook's Section 6, reproduction check.** The gpt2/vioxx row must match the paper (D_sync = 12.0464, tolerance 0.05). If the assert fails, stop and report the numbers you got; do not continue.
-   - **The notebook's Section 4, tokenization.** For each model, the printed `answer_first_piece` should be the expected word piece. If a tokenizer splits an answer strangely, note it; the row is still valid but the note matters for the paper.
-5. Write the notebook's Section 9 (Findings): one short paragraph per question, each sentence backed by a number from the tables in its Section 7 and the chart in its Section 8. If something looks wrong or surprising, say so plainly; a strange result honestly reported is worth more than a clean-looking one.
-6. Save the notebook version on Kaggle (Save Version, Save and Run All), and send back: the Kaggle notebook link, the written findings, and `cross_model_dsync.csv` from the output.
+The sweep loads six models between 124M and 1.5B parameters, one at a time:
 
-## Rules that apply
+```bash
+python experiments/cross_model_sweep.py
+```
 
-- Nothing in the notebook is edited above its Section 9 without flagging it first; the probes and protocol must stay byte-identical to the paper or the comparison collapses.
-- Every claim in the findings carries its number.
-- Nothing that failed is deleted. If a model errors out or gives a bizarre distribution, that is a finding, not a blemish.
+About four minutes of compute once the weights are cached, plus roughly 13 GB of
+first-run downloads. These are single forward passes rather than generation, so a
+GPU buys almost nothing.
 
-## What happens with the results
+## Two gates worth watching
 
-The measured tables go into the paper as an appendix, the findings paragraphs seed its prose, and the revision credits the contributor as second author. The same protocol later extends to the text-image conflict case on a vision-language model, which is the larger follow-up if you want it after this.
+**Reproduction.** The `gpt2` and `vioxx` row must come back at
+D<sub>sync</sub> = 12.0464 nats, tolerance 0.05. The notebook asserts this in its
+Section 7 and stops if it fails, because nothing downstream is trustworthy once
+that row moves.
+
+**Tokenization.** `answer_first_piece` should be the expected word piece for every
+model. Answer tokens are obtained by differencing the prompt against the prompt
+plus the answer, never by encoding the answer alone: a SentencePiece vocabulary
+turns the leading space of `" Charles"` and `" Queen"` into the same standalone
+piece, and every comparison between them then collapses to zero.
+
+Every model runs in float32 on every device. Casting logits to float32 after a
+half-precision forward pass does not recover the precision that pass discarded, so
+a sweep that lets dtype follow the hardware is not comparable across machines.
+
+## Where the results appear
+
+Section 8.5 of the paper is the single-model case, Section 8.6 the cross-model
+sweep and the paraphrase spread. The four charts are in `paper/figures/`, one of
+them as Figure 4 and the other three in the repository README.

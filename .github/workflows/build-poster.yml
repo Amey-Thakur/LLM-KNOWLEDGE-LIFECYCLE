@@ -6,9 +6,9 @@
 # License     : CC BY 4.0
 # =============================================================================
 #
-# Independent of the manuscript and the slides. The poster is the artefact most
-# likely to break, because tikzposter drops content that runs past the page
-# bottom without raising an error, so it earns its own badge.
+# Independent of the manuscript and the slides. tikzposter drops content that
+# runs past the page bottom without raising an error, so the poster is the
+# artefact most likely to break silently.
 
 name: Poster
 

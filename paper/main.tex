@@ -22,13 +22,8 @@
 \usetikzlibrary{arrows.meta, positioning, shapes.geometric, calc, decorations.pathmorphing, fit, backgrounds}
 
 % -----------------------------------------------------------------------------
-% The five lifecycle colours, defined once and shared by every figure, and
-% identical to the poster, the slides and the demonstration, so a stage is the
-% same colour wherever the reader meets it.
-%
-% Fills are the light tint (!12) and strokes are the full colour. Solid saturated
-% boxes would fight the text they carry; the tint identifies the stage and the
-% stroke does the separating, which is the convention already used on the poster.
+% The five lifecycle colours, shared by every figure here and by the poster, the
+% slides and the demonstration. Fills take the !12 tint, strokes the full colour.
 % -----------------------------------------------------------------------------
 \definecolor{acquire} {HTML}{4A7FD4}
 \definecolor{store}   {HTML}{2A9D8F}
@@ -84,7 +79,7 @@
 \maketitle
 
 \begin{abstract}
-The emergence of reasoning models and inference-time scaling has altered how large language models (LLMs) process knowledge. Earlier systems relied on static pipelines built from retrieval-augmented generation (RAG), knowledge editing, and continual learning; modern systems resolve conflicts during test-time compute. This shift exposes a methodological gap: there is currently no unified formalism for how knowledge persists, evolves, and is computed over across a model's lifespan. This paper introduces the \textbf{Knowledge Lifecycle}, a framework that organizes LLM knowledge management into five structural stages: \textit{Acquisition}, \textit{Storage}, \textit{Retrieval}, \textit{Update}, and \textit{Forgetting}. We make three contributions. First, we formalize the five stages and their cross-stage failure modes, showing that the fragmented subfields addressing each stage in isolation leave the boundaries between stages unstudied. Second, we propose the \textbf{Provenance Vector} ($p$), an architectural modification that stores temporal and source metadata alongside parametric memories, enabling a gating mechanism that suppresses stale parametric activations during test-time conflict resolution. Third, we introduce \textbf{Lifecycle Desynchronization} ($\mathcal{D}_{sync}$), a metric based on Kullback-Leibler (KL) divergence that quantifies the predictive failure occurring when parametric weights and non-parametric context conflict. In a reproducible probe of a documented pharmaceutical withdrawal, GPT-2 assigns the correct continuation a probability of $5.9 \times 10^{-6}$ even when the withdrawal notice is present in context ($\mathcal{D}_{sync} = 12.05$ nats), while the context shifts the model's full output distribution by only $0.03$ nats. Extending the same protocol to six open models from 124M to 1.5B parameters and three documented fact changes, we find that this conflict does not resolve with scale: no model answers the withdrawal probe correctly, and within a single model family the measurement is not even monotone in size. Other conflicts in the same set do resolve, which is what shows the metric tracks the conflict rather than the difficulty of the question. These measurements demonstrate near-total parametric dominance on the unresolved cases and motivate lifecycle-aware architectures for reliable deployment.
+The emergence of reasoning models and inference-time scaling has altered how large language models (LLMs) process knowledge. Earlier systems relied on static pipelines built from retrieval-augmented generation (RAG), knowledge editing, and continual learning; modern systems resolve conflicts during test-time compute. This shift exposes a methodological gap: there is currently no unified formalism for how knowledge persists, evolves, and is computed over across a model's lifespan. This paper introduces the \textbf{Knowledge Lifecycle}, a framework that organizes LLM knowledge management into five structural stages: \textit{Acquisition}, \textit{Storage}, \textit{Retrieval}, \textit{Update}, and \textit{Forgetting}. We make three contributions. First, we formalize the five stages and their cross-stage failure modes, showing that the fragmented subfields addressing each stage in isolation leave the boundaries between stages unstudied. Second, we propose the \textbf{Provenance Vector} ($p$), an architectural modification that stores temporal and source metadata alongside parametric memories, enabling a gating mechanism that suppresses stale parametric activations during test-time conflict resolution. Third, we introduce \textbf{Lifecycle Desynchronization} ($\mathcal{D}_{sync}$), a metric based on Kullback-Leibler (KL) divergence that quantifies the predictive failure occurring when parametric weights and non-parametric context conflict. In a reproducible probe of a documented pharmaceutical withdrawal, GPT-2 assigns the correct continuation a probability of $5.9 \times 10^{-6}$ even when the withdrawal notice is present in context ($\mathcal{D}_{sync} = 12.05$ nats), while the context shifts the model's full output distribution by only $0.033$ nats. Extending the same protocol to six open models from 124M to 1.5B parameters and three documented fact changes, we find that this conflict does not resolve with scale: no model answers the withdrawal probe correctly, and within a single model family the measurement is not even monotone in size. Other conflicts in the same set do resolve, so the metric tracks the conflict rather than the difficulty of the question. On the unresolved cases the parametric prior dominates almost completely, which is what lifecycle-aware architectures have to address.
 \end{abstract}
 
 \section*{List of Abbreviations}
@@ -112,7 +107,7 @@ The emergence of reasoning models and inference-time scaling has altered how lar
 \label{sec:introduction}
 % ============================================================
 
-Large language models serve as the backbone of systems that answer medical questions, draft legal briefs, write production code, and tutor students in mathematics~\citep{brown2020language, achiam2023gpt4, team2023gemini}. With the advent of inference-time scaling and reasoning models such as OpenAI o1 and DeepSeek-R1~\citep{openai2024o1, guo2025deepseekr1}, these systems no longer simply retrieve and generate; they execute extended test-time compute to search, reflect, and self-correct. This advanced reasoning, however, is bound by a specific bottleneck: the model's underlying relationship with facts. A medical reasoning agent that computes over a retracted drug interaction, or a coding agent that builds logic around a deprecated API, represents a failure of knowledge management rather than a failure of reasoning capacity.
+Large language models serve as the backbone of systems that answer medical questions, draft legal briefs, write production code, and tutor students in mathematics~\citep{brown2020language, achiam2023gpt4, team2023gemini}. With the advent of inference-time scaling and reasoning models such as OpenAI o1 and DeepSeek-R1~\citep{openai2024o1, guo2025deepseekr1}, these systems no longer simply retrieve and generate; they execute extended test-time compute to search, reflect, and self-correct. That reasoning is bound by a bottleneck beneath it: the model's relationship with the facts it reasons over. A medical reasoning agent that computes over a retracted drug interaction, or a coding agent that builds logic around a deprecated API, represents a failure of knowledge management rather than a failure of reasoning capacity.
 
 Current responses to these challenges are fragmented. General surveys on LLMs~\citep{zhao2023surveyllm, wang2024agents} touch on knowledge tangentially, while specific subfields operate in isolation. At least five separate subfields now address different pieces of the knowledge problem:
 
@@ -158,7 +153,7 @@ We use ``knowledge'' broadly. Within the Knowledge Lifecycle framework, knowledg
   \item \textbf{Contextual knowledge.} Information provided at inference time via the prompt or fetched from an external source~\citep{lewis2020rag}.
 \end{itemize}
 
-One important observation: the same fact can exist in multiple forms simultaneously. ``The CEO of OpenAI is Sam Altman'' might live in the model's weights (parametric), in a vector database (non-parametric), and in the current prompt (contextual). Each copy follows a different lifecycle path, with different update and deletion properties.
+The same fact can exist in several forms at once. ``The CEO of OpenAI is Sam Altman'' might live in the model's weights (parametric), in a vector database (non-parametric), and in the current prompt (contextual). Each copy follows a different lifecycle path, with different update and deletion properties.
 
 \subsection{Relationship to Existing Literature}
 
@@ -186,9 +181,9 @@ Wu et al.\ (2025), Human$\to$AI Memory & \halfmark & \fullmark & \halfmark & \ha
 \vspace{-1em}
 \end{table}
 
-Three works require explicit differentiation. \citet{wu2025humanmemory} drew a productive analogy between human memory systems (sensory, working, long-term) and LLM memory architectures. Their contribution is taxonomic: it classifies memory types but does not formalize the transitions between them or identify the failure modes that arise when stages interact. Our framework differs in that it treats the stages as an \textit{operational architecture} with mathematically defined interfaces, not as a classification scheme.
+Three works require explicit differentiation. \citet{wu2025humanmemory} drew an analogy between human memory systems (sensory, working, long-term) and LLM memory architectures. Their contribution is taxonomic: it classifies memory types but does not formalize the transitions between them or identify the failure modes that arise when stages interact. Our framework differs in that it treats the stages as an \textit{operational architecture} with mathematically defined interfaces, not as a classification scheme.
 
-\citet{hu2025agentmemory} provided the most comprehensive survey of agent memory to date, covering storage hierarchies, retrieval scoring functions, and consolidation mechanisms. Their scope, however, is restricted to agent systems; they do not address parametric storage, knowledge editing, or machine unlearning. Our framework subsumes agent memory as a special case, one in which all five stages operate within a single persistent system, and extends the analysis to the broader LLM ecosystem.
+\citet{hu2025agentmemory} provided the broadest survey of agent memory to date, covering storage hierarchies, retrieval scoring functions, and consolidation mechanisms. Their scope, however, is restricted to agent systems; they do not address parametric storage, knowledge editing, or machine unlearning. Our framework subsumes agent memory as a special case, one in which all five stages operate within a single persistent system, and extends the analysis to the broader LLM ecosystem.
 
 \citet{gao2023ragsurvey} surveyed retrieval-augmented generation in depth but treated retrieval as a self-contained pipeline. Their analysis does not consider what happens when retrieved facts contradict the model's parametric memory, or when a retrieved fact has been marked for deletion under privacy regulations. These are precisely the cross-stage failure modes that our lifecycle analysis is designed to expose.
 
@@ -204,45 +199,18 @@ We restrict attention to text-based LLMs built on the Transformer architecture~\
 The lifecycle has five stages. Each one maps to a well-defined set of research questions. Figure~\ref{fig:lifecycle} gives the visual overview.
 
 % -----------------------------------------------------------------------------
-% Figure 1, redrawn. The first version placed five stages on a pentagon and then
-% added four dashed "cross-stage" arrows, but every one of those four connected a
-% consecutive pair, so three of them were drawn directly on top of an existing
-% solid arrow and their labels landed on the boxes: "conflict" sat across the
-% Retrieve box and "catastrophic" across Forget.
-%
-% The correction is conceptual before it is graphical. The interactions this
-% figure wants to show are not chords across the pentagon; they are what happens
-% at each boundary of the cycle, which is the paper's thesis. Section 3.2 names
-% all five boundaries, so the figure now carries one arc and one label per
-% boundary, and nothing is drawn twice.
-%
-% The geometry is stated rather than eyeballed. Stage centres sit on a circle of
-% radius 4.2 cm at 72 degree intervals from the top, running clockwise so the
-% numbering reads in the direction a reader scans. Boundary labels sit on the
-% same circle's bisectors at radius 5.3 cm, which puts each one radially outside
-% the gap between the two boxes it joins. The closest approach between a label
-% and a neighbouring box centre is
+% Figure 1. Stage centres on a circle of radius 4.2 cm at 72 degree intervals
+% from the top, clockwise. Boundary labels on the bisectors at radius 5.3 cm.
+% Label to nearest box centre is
 %   sqrt(5.3^2 + 4.2^2 - 2*5.3*4.2*cos 36) = 3.12 cm,
-% against a box half-diagonal of 1.84 cm plus a label half-width of about
-% 1.0 cm, so 2.84 cm is occupied and 0.28 cm is clear. Every label is set on two
-% lines to hold that half-width, which also makes the five read as one set.
+% against a box half-diagonal of 1.84 cm and a label half-width of about 1.0 cm.
 % -----------------------------------------------------------------------------
 \begin{figure*}[t]
 \centering
 \begin{tikzpicture}[
-  % Hyphenation is off inside the boxes. At a 2.75 cm measure the Update box
-  % broke "continual" across lines and ran to four lines where the others take
-  % three, which made one box taller than its neighbours and cost the ring its
-  % symmetry. The measure is now 3.0 cm, which holds every stage's longest line,
-  % and a word too long to fit would now overflow visibly rather than hyphenate
-  % quietly.
-  %
-  % The height floor is set to what the tallest stage needs, not to what the
-  % shortest allows. Store and Forget take four lines where the other three take
-  % three, so letting content decide the height left the boxes between 37 and 49
-  % pt tall around a circle whose radii were otherwise identical to within a
-  % rounding error. A floor of 1.75 cm makes all five the same size and puts the
-  % slack inside the shorter boxes, where it reads as padding.
+  % Hyphenation off, and 3.0 cm of measure holds every stage's longest line. The
+  % 1.75 cm height floor is what Store and Forget need at four lines, so all five
+  % boxes come out the same size.
   stage/.style={
     draw, rounded corners=8pt, minimum width=3.35cm, text width=3.0cm,
     minimum height=1.75cm, font=\sffamily, align=center, line width=1pt,
@@ -298,7 +266,7 @@ The lifecycle has five stages. Each one maps to a well-defined set of research q
 
 \paragraph{Stage 2: Storage.} Acquired knowledge has to live somewhere. We identify four storage modalities: \textit{parametric} (baked into weights), \textit{non-parametric} (sitting in a vector database, knowledge graph, or document index), \textit{hybrid} (architectures such as RETRO~\citep{borgeaud2022retro} and nearest-neighbor language models~\citep{khandelwal2020knnlm} that blend both), and \textit{agent memory hierarchies} (tiered systems with working, episodic, and archival layers~\citep{packer2023memgpt}).
 
-\paragraph{Stage 3: Retrieval.} A question arrives. The system must locate the right knowledge and bring it to bear. Internal retrieval works through the self-attention mechanism. External retrieval is the RAG pipeline: encode the query, search the index, return the top passages~\citep{karpukhin2020dpr}; graph-structured variants extend it from passage lookup to corpus-level summarization~\citep{edge2024graphrag}. Context engineering, meaning the choice of which passages to include, in what order, and in what format, determines whether retrieved knowledge actually reaches the model's reasoning process~\citep{liu2024lost}.
+\paragraph{Stage 3: Retrieval.} A question arrives. The system must locate the right knowledge and bring it to bear. Internal retrieval works through the self-attention mechanism. External retrieval is the RAG pipeline: encode the query, search the index, return the top passages~\citep{karpukhin2020dpr}; graph-structured variants extend it from passage lookup to corpus-level summarization~\citep{edge2024graphrag}. Context engineering, meaning the choice of which passages to include, in what order, and in what format, determines whether retrieved knowledge reaches the model's reasoning process~\citep{liu2024lost}.
 
 \paragraph{Stage 4: Update.} The world changes, and the system's knowledge must change with it. Knowledge editing rewrites individual facts in the weights~\citep{meng2022rome, meng2023memit}. Continual learning extends the model to new domains over time~\citep{kirkpatrick2017ewc}. Agent memory consolidation turns raw interaction logs into distilled insights~\citep{park2023generative}. Knowledge conflict resolution decides what to do when the weights say one thing and the retrieved document says another~\citep{xie2024conflicts, longpre2021entity}.
 
@@ -322,7 +290,7 @@ The five stages are not a linear pipeline. They interact, and those interactions
 \label{sec:retrieval}
 % ============================================================
 
-Before examining how inference-time scaling alters the lifecycle, we formally define the constraints of the Acquisition, Storage, and Retrieval stages. These stages established the baseline mathematics of LLM knowledge management prior to the advent of reasoning models.
+Before examining how inference-time scaling alters the lifecycle, we formally define the constraints of the Acquisition, Storage, and Retrieval stages. These stages set the baseline mathematics of LLM knowledge management before reasoning models.
 
 \subsection{Acquisition and Parametric Storage}
 \label{sec:acquisition}
@@ -352,7 +320,7 @@ To bypass the rigidity of parametric storage, the field adopted Retrieval-Augmen
   d^* = \arg\max_{d \in \mathcal{C}} \left( E_Q(q)^\top E_D(d) \right)
 \end{equation}
 
-External retrieval solves the immutability problem of parametric weights, but it introduces a critical bottleneck. When the retriever injects documents into the context window, the knowledge must pass through the model's self-attention mechanism. If the retrieved context contradicts the model's highly confident parametric weights, standard forward-pass decoding lacks a formal mechanism to resolve the conflict, and the outcome is unpredictable~\citep{xie2024conflicts, longpre2021entity}. Our measurements in \S\ref{sec:case_study} quantify exactly this failure.
+External retrieval solves the immutability problem of parametric weights, but it introduces a bottleneck of its own. When the retriever injects documents into the context window, the knowledge must pass through the model's self-attention mechanism. If the retrieved context contradicts the model's confident parametric weights, standard forward-pass decoding lacks a formal mechanism to resolve the conflict, and the outcome is unpredictable~\citep{xie2024conflicts, longpre2021entity}. Our measurements in \S\ref{sec:case_study} quantify exactly this failure.
 
 % ============================================================
 \section{Update: From Static Editing to Test-Time Resolution}
@@ -378,7 +346,7 @@ Reasoning models trained with reinforcement learning, such as OpenAI o1~\citep{o
 
 \subsection{Machine Unlearning}
 
-Machine unlearning attempts to remove specific data points from the weights, often to comply with privacy regulations~\citep{jang2023unlearning}. Standard approaches apply gradient ascent on the forget-set or fine-tune on obfuscated targets~\citep{eldan2023harrypotter}. Evaluations on benchmarks such as TOFU~\citep{maini2024tofu} consistently demonstrate the same entanglement problem seen in editing: aggressive unlearning inflicts collateral damage on retained knowledge, while conservative unlearning leaves the target recoverable through indirect queries. Training-data extraction attacks~\citep{carlini2021extraction} supply the adversarial standard against which unlearning must be verified.
+Machine unlearning attempts to remove specific data points from the weights, often to comply with privacy regulations~\citep{jang2023unlearning}. Standard approaches apply gradient ascent on the forget-set or fine-tune on obfuscated targets~\citep{eldan2023harrypotter}. Evaluations on benchmarks such as TOFU~\citep{maini2024tofu} show the same entanglement problem seen in editing: aggressive unlearning inflicts collateral damage on retained knowledge, while conservative unlearning leaves the target recoverable through indirect queries. Training-data extraction attacks~\citep{carlini2021extraction} supply the adversarial standard against which unlearning must be verified.
 
 \subsection{Structural Forgetting}
 
@@ -392,11 +360,8 @@ The most routine form of forgetting is structural: context window eviction. Desp
 \begin{figure}[t]
 \centering
 \begin{tikzpicture}[
-  % Shares the lifecycle palette with Figures 1 and 3: the parametric path takes
-  % the Acquire blue and the non-parametric path the Retrieve orange, tinted for
-  % fills and full strength for strokes.
-  % A height floor above what any box needs, so all eight are the same size and
-  % the two paths read as two rows rather than as eight separate shapes.
+  % Parametric path in the Acquire blue, non-parametric in the Retrieve orange.
+  % The height floor sits above what any box needs, so all eight match.
   box/.style={draw, rounded corners=4pt, minimum width=2.2cm, minimum height=0.78cm,
               text width=1.95cm, font=\sffamily\scriptsize, align=center,
               line width=0.7pt,
@@ -405,8 +370,7 @@ The most routine form of forgetting is structural: context window eviction. Desp
   nparrow/.style={-{Stealth[length=2mm]}, line width=0.9pt, color=retrieve},
   plabel/.style={font=\sffamily\scriptsize\bfseries, color=acquire},
   nlabel/.style={font=\sffamily\scriptsize\bfseries, color=retrieve},
-  % The property lines were set at 50 percent of their hue, which prints as a
-  % smudge rather than as quiet text. They are the same hue at full strength.
+  % Property lines at full hue; tinted they print as a smudge.
   pprop/.style={font=\sffamily\tiny, text=acquire, align=center},
   nprop/.style={font=\sffamily\tiny, text=retrieve, align=center}
 ]
@@ -440,8 +404,7 @@ The most routine form of forgetting is structural: context window eviction. Desp
 \draw[nparrow] (nret) -- (gen);
 
 % --- Conflict zone ---
-% The Update red, which is the colour this conflict carries in Figure 1, on the
-% poster and in the demonstration.
+% The Update red, the colour this conflict carries throughout.
 \draw[densely dashed, update, line width=0.8pt] (pret) -- (nret)
   node[midway, right, font=\sffamily\tiny\bfseries, text=update, align=center] {conflict\\zone};
 
@@ -497,11 +460,11 @@ Edge et al.\ (GraphRAG, 2024) & -- & \checkmark & \checkmark & -- & -- & 2 \\
 \end{tabular}
 \end{table*}
 
-The pattern is quantitatively clear. Of the 20 representative works mapped, 5 address only a single lifecycle stage, 10 address exactly two, 3 address three, and only 2 (Generative Agents and MemGPT) touch four or more. The median coverage is 2 stages. No prior work provides a unified formalism across all five. Pairwise coverage is thinner still. Counting how often two stages are addressed by the same work, the Acquisition--Update and Retrieval--Forgetting pairs are the least studied at 2 works each, and the Acquisition--Forgetting and Update--Forgetting pairs follow at 3, the last two despite being the source of damaging real-world failures such as fine-tuning that silently overwrites earlier alignment. The two most studied pairs, Storage--Retrieval and Storage--Update at 6 works each, are precisely the ones that sit inside an established subfield rather than across two.
+Of the 20 representative works mapped, 5 address only a single lifecycle stage, 10 address exactly two, 3 address three, and only 2 (Generative Agents and MemGPT) touch four or more. The median coverage is 2 stages. No prior work provides a unified formalism across all five. Pairwise coverage is thinner still. Counting how often two stages are addressed by the same work, the Acquisition--Update and Retrieval--Forgetting pairs are the least studied at 2 works each, and the Acquisition--Forgetting and Update--Forgetting pairs follow at 3, the last two despite being the source of damaging real-world failures such as fine-tuning that silently overwrites earlier alignment. The two most studied pairs, Storage--Retrieval and Storage--Update at 6 works each, are precisely the ones that sit inside an established subfield rather than across two.
 
 \subsection{Parametric vs.\ Non-Parametric: A Unified View}
 
-The single most important design decision in any LLM knowledge system is where to put the knowledge: in the weights or outside them. Figure~\ref{fig:two_paths} visualizes the two paths, and Table~\ref{tab:parametric_comparison} lays out how this choice plays out across every lifecycle stage.
+The first design decision in any LLM knowledge system is where the knowledge goes: into the weights or outside them. Figure~\ref{fig:two_paths} visualizes the two paths, and Table~\ref{tab:parametric_comparison} lays out how this choice plays out across every lifecycle stage.
 
 \begin{table}[t]
 \centering
@@ -525,7 +488,7 @@ Scalability & Fixed at training time & Grows with corpus \\
 \end{tabular}
 \end{table}
 
-The pattern is consistent. Parametric storage is fast and tightly integrated with the model's reasoning, but opaque, rigid, and difficult to modify. Non-parametric storage is modular and transparent, but depends entirely on the retrieval pipeline's ability to surface the right knowledge at the right time. The most promising path forward is lifecycle-aware hybrid design: route stable, frequently accessed knowledge into the weights, and route dynamic, auditable, regulation-sensitive knowledge into external stores where it can be updated and deleted without touching the model.
+Parametric storage is fast and tightly integrated with the model's reasoning, but opaque, rigid, and difficult to modify. Non-parametric storage is modular and transparent, but depends on the retrieval pipeline surfacing the right knowledge at the right time. A lifecycle-aware hybrid takes both: route stable, frequently accessed knowledge into the weights, and dynamic, auditable, regulation-sensitive knowledge into external stores, where it can be updated and deleted without touching the model.
 
 \subsection{Evaluation Methods and Benchmarks}
 
@@ -551,7 +514,7 @@ Consistency is a lifecycle problem by definition. It cannot be fixed at any sing
 \label{sec:contributions}
 % ============================================================
 
-Based on the five-stage analysis, we propose two original technical components designed to address the fundamental asymmetries of the knowledge lifecycle. Table~\ref{tab:synthesis} summarizes the failure modes identified in the preceding sections and the corresponding mechanisms introduced here.
+From the five-stage analysis we propose two technical components for the asymmetries the lifecycle creates. Table~\ref{tab:synthesis} summarizes the failure modes identified in the preceding sections and the corresponding mechanisms introduced here.
 
 \begin{table}[h]
 \centering
@@ -677,7 +640,7 @@ A large value means the deployed system, even with the corrective context in its
 \end{equation}
 This estimator is measurable on any model that exposes token probabilities, requires no retraining or counterfactual model, and is expressed in nats with a direct probabilistic reading: $\widehat{\mathcal{D}}_{sync} = n$ means the deployed system assigns the correct answer probability $e^{-n}$.
 
-\paragraph{Interpretation scale.} Because the estimator is a negative log probability, thresholds carry concrete meaning: $\widehat{\mathcal{D}}_{sync} \leq 0.7$ means the correct answer holds at least half the probability mass; values near $4.6$ mean it has fallen to roughly $1\%$; values above $9.2$ mean below $10^{-4}$, a regime in which greedy or sampled decoding will essentially never produce the correct answer. We treat this last regime as desynchronization failure.
+\paragraph{Interpretation scale.} Because the estimator is a negative log probability, thresholds carry concrete meaning: $\widehat{\mathcal{D}}_{sync} \leq \ln 2 \approx 0.69$ means the correct answer holds at least half the probability mass; values near $4.6$ mean it has fallen to roughly $1\%$; values above $9.2$ mean below $10^{-4}$, a regime in which greedy decoding never selects the correct answer and sampling reaches it less than once in ten thousand draws. We treat this last regime as desynchronization failure.
 
 \paragraph{Context influence.} A complementary diagnostic separates ignoring the context from lacking the answer: the full-vocabulary divergence between the deployed model's distributions with and without the retrieved context,
 \begin{equation}
@@ -709,25 +672,15 @@ To demonstrate that lifecycle failures are not hypothetical, we trace a document
 \begin{figure}[h]
 \centering
 \begin{tikzpicture}[
-  % A text width, not just a minimum width. Sized to the content alone, these six
-  % boxes came out between 96.4 and 115.4 pt wide, so a stack that should read as
-  % one column had ragged edges on both sides. A fixed measure makes all six
-  % identical, and hyphenation is off so an overlong line shows itself.
-  % The height floor is what the tallest row needs, for the reason Figure 1 sets
-  % one: the CONFLICT row wraps to three lines where the rest take two, and
-  % letting content decide left one box 29.1 pt against 21.2 pt for its
-  % neighbours in a column that should read as a single stack.
-  % 4.4 cm of measure, because the two bold rows are the longest: at 3.55 cm
-  % "4. Update: Weights NOT edited" broke after "Weights" and ran to three lines
-  % where every other row took two. The height floor then follows from two lines
-  % rather than three, so the column is both uniform and no taller than it needs.
+  % A text width and a height floor, so the six boxes read as one column rather
+  % than as a ragged stack. 4.4 cm is set by the longest bold row, which keeps
+  % every row to two lines. Hyphenation off so an overlong line shows itself.
   stage/.style={draw, rounded corners=4pt, minimum width=4.7cm, text width=4.4cm,
                 minimum height=0.9cm, font=\sffamily\scriptsize, align=center,
                 line width=0.7pt,
                 execute at begin node={\hyphenpenalty=10000\exhyphenpenalty=10000}},
-  % The failing rows are marked by weight and by the red arrows feeding them, not
-  % by overriding their stage colour: each box keeps the colour its stage carries
-  % in Figure 1, so the cascade can be followed stage by stage.
+  % Failing rows are marked by weight and by the red arrows feeding them, not by
+  % overriding the stage colour, so the cascade reads stage by stage.
   fail/.style={stage, font=\sffamily\scriptsize\bfseries, line width=0.9pt},
   arr/.style={-{Stealth[length=2mm]}, line width=0.7pt, color=muted},
   farr/.style={-{Stealth[length=2mm]}, line width=0.9pt, color=update}
@@ -778,9 +731,9 @@ $\widehat{\mathcal{D}}_{sync}$ (Equation~\ref{eq:estimator}) & \multicolumn{2}{c
 \end{tabular}
 \end{table}
 
-\paragraph{Findings.} Three observations follow. First, the correct continuation `` withdrawn'' receives probability $5.9 \times 10^{-6}$ even with the withdrawal notice present, placing $\widehat{\mathcal{D}}_{sync} = 12.05$ nats deep in the failure regime: no realistic decoding strategy recovers the correct answer. Second, the context is essentially inert: it shifts the full output distribution by only $\mathcal{I}_{ctx} = 0.033$ nats, so the failure is localized to conflict resolution, not retrieval. Third, the corrective context slightly \textit{increases} the probability of the incorrect answer `` safe'' (37.53\% to 42.58\%) and decreases that of `` unsafe''; merely mentioning the drug in a safety-related passage reinforces the dominant parametric association rather than overriding it. This last effect is a concrete, measurable instance of the failure mode that provenance gating (\S\ref{sec:gating}) is designed to eliminate: the stale parametric activation, not the retrieved evidence, controls the output.
+\paragraph{Findings.} Three observations follow. First, the correct continuation `` withdrawn'' receives probability $5.9 \times 10^{-6}$ even with the withdrawal notice present, placing $\widehat{\mathcal{D}}_{sync} = 12.05$ nats deep in the failure regime: no realistic decoding strategy recovers the correct answer. Second, the context barely moves the model: it shifts the full output distribution by only $\mathcal{I}_{ctx} = 0.033$ nats, so the failure is localized to conflict resolution, not retrieval. Third, the corrective context slightly \textit{increases} the probability of the incorrect answer `` safe'' (37.53\% to 42.58\%) and decreases that of `` unsafe''; merely mentioning the drug in a safety-related passage reinforces the dominant parametric association rather than overriding it. This last effect is a concrete, measurable instance of the failure mode that provenance gating (\S\ref{sec:gating}) is designed to eliminate: the stale parametric activation, not the retrieved evidence, controls the output.
 
-\paragraph{Scope of the measurement.} GPT-2 base is a deliberately small, fully open model: it makes the probe exactly reproducible on commodity hardware and free of instruction-tuning confounds. The measured numbers characterize this model and probe, not frontier systems; \S\ref{sec:crossmodel} carries the same protocol across five further models, including instruction-tuned ones, and finds that this probe does not resolve at any scale tested. What the probe establishes is the existence and measurability of the failure mode, and that the metric cleanly separates its two possible causes.
+\paragraph{Scope of the measurement.} GPT-2 base is a deliberately small, fully open model: it makes the probe exactly reproducible on commodity hardware and free of instruction-tuning confounds. The measured numbers characterize this model and probe, not frontier systems; \S\ref{sec:crossmodel} carries the same protocol across five further models, including instruction-tuned ones, and finds that this probe does not resolve at any scale tested. The probe establishes that the failure mode exists, that it is measurable, and that the metric separates its two possible causes.
 
 
 \subsection{Cross-Model Measurement}
@@ -822,7 +775,7 @@ Qwen2.5-1.5B-Instruct & 1544 & 8.85 & \textbf{0.64} & \textbf{0.09} & 0.44 & 2.2
 \end{table}
 
 \paragraph{The conflict does not resolve with scale.} No model in the ladder
-answers the Vioxx probe correctly. The most likely continuation is `` safe'' for
+answers the Vioxx probe correctly. The most likely continuation is \textit{safe} for
 all three GPT-2 models and for TinyLlama, and $\widehat{\mathcal{D}}_{sync}$
 stays above 7 nats everywhere, so even the best case leaves the correct answer
 below one chance in a thousand while the withdrawal notice sits in the prompt.
@@ -840,8 +793,8 @@ the within-family column is the comparison that holds size as the only variable.
 also non-monotone within the GPT-2 family: the 355M model answers `` Charles''
 correctly and the 774M model regresses to `` Queen''. A metric that reported
 failure everywhere would be measuring its own construction; these three probes
-separate cleanly, which is the evidence that it measures the conflict rather
-than the difficulty of the question.
+separate cleanly, so the metric tracks the conflict and not the difficulty of
+the question.
 
 \paragraph{Attending to the document is not the same as being governed by it.}
 $\mathcal{I}_{ctx}$ rises with size on the Twitter probe within the GPT-2
@@ -875,7 +828,7 @@ withdrawal notice's 0.033, and an irrelevant document has the larger effect in
 \paragraph{The exposure trap is the common case, not the exception.} Comparing
 the surprisal of the \textit{stale} answer with and without the corrective
 document, the document makes the stale answer \textit{more} likely on the Vioxx
-probe for 5 of the 6 models. Naming a fact, even in order to correct it,
+probe for 5 of the 6 models. Naming a fact, even to correct it,
 reinforces the association the model already holds. This is the effect that
 \S\ref{sec:case_study} reports for a single model, measured across the ladder.
 
@@ -883,7 +836,7 @@ reinforces the association the model already holds. This is the effect that
 surprisal measured on one sentence may be a fact about that sentence, so we
 re-ran every probe under two further phrasings that ask the same question in
 different words, holding the corrective document and the verified answer fixed.
-The wording matters, and it matters more than we expected. On the Vioxx probe
+The wording matters, and by a wide margin. On the Vioxx probe
 $\widehat{\mathcal{D}}_{sync}$ has a median standard deviation of 5.14 nats
 across the three phrasings, and the phrasing used above is the hardest of the
 three for all six models: it averages 10.00 nats where the three-phrasing mean is
@@ -937,11 +890,11 @@ The field needs benchmarks that test \textit{sequences} of lifecycle operations,
 
 \subsection{Scaling the Desynchronization Measurement}
 
-The single-probe measurement in this paper should become a benchmark: a curated set of documented fact changes (drug withdrawals, leadership changes, API deprecations, boundary revisions) paired with corrective documents, evaluated across model families and scales. Two axes matter most: how $\widehat{\mathcal{D}}_{sync}$ varies with model scale and instruction tuning, and whether reasoning-mode inference~\citep{openai2024o1, guo2025deepseekr1} reduces it, as the test-time resolution hypothesis (\S\ref{sec:update}) predicts it should. That sweep is reported in \S\ref{sec:crossmodel}: across six open models and three probes, the conflict resolves readily on one probe, not at all on another, and non-monotonically with scale on the third. Whether reasoning-mode inference reduces $\widehat{\mathcal{D}}_{sync}$ where scale does not remains open.
+The single-probe measurement in this paper should become a benchmark: a curated set of documented fact changes (drug withdrawals, leadership changes, API deprecations, boundary revisions) paired with corrective documents, evaluated across model families and scales. Two axes matter most: how $\widehat{\mathcal{D}}_{sync}$ varies with model scale and instruction tuning, and whether reasoning-mode inference~\citep{openai2024o1, guo2025deepseekr1} reduces it, as the test-time resolution hypothesis (\S\ref{sec:update}) predicts it should. We report that sweep in \S\ref{sec:crossmodel}: across six open models and three probes, the conflict resolves readily on one probe, not at all on another, and non-monotonically with scale on the third. Whether reasoning-mode inference reduces $\widehat{\mathcal{D}}_{sync}$ where scale does not remains open.
 
 \subsection{End-to-End Differentiable Knowledge Systems}
 
-Current RAG pipelines are modular but non-differentiable: the retriever and the generator are trained separately, and the boundary between them is a hard discrete selection of top-$k$ passages. Early work on joint training~\citep{guu2020realm, izacard2023atlas} showed that end-to-end optimization improves both retrieval and generation. Extending this idea across the full lifecycle, jointly optimizing acquisition, storage format, retrieval strategy, update mechanisms, and forgetting policies, is a long-term research goal. It would require differentiable approximations of inherently discrete operations such as database insertion and deletion.
+Current RAG pipelines are modular but non-differentiable: the retriever and the generator are trained separately, and the boundary between them is a hard discrete selection of top-$k$ passages. Early work on joint training~\citep{guu2020realm, izacard2023atlas} showed that end-to-end optimization improves both retrieval and generation. Extending this idea across the full lifecycle, jointly optimizing acquisition, storage format, retrieval strategy, update mechanisms, and forgetting policies, remains open: it would require differentiable approximations of inherently discrete operations such as database insertion and deletion.
 
 \subsection{Multi-Modal Knowledge Lifecycles}
 
@@ -949,20 +902,18 @@ This paper focuses on text, but each new modality brings its own lifecycle chall
 
 \subsection{Knowledge Lifecycles for Multi-Agent Systems}
 
-When multiple LLM agents collaborate, knowledge management becomes a distributed systems problem. Agents must share knowledge without creating inconsistencies, coordinate updates so that one agent's edit does not conflict with another agent's cached copy, and manage access control so that sensitive knowledge is available to authorized agents and hidden from others. The lifecycle framework suggests that each agent maintains its own local lifecycle while participating in a collective lifecycle at the system level. Distributed systems research provides decades of experience with consistency, replication, and conflict resolution; applying it to multi-agent LLM systems is a promising and largely unexplored direction~\citep{wang2024agents}.
+When multiple LLM agents collaborate, knowledge management becomes a distributed systems problem. Agents must share knowledge without creating inconsistencies, coordinate updates so that one agent's edit does not conflict with another agent's cached copy, and manage access control so that sensitive knowledge is available to authorized agents and hidden from others. The lifecycle framework suggests that each agent maintains its own local lifecycle while participating in a collective lifecycle at the system level. Distributed systems research provides decades of experience with consistency, replication, and conflict resolution; applying it to multi-agent LLM systems is largely unexplored~\citep{wang2024agents}.
 
 % ============================================================
 \section{Limitations}
 \label{sec:limitations}
 % ============================================================
 
-We state the limitations of this work directly.
-
 First, the Provenance Vector is an architectural proposal supported by an idealized analysis, not a trained system. Proposition~\ref{prop:consistency} holds under strong assumptions, stated explicitly in \S\ref{sec:analysis_proof}, and the auxiliary provenance loss may interact with the language modeling objective in ways only a full pre-training run can reveal. We present it as a principled architectural direction, not a validated method.
 
 Second, the empirical measurement covers three probe scenarios across six models from 124M to 1.5B parameters (\S\ref{sec:crossmodel}). It establishes that the failure mode exists, is measurable, is separable into retrieval and resolution components, and does not disappear with scale on the Vioxx probe; it does not establish prevalence across domains, nor behavior at frontier scale, nor under reasoning-mode inference. The point-mass estimator additionally assumes a single verifiable correct continuation, which fits factual probes but not open-ended queries, and it is sensitive to how the query is worded: across three phrasings of each probe the Vioxx measurement has a median standard deviation of 5.14 nats, and the phrasing reported here is the hardest of the three for every model tested (\S\ref{sec:crossmodel}). The estimator measures the conflict together with how readily the query frame admits the answer string, and those two are not separated here.
 
-Third, the coverage analysis (Table~\ref{tab:coverage}) maps twenty representative works chosen to span the five subfields. A comprehensive bibliometric analysis would strengthen the fragmentation claim, though the qualitative pattern is consistent with the dedicated surveys of each subfield.
+Third, the coverage analysis (Table~\ref{tab:coverage}) maps twenty representative works chosen to span the five subfields. A full bibliometric analysis would strengthen the fragmentation claim, though the qualitative pattern is consistent with the dedicated surveys of each subfield.
 
 Fourth, the cross-modal extension of the metric is scoped but not yet executed; no multimodal measurement is reported in this paper.
 
@@ -982,7 +933,7 @@ The Provenance Vector and the $\mathcal{D}_{sync}$ metric are designed to mitiga
 
 This paper structures the fragmented study of knowledge in large language models, showing that five separately developed subfields (retrieval-augmented generation, knowledge editing, continual learning, context engineering, and agent memory) operate as interconnected stages of a single Knowledge Lifecycle: Acquisition, Storage, Retrieval, Update, and Forgetting. Mapping twenty representative works onto these stages shows a median coverage of two stages, and the least-studied boundaries between stages are precisely where deployed systems fail.
 
-We contributed two technical components for those boundaries. \textbf{Lifecycle Desynchronization} ($\mathcal{D}_{sync}$) makes the boundary failure measurable: in a reproducible probe of a documented drug withdrawal, GPT-2 assigns the correct continuation probability $5.9 \times 10^{-6}$ with the corrective document present in context, while the document shifts the model's distribution by only $0.03$ nats. The \textbf{Provenance Vector} ($p$) addresses the failure's root cause, the absence of temporal metadata in parametric storage, by attaching provenance to each FFN memory slot and gating stale activations at inference time, with an idealized consistency result delimiting exactly what accurate provenance buys.
+We contributed two technical components for those boundaries. \textbf{Lifecycle Desynchronization} ($\mathcal{D}_{sync}$) makes the boundary failure measurable: in a reproducible probe of a documented drug withdrawal, GPT-2 assigns the correct continuation probability $5.9 \times 10^{-6}$ with the corrective document present in context, while the document shifts the model's distribution by only $0.033$ nats. The \textbf{Provenance Vector} ($p$) addresses the failure's root cause, the absence of temporal metadata in parametric storage, by attaching provenance to each FFN memory slot and gating stale activations at inference time, with an idealized consistency result delimiting exactly what accurate provenance buys.
 
 As language models transition into autonomous systems, knowledge management can no longer rely on the assumption that weights, indices, and contexts agree. The Knowledge Lifecycle framework supplies the shared vocabulary, the metric makes disagreement measurable, and the Provenance Vector offers one architectural path to closing the loop.
 

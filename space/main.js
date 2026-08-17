@@ -26,11 +26,10 @@ const PRESETS = {
     context: "Context: In September 2004, Merck voluntarily withdrew Vioxx after trials revealed increased cardiovascular risks.",
     answer: " withdrawn",
     // Stated as the direction of the change rather than as the winning token.
-    // At full precision "safe" is the top answer, but this page runs 8-bit
-    // weights, under which a function word takes first place, and a reader
-    // watching "safe" lose the top slot would take the sentence for a mistake.
-    // What holds in both builds is that the corrective document pushes "safe"
-    // up and leaves "withdrawn" nowhere.
+    // At full precision "safe" is the top answer; under the 8-bit weights this
+    // page runs, a function word takes first place. What holds in both builds
+    // is that the corrective document pushes "safe" up and leaves "withdrawn"
+    // nowhere.
     reading: "The headline case. The withdrawal notice is in the prompt, and the model's confidence in “safe” goes up rather than down: 37.53% to 42.58% at full precision, where the paper measures 12.05 nats, far past the 9.2 failure threshold.",
   },
   monarch: {
@@ -105,6 +104,11 @@ async function ensureModel() {
 }
 
 // ---------- measurement core ----------
+
+// Regime boundaries in nats. SYNC is ln 2 exactly, the point at which the
+// correct answer holds half the probability mass; PERCENT and FAIL are ln 100
+// and ln 10000 to the precision they are quoted at.
+const SYNC = Math.LN2, PERCENT = 4.6, FAIL = 9.2;
 async function lastLogits(text) {
   const inputs = await tokenizer(text);
   const { logits } = await model(inputs);
@@ -126,9 +130,8 @@ function softmax(row, temperature = 1.0) {
 /**
  * Indices of the k largest probabilities, highest first.
  *
- * One pass over the vocabulary, maintaining a short sorted list. The obvious
- * alternative, k full scans with a "already taken" set, costs k passes over
- * 50,257 entries at every call site; this costs one.
+ * One pass over the vocabulary, maintaining a short sorted list. Repeated scans
+ * with an "already taken" set cost k passes over 50,257 entries per call.
  */
 function topK(probs, k) {
   const best = [];   // indices, kept sorted by descending probability
@@ -175,10 +178,9 @@ function renderBars(pPlain, pCtx, target) {
 /**
  * Plain-language account of one measurement, written from the numbers.
  *
- * The observations are additive rather than exclusive: a single run can be
- * both "the document helped" and "the document also strengthened the wrong
- * answer", and an if/else chain would report only the first and hide the
- * second, which is the more interesting half.
+ * The observations are additive rather than exclusive: one run can be both
+ * "the document helped" and "the document strengthened the wrong answer", so
+ * they accumulate instead of branching.
  */
 function narrative(m) {
   const answerWon = m.topCtx === m.answerPiece;
@@ -213,7 +215,7 @@ function renderStagebar(m) {
   if (m.dsync > 9.2) {
     u.textContent = "Update ✗";
     note.textContent = "Retrieve succeeded: the document is in the context. Update failed: the conflict was resolved in favor of stale memory.";
-  } else if (m.dsync > 0.7) {
+  } else if (m.dsync > SYNC) {
     u.textContent = "Update △";
     note.textContent = "Retrieve succeeded. Update is partial: the document shifted the model, but the stale memory still leads.";
   } else {
@@ -280,7 +282,7 @@ $("run").addEventListener("click", async () => {
     const topCtxId = topK(pCtx, 1)[0];
 
     let chipText, chipClass, detail;
-    if (dsync > 9.2) {
+    if (dsync > FAIL) {
       if (ictx < 0.05) {
         chipText = "resolution failure"; chipClass = "chip-fail";
         detail = "context ignored; no realistic decoding recovers the correct answer";
@@ -288,10 +290,10 @@ $("run").addEventListener("click", async () => {
         chipText = "drift, context losing"; chipClass = "chip-fail";
         detail = "context influential but losing; no realistic decoding recovers the correct answer";
       }
-    } else if (dsync > 4.6) {
+    } else if (dsync > PERCENT) {
       chipText = "severe drift"; chipClass = "chip-drift";
       detail = "correct answer below 1% probability";
-    } else if (dsync > 0.7) {
+    } else if (dsync > SYNC) {
       chipText = "drift"; chipClass = "chip-drift";
       detail = "correct answer no longer holds most of the probability mass";
     } else {
@@ -299,12 +301,12 @@ $("run").addEventListener("click", async () => {
       detail = "correct answer holds at least half the probability mass";
     }
 
-    // Gauge markers follow the drawn zone boundaries: D_sync thresholds
-    // 0.7 / 4.6 / 9.2 sit at 5% / 33% / 66%, scale capped at 14 nats.
-    const dPos = dsync <= 0.7 ? (dsync / 0.7) * 5
-      : dsync <= 4.6 ? 5 + ((dsync - 0.7) / 3.9) * 28
-      : dsync <= 9.2 ? 33 + ((dsync - 4.6) / 4.6) * 33
-      : Math.min(100, 66 + ((dsync - 9.2) / 4.8) * 34);
+    // Gauge markers follow the drawn zone boundaries: the three thresholds sit
+    // at 5% / 33% / 66% of the track, and the scale is capped at 14 nats.
+    const dPos = dsync <= SYNC ? (dsync / SYNC) * 5
+      : dsync <= PERCENT ? 5 + ((dsync - SYNC) / (PERCENT - SYNC)) * 28
+      : dsync <= FAIL ? 33 + ((dsync - PERCENT) / (FAIL - PERCENT)) * 33
+      : Math.min(100, 66 + ((dsync - FAIL) / 4.8) * 34);
     const iPos = ictx <= 0.05 ? (ictx / 0.05) * 10
       : ictx <= 0.5 ? 10 + ((ictx - 0.05) / 0.45) * 40
       : Math.min(100, 50 + ((ictx - 0.5) / 1.5) * 50);
