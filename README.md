@@ -93,7 +93,7 @@ Put that withdrawal notice directly into GPT-2's prompt, then ask whether the dr
 | Answers **"withdrawn"** | 0.0004% | 0.0006% |
 | Most likely next word | "safe" | "safe" |
 
-The correction is sitting in front of the model, and its confidence that the drug is safe **goes up**. The correct answer is left at roughly six chances in a million.
+The correction is sitting in front of the model, and its confidence that the drug is safe **goes up**. The correct answer is left at roughly **six chances in a million**.
 
 > [!CAUTION]
 > A model in this state does not look broken. It answers fluently, cites the document it was given, and is wrong. In medicine, law, or finance, the failure is invisible until someone acts on it.
@@ -121,7 +121,19 @@ The root cause is what training throws away. A model learns *what* is true but n
 <a name="try-it"></a>
 ## Try it
 
-**[Open the live demonstration →](https://huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle)**
+> [!TIP]
+> ### 🤗 &nbsp; Run the measurement yourself, right now
+> **[huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle](https://huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle)**
+>
+> No install, no sign-in, no API key. Press **Measure** and watch a model ignore a document sitting in its own prompt.
+
+<div align="center">
+
+[![Open in Hugging Face](https://img.shields.io/badge/Open_the_live_demo-Hugging_Face_Space-FFD21E?style=for-the-badge&logo=huggingface&logoColor=black)](https://huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle)
+
+</div>
+
+<br>
 
 GPT-2 runs inside your own browser, so nothing you type leaves your machine and the same input always returns the same number. The demonstration's full source is in [`space/`](space/), byte for byte what the Space serves. Three worked examples cover three different ways the failure appears, and you can enter any fact change of your own.
 
@@ -137,7 +149,10 @@ pip install torch transformers
 python experiments/dsync_experiment.py
 ```
 
-Every number above comes out of that script. Nothing samples, so the digits are identical on every machine and every run. A laptop is enough: GPT-2 base at 124M parameters, chosen because it is small, fully open, and free of the instruction tuning that would confound the result.
+> [!NOTE]
+> **Every number in this README comes out of that one script**, and nothing in it samples. The digits are identical on every machine and every run, so any claim above can be checked in under a minute.
+
+ A laptop is enough: GPT-2 base at 124M parameters, chosen because it is small, fully open, and free of the instruction tuning that would confound the result.
 
 A [Kaggle notebook](https://www.kaggle.com/code/ameythakur20/cross-model-lifecycle-desynchronization) extends the same measurement across six models, testing whether scale or instruction tuning makes the problem go away.
 
@@ -148,8 +163,7 @@ A [Kaggle notebook](https://www.kaggle.com/code/ameythakur20/cross-model-lifecyc
 
 The manuscript is [`paper/main.tex`](paper/main.tex), with a poster and slide deck alongside it.
 
-> [!TIP]
-> Short on time? **Section 7.5** defines the metric and **Section 7.7** is the measurement. Those two sections stand alone without the survey around them.
+Short on time: **Section 7.5** defines the metric and **Section 7.7** is the measurement. Those two stand alone without the survey around them.
 
 ```
 .
