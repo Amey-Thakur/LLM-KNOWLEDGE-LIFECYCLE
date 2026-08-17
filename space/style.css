@@ -37,7 +37,7 @@
 body {
   margin: 0 auto;
   padding: 3rem 1.5rem 4.5rem;
-  max-width: 58rem;
+  max-width: 54rem;
   font: 16px/1.55 -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   color: var(--ink);
   background:
@@ -305,8 +305,10 @@ body { line-height: 1.65; }
 .reading,
 #guide p,
 .narrative,
-.note { max-width: 46rem; }
-.alert { max-width: 46rem; line-height: 1.6; }
+.note,
+.alert,
+.glossary { max-width: none; }
+.alert { line-height: 1.6; }
 .subtitle { max-width: 44rem; }
 
 .lede { margin-bottom: 1.6rem; font-size: 1rem; }

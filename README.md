@@ -19,16 +19,33 @@
 
 <br><br>
 
+[Authors](#authors) &nbsp;·&nbsp;
 [The paper](#the-paper) &nbsp;·&nbsp;
 [Contributions](#contributions) &nbsp;·&nbsp;
 [The measurement](#the-measurement) &nbsp;·&nbsp;
 [Live demonstration](#live-demonstration) &nbsp;·&nbsp;
 [Reproducing](#reproducing-the-measurement) &nbsp;·&nbsp;
 [Repository layout](#repository-layout) &nbsp;·&nbsp;
-[Authors](#authors) &nbsp;·&nbsp;
 [Citation](#citation)
 
 </div>
+
+---
+
+<!-- AUTHORS -->
+<div align="center">
+
+  <a name="authors"></a>
+  ## Authors
+
+| <a href="https://github.com/Amey-Thakur"><img src="space/amey-thakur.jpg" width="150" height="150" alt="Amey Thakur"></a><br>[**Amey Thakur**](https://github.com/Amey-Thakur)<br><br>[![ORCID](https://img.shields.io/badge/ORCID-0000--0001--5644--1575-A6CE39.svg)](https://orcid.org/0000-0001-5644-1575) | <a href="https://github.com/sarveshtalele"><img src="https://github.com/sarveshtalele.png" width="150" height="150" alt="Sarvesh Talele"></a><br>[**Sarvesh Talele**](https://github.com/sarveshtalele)<br><br>[![ORCID](https://img.shields.io/badge/ORCID-0009--0002--0818--461X-A6CE39.svg)](https://orcid.org/0009-0002-0818-461X) |
+| :---: | :---: |
+
+</div>
+
+> [!IMPORTANT]
+> ### 🤝🏻 Special Acknowledgement
+> *Special thanks to **[Sarvesh Talele](https://github.com/sarveshtalele)** for his meaningful contributions, support, and wisdom that helped shape this work.*
 
 ---
 
@@ -44,7 +61,7 @@ The manuscript is [`paper/main.tex`](paper/main.tex). Every push compiles it, th
 <a name="contributions"></a>
 ## Contributions
 
-**Lifecycle Desynchronization ($\mathcal{D}_{sync}$)** turns the boundary failure into a number. For a fact with a verified answer it reduces to the surprisal of that answer with the corrective document present in context: $n$ nats means the model assigns the correct answer probability $e^{-n}$. A companion diagnostic, $\mathcal{I}_{ctx}$, measures how far the document moves the model's output distribution at all. Together they separate a retrieval failure from a resolution failure, which no single-stage benchmark can do.
+**Lifecycle Desynchronization ($\mathcal{D}_{sync}$)** turns the boundary failure into a number. For a fact with a verified answer it reduces to the surprisal of that answer with the corrective document present in context. The unit is the nat, a measure of information based on natural logarithms, and it converts straight back to probability: $n$ nats means the model assigns the correct answer probability $e^{-n}$. A companion diagnostic, $\mathcal{I}_{ctx}$, measures how far the document moves the model's output distribution at all. Together they separate a retrieval failure from a resolution failure, which no single-stage benchmark can do.
 
 **The Provenance Vector ($p$)** addresses the root cause: parametric storage discards when and from where a fact was learned, so a model has no principled basis for preferring fresh evidence over a confident stale memory. Each feed-forward memory slot gains a metadata embedding of acquisition time and source reliability, and a gate attenuates stale activations at inference. Weights are never modified, so the specificity bottleneck that limits static editing does not apply. The paper gives the forward pass as an algorithm, derives the parameter cost, and proves an idealized consistency result under explicitly stated assumptions.
 
@@ -69,7 +86,7 @@ The correction is in the prompt, and the model's confidence that the drug is saf
 
 [**huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle**](https://huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle)
 
-GPT-2 runs entirely in the visitor's browser through ONNX; no server sees the input. Three preset probes cover three distinct regimes, and any fact change with a single-word answer can be entered directly. Two parameters are adjustable: sampling temperature, recomputed live from the measured logits, and document repetition, which re-runs the model to test whether saying it louder helps.
+GPT-2 runs entirely in the visitor's browser through ONNX; no server sees the input. Three preset probes cover three distinct regimes, and any fact change with a single-word answer can be entered directly. Two parameters are adjustable: sampling temperature, which controls how randomly the model chooses among candidates, and document repetition, which re-runs the model to test whether stating the correction more than once helps.
 
 The Space is mirrored from [`space/`](space/) by [a workflow](.github/workflows/sync-space.yml) on every push. **GitHub is the source of truth**; edits made through the Hugging Face web interface are overwritten by the next push.
 
@@ -104,20 +121,6 @@ Prints the top tokens under both conditions, the probabilities of the correct an
 ├── codemeta.json             # Machine-readable project metadata
 └── LICENSE                   # CC BY 4.0
 ```
-
-<a name="authors"></a>
-## Authors
-
-<div align="center">
-
-| <a href="https://github.com/Amey-Thakur"><img src="space/amey-thakur.jpg" width="150" height="150" alt="Amey Thakur"></a><br>[**Amey Thakur**](https://github.com/Amey-Thakur)<br><br>[![ORCID](https://img.shields.io/badge/ORCID-0000--0001--5644--1575-A6CE39.svg)](https://orcid.org/0000-0001-5644-1575)<br>[![Kaggle](https://img.shields.io/badge/Kaggle-ameythakur20-20BEFF?logo=kaggle&logoColor=white)](https://www.kaggle.com/ameythakur20) | <a href="https://github.com/sarveshtalele"><img src="https://github.com/sarveshtalele.png" width="150" height="150" alt="Sarvesh Talele"></a><br>[**Sarvesh Talele**](https://github.com/sarveshtalele)<br><br>[![ORCID](https://img.shields.io/badge/ORCID-0009--0002--0818--461X-A6CE39.svg)](https://orcid.org/0009-0002-0818-461X)<br>[![GitHub](https://img.shields.io/badge/GitHub-sarveshtalele-181717?logo=github)](https://github.com/sarveshtalele) |
-| :---: | :---: |
-
-</div>
-
-> [!IMPORTANT]
-> ### 🤝🏻 Special Acknowledgement
-> *Special thanks to **[Sarvesh Talele](https://github.com/sarveshtalele)** for his meaningful contributions, support, and wisdom that helped shape this work.*
 
 <a name="citation"></a>
 ## Citation
