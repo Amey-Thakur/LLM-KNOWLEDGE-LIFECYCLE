@@ -64,28 +64,19 @@
 \colorlet{innerblockbodybgcolor}{panel}
 \colorlet{innerblockbodyfgcolor}{ink}
 
-% Block titles sit above a colored rule rather than inside a filled bar. At A0,
-% one filled bar per block turns the whole page into stripes.
-\defineblockstyle{Rule}{
-  titlewidthscale=1, bodywidthscale=1, titleleft, bodyoffsetx=0mm,
-  bodyoffsety=8mm, titleoffsetx=0mm, titleoffsety=0mm,
-  bodyverticalshift=0mm, roundedcorners=0, linewidth=0pt,
-  titleinnersep=0mm, bodyinnersep=0mm
-}{
-  % no body frame: the rule under the title is the only structure needed
-}{
-  \draw[color=acquire, line width=8pt]
-    ([yshift=-4mm]blocktitle.south west) -- ([yshift=-4mm]blocktitle.south east);
-}
-\useblockstyle{Rule}
+% Minimal is the built-in style that rules under the block title. A custom
+% style was tried first and broke the build: its rule dereferences the
+% blocktitle node, which does not exist for a block with an empty title.
+\useblockstyle{Minimal}
+\colorlet{framecolor}{acquire}
 
 % A circular author portrait at a fixed physical size, independent of column
 % width, so the two authors always match each other.
-\newcommand{\portrait}[2]{%
+\newcommand{\portrait}[2]{%  #1 = image file, #2 = diameter as a length
   \begin{tikzpicture}
-    \begin{scope}\clip (0,0) circle (#2);
-      \node at (0,0) {\includegraphics[width=2*#2]{#1}};\end{scope}
-    \draw[hairline, line width=3pt] (0,0) circle (#2);
+    \begin{scope}\clip (0,0) circle (\dimexpr#2/2\relax);
+      \node at (0,0) {\includegraphics[width=#2]{#1}};\end{scope}
+    \draw[hairline, line width=3pt] (0,0) circle (\dimexpr#2/2\relax);
   \end{tikzpicture}%
 }
 
@@ -121,7 +112,7 @@
 
   \begin{minipage}[c]{0.42\linewidth}
     \raggedleft
-    \begin{minipage}[c]{4cm}\portrait{amey-thakur.jpg}{2cm}\end{minipage}%
+    \begin{minipage}[c]{4cm}\portrait{amey-thakur.jpg}{4cm}\end{minipage}%
     \hspace{6mm}%
     \begin{minipage}[c]{16cm}
       \raggedright
@@ -132,7 +123,7 @@
   \hspace{0.04\linewidth}%
   \begin{minipage}[c]{0.42\linewidth}
     \raggedright
-    \begin{minipage}[c]{4cm}\portrait{sarvesh-talele.jpg}{2cm}\end{minipage}%
+    \begin{minipage}[c]{4cm}\portrait{sarvesh-talele.jpg}{4cm}\end{minipage}%
     \hspace{6mm}%
     \begin{minipage}[c]{16cm}
       \raggedright
