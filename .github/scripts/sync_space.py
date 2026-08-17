@@ -42,6 +42,10 @@ SOURCE = Path(__file__).resolve().parents[2] / "space"
 # Housekeeping that the Space has no use for.
 IGNORE = ["*.pyc", "__pycache__/*", ".DS_Store"]
 
+# The kinds of file the Space serves. Anything of these kinds that is on the
+# Space but no longer in space/ is removed, so the two cannot drift.
+SERVED = ["*.html", "*.js", "*.css", "*.png", "*.jpg", "*.jpeg", "*.svg", "*.md"]
+
 
 def main() -> int:
     token = os.environ.get("HF_TOKEN", "").strip()
@@ -66,15 +70,17 @@ def main() -> int:
     files = sorted(p.name for p in SOURCE.iterdir() if p.is_file())
     print(f"Mirroring {len(files)} file(s) to {SPACE_ID}: {', '.join(files)}")
 
-    # delete_patterns removes anything on the Space that is no longer in
-    # space/, which is what makes this a mirror rather than an accumulation.
+    # Deleting by suffix rather than by "*" keeps the mirror honest about the
+    # files the Space serves without reaching the repository configuration.
+    # A bare "*" also removes .gitattributes, and that file is what marks
+    # social-preview.png as LFS.
     api.upload_folder(
         folder_path=str(SOURCE),
         repo_id=SPACE_ID,
         repo_type="space",
         commit_message="Knowledge Lifecycle",
         ignore_patterns=IGNORE,
-        delete_patterns="*",
+        delete_patterns=SERVED,
     )
 
     print(f"Space updated: https://huggingface.co/spaces/{SPACE_ID}")
