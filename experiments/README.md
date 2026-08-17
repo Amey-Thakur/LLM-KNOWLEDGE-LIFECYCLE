@@ -7,12 +7,12 @@ This folder holds the cross-model desynchronization experiment for *The Knowledg
 
 ## Background, in three sentences
 
-The paper shows that when a fact changes after a model's training data was collected, GPT-2 keeps answering from its stale memory even when the correction sits in its prompt: the correct answer gets probability six in a million (D_sync = 12.05 nats), and the corrective document barely moves the output distribution (I_ctx = 0.033 nats). The open question, stated in Section 9.2 of the paper, is how these numbers change with model scale and instruction tuning. This notebook measures exactly that, across six models on the same three probes.
+The paper shows that when a fact changes after a model's training data was collected, GPT-2 keeps answering from its stale memory even when the correction sits in its prompt: the correct answer gets probability six in a million (D_sync = 12.05 nats), and the corrective document barely moves the output distribution (I_ctx = 0.033 nats). Section 9.2 of the paper asks how these numbers change with model scale and instruction tuning. This notebook is the sweep that answers it, across six models on the same three probes, and its results are reported as Section 8.6.
 
 ## Steps
 
 1. Read the paper's Sections 8.4 and 8.5 (the metric and its protocol, then the Vioxx case) and the live demo at https://huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle so the two numbers mean something before you run anything.
-2. Create a new Kaggle notebook. Settings: **GPU T4 x2** (or P100), **Internet on**, latest environment.
+2. Create a new Kaggle notebook. Settings: **CPU**, **Internet on**, latest environment. The notebook runs single forward passes rather than generation, so a GPU buys almost nothing and spends quota; `kernel-metadata.json` sets `enable_gpu: false` to match. Budget about 35 minutes of compute for the six models, plus roughly 13 GB of first-run model downloads.
 3. Upload `cross_model_dsync.ipynb` from this folder (File, Import Notebook) and run all cells, top to bottom, once.
 4. Watch two gates:
    - **The notebook's Section 6, reproduction check.** The gpt2/vioxx row must match the paper (D_sync = 12.0464, tolerance 0.05). If the assert fails, stop and report the numbers you got; do not continue.

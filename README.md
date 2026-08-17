@@ -162,7 +162,7 @@ python experiments/dsync_experiment.py
 
  A laptop is enough: GPT-2 base at 124M parameters, chosen because it is small, fully open, and free of the instruction tuning that would confound the result.
 
-A [Kaggle notebook](https://www.kaggle.com/code/ameythakur20/cross-model-lifecycle-desynchronization) extends the same measurement across six models, testing whether scale or instruction tuning makes the problem go away.
+A [Kaggle notebook](https://www.kaggle.com/code/ameythakur20/cross-model-lifecycle-desynchronization) extends the same measurement across six models from 124M to 1.5B parameters, testing whether scale or instruction tuning makes the problem go away. It does not: no model answers the Vioxx probe correctly, and within the GPT-2 family the measurement is not even monotone in size, so the 774M model is worse at it than the 355M one. Other conflicts in the same set resolve cleanly, which is what shows the metric tracks the conflict rather than the difficulty of the question. The full table is Section 8.6 of the paper, and every measurement is in [`experiments/cross_model_dsync.csv`](experiments/cross_model_dsync.csv).
 
 <br>
 

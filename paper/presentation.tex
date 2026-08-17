@@ -447,10 +447,13 @@
 % ============================== 15. WHAT NEXT ================================
 \begin{frame}{What comes next}
   \begin{itemize}\setlength\itemsep{0.9em}
-    \item \textbf{Does it survive scale?} A cross-model sweep across six open models
-          is prepared and running.
-    \item \textbf{Does instruction tuning fix it?} Chat-tuned models follow context
-          more readily; whether that closes the gap is an open question.
+    \item \textbf{Does it survive scale? Yes.} Across six open models from 124M to
+          1.5B, not one answers the Vioxx probe correctly, and inside the GPT-2
+          family the measurement is not even monotone in size.
+    \item \textbf{Does instruction tuning fix it? Not on this probe.} The tuned
+          models resolve the Twitter and Monarch conflicts and still lose Vioxx;
+          the largest answers ``unsafe'', which is the right direction and the
+          wrong token.
     \item \textbf{Does reasoning-mode inference help?} Extended test-time compute
           should, in principle, resolve conflicts the forward pass cannot.
     \item \textbf{Multimodal.} A text prior overriding a contradicting image is the
@@ -458,11 +461,14 @@
   \end{itemize}
   \vspace{0.8em}
   \begin{center}\color{muted}\small
-    An honest null result answers the first question just as usefully as a positive one.
+    The first two are answered, and the answer to both is largely negative.
+    Reporting that is the point.
   \end{center}
-  \note{Be plain that the sweep is running and we will report whatever it says.
-  Committing publicly to reporting a null result is itself a credibility signal
-  to a jury. Target: 90 seconds.}
+  \note{The first two bullets are results now, not plans, and the honest answer
+  to both is close to a null. Say so plainly: the failure this paper names is
+  not something the field will scale its way out of, and that is precisely why
+  it needs an architectural fix rather than a bigger model. The full table is
+  Section 8.6 of the paper. Target: 90 seconds.}
 \end{frame}
 
 % ============================== 16. SUMMARY ==================================
