@@ -14,8 +14,9 @@
 *.vrb
 paper/poster.pdf
 
-# main.pdf and presentation.pdf are committed on purpose: a reader should be
-# able to download the paper and the deck without building anything.
+# The built paper and deck are committed on purpose, under their LaTeX names,
+# which is what arXiv and latexmk expect: a reader can download either without
+# building anything.
 
 # Python
 __pycache__/

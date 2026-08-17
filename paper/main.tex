@@ -800,9 +800,8 @@ reproduce exactly.
 \caption{Cross-model measurement. $\widehat{\mathcal{D}}_{sync}$ and
 $\mathcal{I}_{ctx}$ in nats, both with the corrective document present.
 \textbf{Bold} marks the cases where the model's most likely continuation is the
-correct answer. $^{\dagger}$ marks a first-token lower bound: TinyLlama's
-tokenizer splits `` withdrawn'' into three pieces, and the chain rule over all
-three gives 9.22 nats against the 9.18 reported here, so the bound is tight.}
+correct answer. Surprisal is summed over every token the answer occupies, so the
+values are exact on every tokenizer rather than first-token bounds.}
 \label{tab:crossmodel}
 \small
 \begin{tabular}{lrrrrrrr}
@@ -816,7 +815,7 @@ GPT-2 base & 124 & 12.05 & 2.91 & 2.09 & 0.03 & 0.16 & 0.90 \\
 GPT-2 medium & 355 & 10.96 & \textbf{1.41} & 1.19 & 0.12 & 0.76 & 1.43 \\
 GPT-2 large & 774 & 11.91 & 3.99 & \textbf{0.71} & 0.10 & 0.14 & 3.66 \\
 Qwen2.5-0.5B-Instruct & 494 & 7.03 & 3.32 & \textbf{0.32} & 0.42 & 0.18 & 7.69 \\
-TinyLlama-1.1B-Chat & 1100 & 9.18$^{\dagger}$ & 1.78 & \textbf{0.17} & 0.05 & 2.05 & 7.82 \\
+TinyLlama-1.1B-Chat & 1100 & 9.22 & 1.78 & \textbf{0.17} & 0.05 & 2.05 & 7.82 \\
 Qwen2.5-1.5B-Instruct & 1544 & 8.85 & \textbf{0.64} & \textbf{0.09} & 0.44 & 2.28 & 3.43 \\
 \bottomrule
 \end{tabular}
@@ -854,15 +853,51 @@ $\mathcal{I}_{ctx}$ with a large $\widehat{\mathcal{D}}_{sync}$ is a model that
 read the document and still lost to its weights, and no single-stage benchmark
 distinguishes that from a retriever that failed.
 
+\paragraph{Two controls separate an unreachable answer from an unused document.}
+Every probe is additionally run against two controls, which we owe to the second
+author. An \textit{irrelevant} document, matched to the corrective one in length
+and register, establishes how far any document at all moves the model. A
+\textit{leak} document, which states the answer outright, establishes how far the
+model can be moved when the answer is handed to it. The gap between the leak and
+the corrective condition is help that was available and not taken.
+
+On the Vioxx probe that gap is the result. Stating the answer outright is worth
+between 7.7 and 10.6 nats to every model on the ladder, so the correct
+continuation is well within reach of all of them. The corrective document, which
+contains the same fact in prose, is worth at most 0.41 nats to any GPT-2 model.
+The failure is not that the model cannot represent the answer; it is that a
+document saying so does not reach it. Sharper still, on GPT-2 the irrelevant
+document about the Danube moves the output distribution 0.089 nats against the
+withdrawal notice's 0.033, and an irrelevant document has the larger effect in
+2 of the 18 measurements.
+
+\paragraph{The exposure trap is the common case, not the exception.} Comparing
+the surprisal of the \textit{stale} answer with and without the corrective
+document, the document makes the stale answer \textit{more} likely on the Vioxx
+probe for 5 of the 6 models. Naming a fact, even in order to correct it,
+reinforces the association the model already holds. This is the effect that
+\S\ref{sec:case_study} reports for a single model, measured across the ladder.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.86\linewidth]{figures/help.png}
+\caption{How much of the available help the corrective document delivers. The
+pale bar is the surprisal reduction available when the answer is stated outright;
+the solid bar is what the corrective document achieves. On the Twitter probe the
+document delivers nearly all of what is available. On Vioxx it delivers almost
+none of roughly ten nats, and for the largest model it moves the correct answer
+the wrong way.}
+\label{fig:help}
+\end{figure}
+
 \paragraph{Two honest qualifications.} Qwen2.5-1.5B-Instruct answers ``
 unsafe'' on the Vioxx probe. That is the right direction and the wrong token,
 and the point-mass estimator scores it as a failure because it is defined
 against one verified continuation; the estimator measures lexical recovery of a
 specific answer, not semantic correctness, and this is the clearest case in the
-data where the two come apart. Separately, comparisons across model families are
-confounded by tokenization, as the TinyLlama row shows. The GPT-2 column is the
-clean scale comparison because family, tokenizer and training data are held
-fixed and only size changes.
+data where the two come apart. Separately, the GPT-2 rows remain the
+cleanest scale comparison, because family, tokenizer and training data are held
+fixed there and only size changes.
 
 % ============================================================
 \section{Open Problems and Future Directions}
