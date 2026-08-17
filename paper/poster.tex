@@ -230,27 +230,27 @@
   % text width, so the 1.2 unit gutter between boxes is never encroached on.
   \resizebox{\linewidth}{!}{%
   \begin{tikzpicture}[
-    stage/.style={rounded corners=3pt, minimum width=5.5cm, minimum height=3.0cm,
+    lcbox/.style={rounded corners=3pt, minimum width=5.5cm, minimum height=3.0cm,
                   text=white, font=\bfseries, align=center},
-    cap/.style={text=muted, font=\small, text width=5.5cm, align=center},
-    flow/.style={-{Stealth[length=5mm, width=3.5mm]}, line width=2.5pt, muted}
+    lccap/.style={text=muted, font=\small, text width=5.5cm, align=center},
+    lcflow/.style={-{Stealth[length=5mm, width=3.5mm]}, line width=2.5pt, muted}
   ]
-    \node[stage, fill=acquire]  (a) at (0,0)    {Acquire};
-    \node[stage, fill=store]    (s) at (6.7,0)  {Store};
-    \node[stage, fill=retrieve] (r) at (13.4,0) {Retrieve};
-    \node[stage, fill=update]   (u) at (20.1,0) {Update};
-    \node[stage, fill=forget]   (f) at (26.8,0) {Forget};
+    \node[lcbox, fill=acquire]  (a) at (0,0)    {Acquire};
+    \node[lcbox, fill=store]    (s) at (6.7,0)  {Store};
+    \node[lcbox, fill=retrieve] (r) at (13.4,0) {Retrieve};
+    \node[lcbox, fill=update]   (u) at (20.1,0) {Update};
+    \node[lcbox, fill=forget]   (f) at (26.8,0) {Forget};
 
-    \draw[flow] (a) -- (s);
-    \draw[flow] (s) -- (r);
-    \draw[flow] (r) -- (u);
-    \draw[flow] (u) -- (f);
+    \draw[lcflow] (a) -- (s);
+    \draw[lcflow] (s) -- (r);
+    \draw[lcflow] (r) -- (u);
+    \draw[lcflow] (u) -- (f);
 
-    \node[cap, below=4mm of a] {training};
-    \node[cap, below=4mm of s] {weights};
-    \node[cap, below=4mm of r] {attention};
-    \node[cap, below=4mm of u] {editing};
-    \node[cap, below=4mm of f] {unlearning};
+    \node[lccap, below=4mm of a] {training};
+    \node[lccap, below=4mm of s] {weights};
+    \node[lccap, below=4mm of r] {attention};
+    \node[lccap, below=4mm of u] {editing};
+    \node[lccap, below=4mm of f] {unlearning};
 
     % The conflict spans two stages, so it is a brace beneath them rather than a
     % label on the arrow between them, where it collided with the Update box.
@@ -390,13 +390,13 @@
   % held inside a 4.2 unit text width, well clear of it.
   \resizebox{\linewidth}{!}{%
   \begin{tikzpicture}[
-    slot/.style={rounded corners=3pt, minimum width=5.0cm, minimum height=3.2cm,
+    lcslot/.style={rounded corners=3pt, minimum width=5.0cm, minimum height=3.2cm,
                  align=center, draw=hairline, line width=2pt,
                  font=\small, text width=4.2cm}
   ]
-    \node[slot] (k) at (0,0)   {key\\ $k_i$};
-    \node[slot] (v) at (6.5,0) {value\\ $v_i$};
-    \node[slot, draw=acquire, fill=acquire!12, text=acquire] (p) at (13.0,0)
+    \node[lcslot] (k) at (0,0)   {key\\ $k_i$};
+    \node[lcslot] (v) at (6.5,0) {value\\ $v_i$};
+    \node[lcslot, draw=acquire, fill=acquire!12, text=acquire] (p) at (13.0,0)
       {\textbf{provenance}\\ $p_i$};
 
     \draw[-{Stealth[length=4mm]}, muted,   line width=2pt] (k) -- (v);
