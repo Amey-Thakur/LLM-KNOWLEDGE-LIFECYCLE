@@ -48,11 +48,14 @@ body {
       rgba(143,95,184,.045) 82%, rgba(74,127,212,.04) 100%),
     /* Measurement grid: a major line every fifth cell, so the ground has
        structure at reading distance instead of an even hairline hum. */
-    repeating-linear-gradient(0deg, transparent 0 119px, rgba(26,26,26,.10) 119px 120px),
-    repeating-linear-gradient(90deg, transparent 0 119px, rgba(26,26,26,.10) 119px 120px),
-    repeating-linear-gradient(0deg, transparent 0 23px, rgba(26,26,26,.055) 23px 24px),
-    repeating-linear-gradient(90deg, transparent 0 23px, rgba(26,26,26,.055) 23px 24px),
+    repeating-linear-gradient(0deg, transparent 0 119px, rgba(26,26,26,.07) 119px 120px),
+    repeating-linear-gradient(90deg, transparent 0 119px, rgba(26,26,26,.07) 119px 120px),
+    repeating-linear-gradient(0deg, transparent 0 23px, rgba(26,26,26,.035) 23px 24px),
+    repeating-linear-gradient(90deg, transparent 0 23px, rgba(26,26,26,.035) 23px 24px),
     var(--bg);
+  /* The ground is a fixed surface the content moves across, so it stays put on
+     scroll. One value per image layer, in the order declared above. */
+  background-attachment: fixed, fixed, fixed, fixed, fixed;
 }
 
 header { text-align: center; }
