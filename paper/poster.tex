@@ -203,10 +203,10 @@
   % assignment is global because tikzposter typesets the title inside a node,
   % and a local length would revert before the footer band is reached.
   \global\bandw=\linewidth\relax
-  % The class leaves 1.30 cm above this band. With the footer as it now sets,
-  % the page carries 4.79 cm of slack, so this lead puts 2.40 cm at the top and
-  % leaves the same at the bottom.
-  \vspace*{11mm}
+  % The class leaves 1.30 cm above this band. With the air added around the
+  % author strip and the divider pulled in below it, the page carries 5.79 cm of
+  % slack, so this lead puts 2.90 cm at the top and leaves the same at the foot.
+  \vspace*{16mm}
   \atbandwidth{\stageband{\bandw}{0.9}}
   \vspace{8mm}
 
@@ -219,17 +219,22 @@
 
   {\fontsize{40}{50}\selectfont\color{muted}
    A model holds two memories. When they disagree, training usually wins.\par}
-  \vspace{9mm}
+  % The author strip is given equal and generous air above and below, so the two
+  % faces read as their own band rather than as a caption hung off the subtitle.
+  \vspace{14mm}
 
   \authorcard{amey-circle.png}{Amey Thakur}{Toronto, Canada}{0000-0001-5644-1575}%
   \hspace{22mm}%
   \authorcard{sarvesh-circle.png}{Sarvesh Talele}{Mumbai, India}{0009-0002-0818-461X}
-  \vspace{9mm}
+  \vspace{14mm}
 
   % A third of the weight of the opening and closing bands: enough to divide the
   % header from the content, not enough to compete with them.
   \atbandwidth{\stageband{\bandw}{0.3}}
-  \vspace{2mm}
+  % The class leaves 5.06 cm between this rule and the first block title, which
+  % reads as a break rather than as a division. This pulls it back to about
+  % 2.9 cm, so the divider sits with the content it introduces.
+  \vspace*{-18mm}
 }
 
 \begin{document}
