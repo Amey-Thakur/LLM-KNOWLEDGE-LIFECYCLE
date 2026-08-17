@@ -111,7 +111,7 @@ The root cause is what training throws away. A model learns *what* is true but n
 
 **[Open the live demonstration →](https://huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle)**
 
-GPT-2 runs inside your own browser, so nothing you type leaves your machine and the same input always returns the same number. Three worked examples cover three different ways the failure appears, and you can enter any fact change of your own.
+GPT-2 runs inside your own browser, so nothing you type leaves your machine and the same input always returns the same number. The demonstration's full source is in [`space/`](space/), byte for byte what the Space serves. Three worked examples cover three different ways the failure appears, and you can enter any fact change of your own.
 
 Vioxx is the outright failure. The British monarch case is stranger: after the 2022 succession, telling the model that Elizabeth II has died mostly makes it *more* likely to answer "Queen". The Twitter rename shows a document shifting the model hard and still losing.
 

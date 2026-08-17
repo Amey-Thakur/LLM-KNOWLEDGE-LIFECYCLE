@@ -12,15 +12,17 @@ RELEASE DATE : August 16, 2026
 LICENSE      : CC BY 4.0
 ===============================================================================
 
-GitHub is the single source of truth. This script pushes one way, from the
+Run by hand when the demonstration changes. It pushes one way, from the
 repository to the Space, and deletes files on the Space that no longer exist
-here, so the two cannot silently drift apart.
+here, so the two cannot drift apart.
 
-Editing the Space directly through the Hugging Face web interface is therefore
-not durable: the next push to main overwrites it. Change space/ instead.
+GitHub is the source of truth: space/ always holds exactly what the Space
+serves. Editing the Space through the Hugging Face web interface is therefore
+not durable, since the next run overwrites it. Change space/ instead.
 
-Requires an HF_TOKEN with write access to the Space, supplied by the workflow
-as a repository secret and never written to disk.
+    HF_TOKEN=<token with write access> python .github/scripts/sync_space.py
+
+The token is read from the environment and never written to disk.
 """
 
 import os
