@@ -774,6 +774,17 @@ Qwen2.5-1.5B-Instruct & 1544 & 8.85 & \textbf{0.64} & \textbf{0.09} & 0.44 & 2.2
 \end{tabular}
 \end{table}
 
+egin{figure}[t]
+\centering
+\includegraphics[width=0.86\linewidth]{figures/scale.png}
+\caption{$\widehat{\mathcal{D}}_{sync}$ against model size for each probe, with
+the 9.2 nat failure threshold marked. The Twitter probe falls steadily with size.
+The Vioxx probe does not, and inside the GPT-2 family it is not monotone: the 774M
+model sits further from the correct answer than the 355M one. Size alone does not
+order these measurements.}
+\label{fig:scale}
+\end{figure}
+
 \paragraph{The conflict does not resolve with scale.} No model in the ladder
 answers the Vioxx probe correctly. The most likely continuation is \textit{safe} for
 all three GPT-2 models and for TinyLlama, and $\widehat{\mathcal{D}}_{sync}$
@@ -781,7 +792,7 @@ stays above 7 nats everywhere, so even the best case leaves the correct answer
 below one chance in a thousand while the withdrawal notice sits in the prompt.
 Scale does not move it monotonically: within the GPT-2 family the value falls
 from 12.05 to 10.96 and then rises again to 11.91, so the 774M model is worse at
-this probe than the 355M one.
+this probe than the 355M one. Figure~\ref{fig:scale} shows the three curves.
 
 \paragraph{Some conflicts do resolve, which is what makes the metric useful.}
 The Twitter probe behaves in the opposite way. Within the GPT-2 family
