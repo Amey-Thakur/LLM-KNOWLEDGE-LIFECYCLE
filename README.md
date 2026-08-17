@@ -13,6 +13,10 @@
 [![Status](https://img.shields.io/badge/Status-Preprint_in_preparation-2EA043)](#read-the-paper)
 [![License](https://img.shields.io/badge/License-CC_BY_4.0-lightgrey)](LICENSE)
 
+[![Paper](https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE/actions/workflows/build-paper.yml/badge.svg)](https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE/actions/workflows/build-paper.yml)
+[![Slides](https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE/actions/workflows/build-slides.yml/badge.svg)](https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE/actions/workflows/build-slides.yml)
+[![Poster](https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE/actions/workflows/build-poster.yml/badge.svg)](https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE/actions/workflows/build-poster.yml)
+
 <br>
 
 <img src=".github/social-preview.png" alt="The Knowledge Lifecycle of Large Language Models. Five stages: acquire, store, retrieve, update, forget. Retrieval succeeds, resolution fails." width="820">
@@ -162,7 +166,19 @@ python experiments/dsync_experiment.py
 
  A laptop is enough: GPT-2 base at 124M parameters, chosen because it is small, fully open, and free of the instruction tuning that would confound the result.
 
-A [Kaggle notebook](https://www.kaggle.com/code/ameythakur20/cross-model-lifecycle-desynchronization) extends the same measurement across six models from 124M to 1.5B parameters, testing whether scale or instruction tuning makes the problem go away. It does not: no model answers the Vioxx probe correctly, and within the GPT-2 family the measurement is not even monotone in size, so the 774M model is worse at it than the 355M one. Other conflicts in the same set resolve cleanly, which is what shows the metric tracks the conflict rather than the difficulty of the question. The full table is Section 8.6 of the paper, and every measurement is in [`experiments/cross_model_dsync.csv`](experiments/cross_model_dsync.csv).
+### The cross-model notebook
+
+The [Kaggle notebook](https://www.kaggle.com/code/ameythakur20/cross-model-lifecycle-desynchronization) carries the same measurement across **six open models from 124M to 1.5B parameters** and three documented fact changes: eighteen measurements, deterministic, with two controls.
+
+| It answers | Result |
+| :--- | :--- |
+| Does scale resolve the conflict? | **No.** Inside the GPT-2 family the Vioxx probe runs 12.05 → 10.96 → 11.91 nats, and no model on the ladder answers it correctly. |
+| Does instruction tuning resolve it? | **On two probes of three.** The largest tuned model answers Twitter and Monarch and still answers Vioxx with *unsafe*. |
+| Was the answer out of reach, or the document unused? | **Unused.** Stating the answer outright is worth 7.7 to 10.6 nats to every model; the corrective document is worth at most 0.41 nats to any GPT-2. |
+
+Two controls make that last row possible: an irrelevant document matched in length and register, and a leak document that states the answer outright. On GPT-2 the irrelevant article about the Danube moves the output distribution **0.089** nats against the withdrawal notice's **0.033**, and the corrective document makes the *wrong* answer more likely on five of the six models.
+
+The estimator, and both controls, are Sarvesh Talele's.
 
 <br>
 
@@ -171,7 +187,7 @@ A [Kaggle notebook](https://www.kaggle.com/code/ameythakur20/cross-model-lifecyc
 
 <div align="center">
 
-[![Download the paper](https://img.shields.io/badge/Download-Paper_(PDF,_19_pages)-B31B1B?logo=adobeacrobatreader&logoColor=white)](paper/main.pdf)
+[![Download the paper](https://img.shields.io/badge/Download-Paper_(PDF,_20_pages)-B31B1B?logo=adobeacrobatreader&logoColor=white)](paper/main.pdf)
 &nbsp;
 [![Download the slides](https://img.shields.io/badge/Download-Slides_(PDF,_18_slides)-4A7FD4?logo=adobeacrobatreader&logoColor=white)](paper/presentation.pdf)
 

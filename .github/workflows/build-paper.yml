@@ -1,23 +1,34 @@
 # =============================================================================
-# Workflow    : Build Paper
+# Workflow    : Paper
 # Project     : The Knowledge Lifecycle of Large Language Models
-# Purpose     : Compile the manuscript, poster, and slide deck to PDF on every
-#               change, so broken LaTeX is caught at the commit that introduced
-#               it rather than at submission time.
+# Purpose     : Compile the manuscript to PDF on every change, so broken LaTeX is
+#               caught at the commit that introduced it rather than at
+#               submission time.
 # Repository  : https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE
 # License     : CC BY 4.0
 # =============================================================================
+#
+# One workflow per artefact, so the Actions tab shows three independent badges
+# and a broken poster never masks a working manuscript. The paths filters keep
+# a poster edit from rebuilding the paper and the reverse.
 
-name: Build Paper
+name: Paper
 
 on:
   push:
     paths:
-      - 'paper/**'
+      - 'paper/main.tex'
+      - 'paper/references.bib'
+      - 'paper/arxiv.sty'
+      - 'paper/figures/**'
+      - 'paper/*.png'
+      - 'paper/*.jpg'
       - '.github/workflows/build-paper.yml'
   pull_request:
     paths:
-      - 'paper/**'
+      - 'paper/main.tex'
+      - 'paper/references.bib'
+      - 'paper/figures/**'
   workflow_dispatch:
 
 jobs:
@@ -42,29 +53,3 @@ jobs:
         with:
           name: manuscript
           path: paper/main.pdf
-
-  companions:
-    name: Poster and slides
-    runs-on: ubuntu-latest
-    # Kept independent of the manuscript job: a broken poster should not mask a
-    # successful manuscript build, or the reverse.
-    steps:
-      - name: Check out the repository
-        uses: actions/checkout@v4
-
-      - name: Compile poster.tex and presentation.tex
-        uses: xu-cheng/latex-action@v3
-        with:
-          working_directory: paper
-          root_file: |
-            poster.tex
-            presentation.tex
-          args: -pdf -interaction=nonstopmode -file-line-error
-
-      - name: Upload the companions
-        uses: actions/upload-artifact@v4
-        with:
-          name: poster-and-slides
-          path: |
-            paper/poster.pdf
-            paper/presentation.pdf

@@ -1,0 +1,45 @@
+# =============================================================================
+# Workflow    : Slides
+# Project     : The Knowledge Lifecycle of Large Language Models
+# Purpose     : Compile the conference deck to PDF on every change to it.
+# Repository  : https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE
+# License     : CC BY 4.0
+# =============================================================================
+#
+# Independent of the manuscript and the poster: each artefact gets its own badge,
+# and a failure in one does not hide a success in another.
+
+name: Slides
+
+on:
+  push:
+    paths:
+      - 'paper/presentation.tex'
+      - 'paper/amey-thakur.jpg'
+      - 'paper/sarvesh-talele.jpg'
+      - '.github/workflows/build-slides.yml'
+  pull_request:
+    paths:
+      - 'paper/presentation.tex'
+  workflow_dispatch:
+
+jobs:
+  slides:
+    name: Slide deck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Compile presentation.tex
+        uses: xu-cheng/latex-action@v3
+        with:
+          working_directory: paper
+          root_file: presentation.tex
+          args: -pdf -interaction=nonstopmode -file-line-error
+
+      - name: Upload the slide deck
+        uses: actions/upload-artifact@v4
+        with:
+          name: slides
+          path: paper/presentation.pdf
