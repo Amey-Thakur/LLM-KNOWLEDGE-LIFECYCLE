@@ -79,7 +79,7 @@
 \maketitle
 
 \begin{abstract}
-Reasoning models and inference-time scaling have changed how large language models (LLMs) handle knowledge: earlier systems used static pipelines of retrieval-augmented generation (RAG), knowledge editing, and continual learning, while modern systems resolve conflicts during test-time compute. No unified formalism describes how knowledge persists, evolves, and is computed over across a model's lifespan. We introduce the \textbf{Knowledge Lifecycle}, which organizes LLM knowledge management into five stages: \textit{Acquisition}, \textit{Storage}, \textit{Retrieval}, \textit{Update}, and \textit{Forgetting}. We formalize the five stages and their cross-stage failure modes, showing that subfields addressing each stage in isolation leave the boundaries between them unstudied. We propose the \textbf{Provenance Vector} ($p$), which stores temporal and source metadata alongside parametric memories and gates stale activations at inference, and \textbf{Lifecycle Desynchronization} ($\mathcal{D}_{sync}$), a Kullback-Leibler metric for the failure that occurs when parametric weights and retrieved context conflict. In a reproducible probe of a documented drug withdrawal, GPT-2 gives the correct continuation probability $5.9 \times 10^{-6}$ with the withdrawal notice in context ($\mathcal{D}_{sync} = 12.05$ nats), while that context shifts its output distribution by $0.033$ nats. Across six open models from 124M to 1.5B parameters and three documented fact changes the conflict does not resolve with scale: no model answers the withdrawal probe correctly, and within one family the measurement is not monotone in size. Other conflicts in the same set do resolve, so the metric tracks the conflict rather than question difficulty. Wording matters too: across three phrasings per probe the Vioxx measurement has a median standard deviation of 5.14 nats and the phrasing reported here is the hardest for every model tested, so $\mathcal{D}_{sync}$ describes a conflict together with the query that probes it.
+Reasoning models and inference-time scaling have changed how large language models (LLMs) handle knowledge: conflicts once left to static pipelines of retrieval-augmented generation (RAG), knowledge editing, and continual learning are now resolved during test-time compute. No unified formalism describes how knowledge persists and evolves across a model's lifespan. We introduce the \textbf{Knowledge Lifecycle}, which organizes LLM knowledge management into five stages: \textit{Acquisition}, \textit{Storage}, \textit{Retrieval}, \textit{Update}, and \textit{Forgetting}. We formalize the five stages and their failure modes, showing that subfields working on one stage each leave the boundaries between them unstudied. We propose the \textbf{Provenance Vector} ($p$), which stores temporal and source metadata alongside parametric memories and gates stale activations at inference, and \textbf{Lifecycle Desynchronization} ($\mathcal{D}_{sync}$), a Kullback-Leibler metric for the failure when parametric weights and retrieved context conflict. In a reproducible probe of a documented drug withdrawal, GPT-2 gives the correct continuation probability $5.9 \times 10^{-6}$ with the withdrawal notice in context ($\mathcal{D}_{sync} = 12.05$ nats) while that context shifts its output distribution by $0.033$ nats. Across six open models from 124M to 1.5B parameters and three documented fact changes the conflict does not resolve with scale, and the corrective document makes the \textit{stale} answer more likely on five of the six. Other conflicts in the same set do resolve, so the metric tracks the conflict rather than question difficulty. Wording matters too: across three phrasings the Vioxx measurement has a median standard deviation of 5.14 nats and the phrasing used here is the hardest for every model, so $\mathcal{D}_{sync}$ describes a conflict together with the query that probes it.
 \end{abstract}
 
 \section*{List of Abbreviations}
@@ -825,11 +825,24 @@ document about the Danube moves the output distribution 0.089 nats against the
 withdrawal notice's 0.033, and an irrelevant document has the larger effect in
 2 of the 18 measurements.
 
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.86\linewidth]{figures/exposure.png}
+\caption{The exposure trap, measured across the ladder. Each bar is the surprisal
+of the \textit{stale} answer with the corrective document present, minus the same
+quantity without it, so a bar above zero means the document that corrects the fact
+made the wrong answer more likely. On the Vioxx probe this happens for five of the
+six models. The vertical axis is linear within one nat of zero and logarithmic
+outside it, because every positive value is under 0.8 nats while one negative bar
+reaches $-6$.}
+\label{fig:exposure}
+\end{figure}
+
 \paragraph{The exposure trap is the common case, not the exception.} Comparing
 the surprisal of the \textit{stale} answer with and without the corrective
 document, the document makes the stale answer \textit{more} likely on the Vioxx
-probe for 5 of the 6 models. Naming a fact, even to correct it,
-reinforces the association the model already holds. This is the effect that
+probe for 5 of the 6 models, shown in Figure~\ref{fig:exposure}. Naming a
+fact, even to correct it, reinforces the association the model already holds. This is the effect that
 \S\ref{sec:case_study} reports for a single model, measured across the ladder.
 
 \paragraph{How much of this is the question, and how much is the wording?} A
