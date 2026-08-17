@@ -8,33 +8,35 @@
 % License     : CC BY 4.0
 % =============================================================================
 %
-% GEOMETRY. A0 portrait is 84.1 x 118.9 cm. With a 15 mm inner margin the
-% usable width is 81.1 cm, so a half column is about 39.6 cm and a 0.38 column
-% about 30.1 cm. Hand-placed centimetre coordinates would therefore differ per
-% column and break the moment a column width changed. Every figure below is
-% instead drawn in its own arbitrary units and wrapped in
+% GEOMETRY. A0 portrait is 84.1 x 118.9 cm; with a 15 mm inner margin the usable
+% width is 81.1 cm. Every figure is drawn in its own arbitrary units and wrapped
+% in \resizebox{\linewidth}{!}{...}, so it scales to exactly the width of the
+% block containing it. Nothing can overflow sideways, and nothing can leave a
+% gap at the right edge, whatever the column split.
 %
-%     \resizebox{\linewidth}{!}{ ... }
-%
-% which scales it to exactly the width of whatever block contains it. Nothing
-% can overflow, and nothing can leave a gap at the right edge.
+% VERTICAL BUDGET. Roughly 110 cm of height after margins. The title takes about
+% 24 cm, leaving three content rows of about 28 cm each. An earlier draft ran two
+% rows past the bottom of the page, so the text below is deliberately spare: a
+% poster is read standing up, in under two minutes.
 %
 % READING ORDER runs down the page, not down each column: problem, framework,
-% evidence, the two contributions, then what to do next. A poster is read
-% standing up, so the finding takes the full width and the largest type.
+% evidence, then the contributions and how to check them.
 %
 % hyperref is deliberately absent: tikzposter applies its theme inside a group,
 % and hyperref fails there whether loaded before or after \usetheme. At A0 a
-% clickable link buys nothing, so URLs are set as plain text.
+% clickable link buys nothing, so URLs are plain text.
 
-\documentclass[25pt, a0paper, portrait, blockverticalspace=15mm, colspace=18mm,
+\documentclass[25pt, a0paper, portrait, blockverticalspace=12mm, colspace=16mm,
                subcolspace=8mm]{tikzposter}
 
 \usepackage{amsmath}
 \usepackage{amssymb}
-\usepackage{booktabs}
 \usepackage{tikz}
-\usetikzlibrary{arrows.meta, positioning, calc}
+\usetikzlibrary{arrows.meta, positioning, calc, decorations.pathreplacing}
+
+% Sans throughout. The figures are drawn in sans, and an earlier draft left the
+% body in the default serif, so the page read as two documents pasted together.
+\renewcommand{\familydefault}{\sfdefault}
 
 % --- the five lifecycle colors, identical across every surface ---------------
 \definecolor{acquire} {HTML}{4A7FD4}
@@ -48,31 +50,26 @@
 \definecolor{ok}      {HTML}{2E7D32}
 \definecolor{panel}   {HTML}{F7F7F9}
 
-% --- a white ground, so the stage colors are the only color on the page ------
 \usetheme{Default}
 \usebackgroundstyle{Empty}
 \usetitlestyle{Empty}
 
+% Minimal is the built-in style that rules under the block title. A custom style
+% was tried first and broke the build: its rule dereferences the blocktitle
+% node, which does not exist for a block with an empty title.
+\useblockstyle{Minimal}
+
 \colorlet{backgroundcolor}{white}
-\colorlet{framecolor}{white}
+\colorlet{framecolor}{acquire}
 \colorlet{blocktitlebgcolor}{white}
 \colorlet{blocktitlefgcolor}{ink}
 \colorlet{blockbodybgcolor}{white}
 \colorlet{blockbodyfgcolor}{ink}
-\colorlet{innerblocktitlebgcolor}{white}
-\colorlet{innerblocktitlefgcolor}{ink}
-\colorlet{innerblockbodybgcolor}{panel}
-\colorlet{innerblockbodyfgcolor}{ink}
 
-% Minimal is the built-in style that rules under the block title. A custom
-% style was tried first and broke the build: its rule dereferences the
-% blocktitle node, which does not exist for a block with an empty title.
-\useblockstyle{Minimal}
-\colorlet{framecolor}{acquire}
-
-% A circular author portrait at a fixed physical size, independent of column
-% width, so the two authors always match each other.
-\newcommand{\portrait}[2]{%  #1 = image file, #2 = diameter as a length
+% A circular portrait at a fixed physical size, so both authors always match.
+% #2 is a diameter and the radius is derived: width=2*#2 is not valid LaTeX
+% arithmetic and silently broke an earlier build.
+\newcommand{\portrait}[2]{%
   \begin{tikzpicture}
     \begin{scope}\clip (0,0) circle (\dimexpr#2/2\relax);
       \node at (0,0) {\includegraphics[width=#2]{#1}};\end{scope}
@@ -80,12 +77,12 @@
   \end{tikzpicture}%
 }
 
-% The five-stage identity band, drawn in arbitrary units and scaled by caller.
-\newcommand{\stageband}[1]{%
+% The identity band, drawn in arbitrary units and scaled by the caller.
+\newcommand{\stageband}{%
   \resizebox{\linewidth}{!}{%
     \begin{tikzpicture}
       \foreach \c [count=\i from 0] in {acquire, store, retrieve, update, forget}
-        \fill[\c] (\i*20, 0) rectangle (\i*20 + 20, #1);
+        \fill[\c] (\i*20, 0) rectangle (\i*20 + 20, 1.5);
     \end{tikzpicture}}%
 }
 
@@ -93,45 +90,37 @@
 \author{Amey Thakur \quad Sarvesh Talele}
 \institute{Independent Research}
 
-% Custom title: tikzposter places this block correctly on the page, so nothing
-% here needs an absolute coordinate.
 \settitle{
   \centering
-  \stageband{1.6}
-  \vspace{18mm}
-
-  {\fontsize{108}{120}\selectfont\bfseries\color{ink}
-   The Knowledge Lifecycle of Large Language Models\par}
+  \stageband
   \vspace{14mm}
 
-  {\fontsize{42}{54}\selectfont\color{muted}
-   A model holds two memories: what it learned in training, and what you put in
-   its prompt.\\
-   When they disagree, training usually wins, even when training is wrong.\par}
-  \vspace{18mm}
+  {\fontsize{104}{116}\selectfont\bfseries\color{ink}
+   The Knowledge Lifecycle of Large Language Models\par}
+  \vspace{10mm}
 
-  \begin{minipage}[c]{0.42\linewidth}
-    \raggedleft
-    \begin{minipage}[c]{4cm}\portrait{amey-thakur.jpg}{4cm}\end{minipage}%
-    \hspace{6mm}%
-    \begin{minipage}[c]{16cm}
-      \raggedright
-      {\fontsize{36}{42}\selectfont\bfseries\color{ink} Amey Thakur\par}
-      {\fontsize{28}{34}\selectfont\color{muted} Toronto, Canada\par}
+  {\fontsize{40}{50}\selectfont\color{muted}
+   A model holds two memories. When they disagree, training usually wins.\par}
+  \vspace{14mm}
+
+  \begin{minipage}[c]{0.40\linewidth}\raggedleft
+    \begin{minipage}[c]{4.4cm}\portrait{amey-thakur.jpg}{4cm}\end{minipage}%
+    \hspace{5mm}%
+    \begin{minipage}[c]{14cm}\raggedright
+      {\fontsize{34}{40}\selectfont\bfseries\color{ink} Amey Thakur\par}
+      {\fontsize{26}{32}\selectfont\color{muted} Toronto, Canada\par}
     \end{minipage}
   \end{minipage}%
-  \hspace{0.04\linewidth}%
-  \begin{minipage}[c]{0.42\linewidth}
-    \raggedright
-    \begin{minipage}[c]{4cm}\portrait{sarvesh-talele.jpg}{4cm}\end{minipage}%
-    \hspace{6mm}%
-    \begin{minipage}[c]{16cm}
-      \raggedright
-      {\fontsize{36}{42}\selectfont\bfseries\color{ink} Sarvesh Talele\par}
-      {\fontsize{28}{34}\selectfont\color{muted} Mumbai, India\par}
+  \hspace{0.06\linewidth}%
+  \begin{minipage}[c]{0.40\linewidth}\raggedright
+    \begin{minipage}[c]{4.4cm}\portrait{sarvesh-talele.jpg}{4cm}\end{minipage}%
+    \hspace{5mm}%
+    \begin{minipage}[c]{14cm}\raggedright
+      {\fontsize{34}{40}\selectfont\bfseries\color{ink} Sarvesh Talele\par}
+      {\fontsize{26}{32}\selectfont\color{muted} Mumbai, India\par}
     \end{minipage}
   \end{minipage}
-  \vspace{10mm}
+  \vspace{6mm}
 }
 
 \begin{document}
@@ -142,280 +131,237 @@
 % ROW 1  |  the problem, and the framework that answers it
 % =============================================================================
 \begin{columns}
-\column{0.44}
+\column{0.42}
 \block{The problem}{
-  Research on how a language model handles a fact is split across
-  \textbf{five separate communities} that rarely cite one another.
-  \vspace{8mm}
-
-  \resizebox{\linewidth}{!}{%
-  \begin{tikzpicture}[font=\sffamily]
-    \foreach \n [count=\i from 0] in
-      {retrieval-augmented generation, knowledge editing, continual learning,
-       context engineering, agent memory}
-      \node[anchor=west, text=ink] at (1.4, -\i*1.5) {\n};
-    \foreach \c [count=\i from 0] in {acquire, store, retrieve, update, forget}
-      \fill[\c] (0, -\i*1.5 - 0.25) rectangle (0.75, -\i*1.5 + 0.35);
-    \useasboundingbox (0,-6.6) rectangle (22, 0.6);
-  \end{tikzpicture}}
-  \vspace{10mm}
-
-  Each has its own benchmarks, and each passes them. A deployed system can pass
-  \textbf{all five} and still fail, because nothing tests what happens
-  \textbf{between} them.
-  \vspace{10mm}
+  How a language model handles a fact is studied by \textbf{five separate
+  communities} that rarely cite one another.
+  \vspace{6mm}
 
   \resizebox{\linewidth}{!}{%
   \begin{tikzpicture}
-    \fill[panel] (0,0) rectangle (30, 7.2);
-    \fill[acquire] (0,0) rectangle (0.42, 7.2);
-    \node[anchor=west, align=left, text width=27cm, font=\sffamily] at (1.6, 3.6)
-      {Across \textbf{20 representative papers}, the median covers \textbf{two}
-       of the five stages. The boundaries are where deployment breaks, and where
-       almost nobody is looking.};
+    \foreach \n [count=\i from 0] in
+      {retrieval-augmented generation, knowledge editing, continual learning,
+       context engineering, agent memory}
+      \node[anchor=west, text=ink] at (1.3, -\i*1.45) {\n};
+    \foreach \c [count=\i from 0] in {acquire, store, retrieve, update, forget}
+      \fill[\c] (0, -\i*1.45 - 0.22) rectangle (0.72, -\i*1.45 + 0.34);
+    \useasboundingbox (0,-6.3) rectangle (21, 0.6);
+  \end{tikzpicture}}
+  \vspace{7mm}
+
+  Each has its own benchmarks, and each passes them. A system can pass
+  \textbf{all five} and still fail, because nothing tests what happens
+  \textbf{between} them.
+  \vspace{7mm}
+
+  \resizebox{\linewidth}{!}{%
+  \begin{tikzpicture}
+    \fill[panel]   (0,0) rectangle (30, 5.6);
+    \fill[acquire] (0,0) rectangle (0.40, 5.6);
+    \node[anchor=west, align=left, text width=27cm] at (1.5, 2.8)
+      {Across \textbf{20 representative papers} the median covers \textbf{two}
+       of the five stages.};
   \end{tikzpicture}}
 }
 
-\column{0.56}
+\column{0.58}
 \block{The framework}{
   A fact passes through five stages. Naming them as one lifecycle is what makes
   the boundaries between them visible.
-  \vspace{10mm}
+  \vspace{7mm}
 
   \resizebox{\linewidth}{!}{%
   \begin{tikzpicture}[
-    font=\sffamily,
-    stage/.style={rounded corners=3pt, minimum width=7.6cm, minimum height=4.4cm,
-                  text=white, font=\sffamily\bfseries\Large, align=center},
+    stage/.style={rounded corners=3pt, minimum width=7.8cm, minimum height=4.2cm,
+                  text=white, font=\bfseries\Large, align=center},
     flow/.style={-{Stealth[length=6mm, width=4mm]}, line width=3pt, muted}
   ]
-    \node[stage, fill=acquire]  (a) at (0,0)      {Acquire};
-    \node[stage, fill=store]    (s) at (9.6,0)    {Store};
-    \node[stage, fill=retrieve] (r) at (19.2,0)   {Retrieve};
-    \node[stage, fill=update]   (u) at (28.8,0)   {Update};
-    \node[stage, fill=forget]   (f) at (38.4,0)   {Forget};
+    \node[stage, fill=acquire]  (a) at (0,0)    {Acquire};
+    \node[stage, fill=store]    (s) at (9.8,0)  {Store};
+    \node[stage, fill=retrieve] (r) at (19.6,0) {Retrieve};
+    \node[stage, fill=update]   (u) at (29.4,0) {Update};
+    \node[stage, fill=forget]   (f) at (39.2,0) {Forget};
 
     \draw[flow] (a) -- (s);
     \draw[flow] (s) -- (r);
+    \draw[flow] (r) -- (u);
     \draw[flow] (u) -- (f);
 
-    % The conflict lives on one specific boundary, so it is drawn, not described.
-    \draw[{Stealth[length=6mm]}-{Stealth[length=6mm]}, line width=5pt, update]
-      (r) -- node[above=4mm, font=\sffamily\bfseries\large, text=update] {conflict} (u);
+    \node[below=4mm of a, text=muted] {training};
+    \node[below=4mm of s, text=muted] {weights, index};
+    \node[below=4mm of r, text=muted] {attention, RAG};
+    \node[below=4mm of u, text=muted] {editing, tuning};
+    \node[below=4mm of f, text=muted] {unlearning};
 
-    \node[below=5mm of a, text=muted, font=\sffamily\small] {training};
-    \node[below=5mm of s, text=muted, font=\sffamily\small] {weights, index};
-    \node[below=5mm of r, text=muted, font=\sffamily\small] {attention, RAG};
-    \node[below=5mm of u, text=muted, font=\sffamily\small] {editing, tuning};
-    \node[below=5mm of f, text=muted, font=\sffamily\small] {unlearning};
+    % The conflict spans two stages, so it is a brace beneath them rather than a
+    % label on the arrow between them, where it collided with the Update box.
+    \draw[update, line width=3pt, decorate,
+          decoration={brace, mirror, amplitude=8mm}]
+      ([xshift=-3.9cm, yshift=-2.7cm]r.south) -- ([xshift=3.9cm, yshift=-2.7cm]u.south);
+    \node[text=update, font=\bfseries\Large] at (24.5, -6.6) {conflict};
+    \useasboundingbox (-4.5,-7.8) rectangle (43.7, 2.6);
   \end{tikzpicture}}
-  \vspace{12mm}
+  \vspace{7mm}
 
-  The failure measured on this poster sits between
-  \textcolor{retrieve}{\textbf{Retrieve}} and \textcolor{update}{\textbf{Update}}:
-  the document arrives, and nothing in the architecture tells the model which
-  copy of the fact to trust. That boundary belongs to neither field beside it,
-  which is exactly why it goes untested.
+  The failure below sits between \textcolor{retrieve}{\textbf{Retrieve}} and
+  \textcolor{update}{\textbf{Update}}: the document arrives, and nothing tells
+  the model which copy of the fact to trust. That boundary belongs to neither
+  field beside it, which is why it goes untested.
 }
 \end{columns}
 
 % =============================================================================
-% ROW 2  |  the finding, full width, the largest type on the page
+% ROW 2  |  the finding, full width, largest type on the page
 % =============================================================================
 \block{The finding}{
-  Rofecoxib, sold as Vioxx, was withdrawn worldwide in September 2004 after
-  trials showed it raised the risk of heart attack and stroke. Put that
-  withdrawal notice \textbf{directly into GPT-2's prompt}, then ask whether the
-  drug is safe to prescribe.
-  \vspace{12mm}
+  Vioxx was withdrawn worldwide in September 2004 for raising the risk of heart
+  attack and stroke. Put that withdrawal notice \textbf{directly into GPT-2's
+  prompt}, then ask whether the drug is safe to prescribe.
+  \vspace{8mm}
 
   \resizebox{\linewidth}{!}{%
-  \begin{tikzpicture}[font=\sffamily]
-    % column headers
-    \node[anchor=west, text=muted] at (14, 6.2) {without the notice};
-    \node[anchor=west, text=muted] at (30, 6.2) {with the notice in the prompt};
+  \begin{tikzpicture}
+    \node[anchor=west, text=muted] at (14, 6.0) {without the notice};
+    \node[anchor=west, text=muted] at (30, 6.0) {with the notice in the prompt};
 
-    % "safe", the wrong answer, which gets stronger
-    \node[anchor=west, font=\sffamily\bfseries\Large, text=update] at (0, 3.6) {``safe''};
+    \node[anchor=west, font=\bfseries\Large, text=update] at (0, 3.6) {``safe''};
     \fill[update!45] (14, 2.9) rectangle (14 + 5.63, 4.3);
-    \node[anchor=west, font=\sffamily\bfseries, text=update] at (20.1, 3.6) {37.53\%};
+    \node[anchor=west, font=\bfseries, text=update] at (20.2, 3.6) {37.53\%};
     \fill[update]    (30, 2.9) rectangle (30 + 6.39, 4.3);
-    \node[anchor=west, font=\sffamily\bfseries, text=update] at (36.9, 3.6) {42.58\%};
+    \node[anchor=west, font=\bfseries, text=update] at (37.0, 3.6) {42.58\%};
 
-    % "withdrawn", the right answer. At the same scale its bar would be 1/70,967
-    % the width of the one above, far below one printed pixel, so a tick marks
-    % the origin instead of a bar. Drawing a visible sliver here would overstate
-    % the result by three orders of magnitude.
-    \node[anchor=west, font=\sffamily\bfseries\Large, text=ok] at (0, 0.9) {``withdrawn''};
+    % At this scale the correct answer's bar is 1/70,967 the width of the one
+    % above, far below a printed pixel, so a tick marks its origin. Drawing a
+    % visible sliver would overstate the result by three orders of magnitude.
+    \node[anchor=west, font=\bfseries\Large, text=ok] at (0, 0.9) {``withdrawn''};
     \draw[ok, line width=2.5pt] (14, 0.2) -- (14, 1.6);
-    \node[anchor=west, font=\sffamily\bfseries, text=ok] at (20.1, 0.9) {0.0004\%};
+    \node[anchor=west, font=\bfseries, text=ok] at (20.2, 0.9) {0.0004\%};
     \draw[ok, line width=2.5pt] (30, 0.2) -- (30, 1.6);
-    \node[anchor=west, font=\sffamily\bfseries, text=ok] at (36.9, 0.9) {0.0006\%};
+    \node[anchor=west, font=\bfseries, text=ok] at (37.0, 0.9) {0.0006\%};
 
-    \node[anchor=west, text=muted, font=\sffamily\small] at (0, -1.7)
-      {Bars are true to scale at 0.15 units per percentage point. The correct
-       answer's bar would be 1/70{,}967 the width of the one above it, so only a
-       tick marks where it begins.};
-    \useasboundingbox (0,-2.8) rectangle (46, 7);
+    \node[anchor=west, text=muted, font=\small] at (0, -1.4)
+      {Bars true to scale. The correct answer's bar would be 1/70{,}967 the width
+       of the one above it, so a tick marks where it begins.};
+    \useasboundingbox (0,-2.2) rectangle (46, 6.6);
   \end{tikzpicture}}
-  \vspace{14mm}
+  \vspace{9mm}
 
   \resizebox{\linewidth}{!}{%
-  \begin{tikzpicture}[font=\sffamily]
-    \fill[panel] (0,0) rectangle (46, 11);
-    \fill[update] (0,0) rectangle (0.5, 11);
-    \node[anchor=north west, align=left, text width=42cm] at (2, 9.6)
-      {\bfseries\Large The correction is in the prompt, and the model's confidence
-       that the drug is safe \textcolor{update}{goes up}.};
-    \node[anchor=north west, align=left, text width=42cm, text=muted] at (2, 5.4)
-      {This is not hallucination. Retrieval worked: the right document was found
-       and delivered. What failed is the step after it, where the model must
+  \begin{tikzpicture}
+    \fill[panel]  (0,0) rectangle (46, 7.4);
+    \fill[update] (0,0) rectangle (0.45, 7.4);
+    \node[anchor=north west, align=left, text width=42.5cm] at (1.8, 6.4)
+      {\bfseries\Large The correction is in the prompt, and confidence that the
+       drug is safe \textcolor{update}{goes up}.};
+    \node[anchor=north west, align=left, text width=42.5cm, text=muted] at (1.8, 3.4)
+      {Retrieval worked. What failed is the step after it, where the model must
        decide which of its two memories to believe.};
   \end{tikzpicture}}
 }
 
 % =============================================================================
-% ROW 3  |  the two contributions, evenly split
+% ROW 3  |  the two contributions, and how to check the work
 % =============================================================================
 \begin{columns}
-\column{0.5}
-\block{Contribution 1: a metric}{
+\column{0.34}
+\block{A metric}{
   \textbf{Lifecycle Desynchronization} is the surprisal of the \textbf{correct}
   answer while the corrective document is present:
-  \vspace{6mm}
-  \begin{equation*}
-    \widehat{\mathcal{D}}_{sync}
-      = -\ln P\!\left(y^{*} \mid q,\, \theta_{stale},\, \mathcal{M}_{now}\right)
-  \end{equation*}
   \vspace{4mm}
+  \begin{equation*}
+    \widehat{\mathcal{D}}_{sync} = -\ln P\!\left(y^{*} \mid q,\, \theta_{stale},\, \mathcal{M}_{now}\right)
+  \end{equation*}
+  \vspace{2mm}
 
-  Measured in nats: $n$ nats means the correct answer holds probability
-  $e^{-n}$. Past \textbf{9.2} nats it is below one chance in ten thousand, where
-  no realistic decoding recovers it.
-  \vspace{10mm}
+  In nats: $n$ nats means probability $e^{-n}$. Past \textbf{9.2} it is below one
+  chance in ten thousand.
+  \vspace{7mm}
 
   \resizebox{\linewidth}{!}{%
-  \begin{tikzpicture}[font=\sffamily]
-    \fill[ok!30]     (0,0)  rectangle (2.3, 1.5);
-    \fill[yellow!45] (2.3,0) rectangle (9.2, 1.5);
-    \fill[orange!45] (9.2,0) rectangle (16.1, 1.5);
+  \begin{tikzpicture}
+    \fill[ok!30]     (0,0)    rectangle (2.3, 1.5);
+    \fill[yellow!45] (2.3,0)  rectangle (9.2, 1.5);
+    \fill[orange!45] (9.2,0)  rectangle (16.1, 1.5);
     \fill[update!45] (16.1,0) rectangle (24, 1.5);
     \draw[ink, line width=5pt] (21.1, -0.5) -- (21.1, 2.0);
-    \node[text=muted, font=\sffamily\small] at (2.3, -1.4)  {0.7};
-    \node[text=muted, font=\sffamily\small] at (9.2, -1.4)  {4.6};
-    \node[text=muted, font=\sffamily\small] at (16.1, -1.4) {9.2};
-    \node[font=\sffamily\bfseries] at (21.1, -1.4) {12.05};
-    \node[anchor=west, text=muted, font=\sffamily\small] at (0, 2.9) {synchronized};
-    \node[anchor=east, text=muted, font=\sffamily\small] at (24, 2.9) {unrecoverable};
-    \useasboundingbox (0,-2.2) rectangle (24, 3.6);
+    \node[text=muted, font=\small] at (2.3, -1.3)  {0.7};
+    \node[text=muted, font=\small] at (9.2, -1.3)  {4.6};
+    \node[text=muted, font=\small] at (16.1, -1.3) {9.2};
+    \node[font=\bfseries] at (21.1, -1.3) {12.05};
+    \useasboundingbox (0,-2.1) rectangle (24, 2.4);
   \end{tikzpicture}}
-  \vspace{12mm}
+  \vspace{7mm}
 
-  A companion diagnostic, \textbf{context influence}, asks whether the document
-  moved the model \textit{at all}. On this probe it is \textbf{0.033} nats: the
-  document is present and \textbf{inert}. The pair separates a retrieval failure
-  from a resolution failure, which no single-stage benchmark can do.
+  A companion number, \textbf{context influence}, asks whether the document moved
+  the model at all. Here it is \textbf{0.033} nats: present, and \textbf{inert}.
 }
 
-\column{0.5}
-\block{Contribution 2: an architecture}{
-  Parametric storage records \textbf{what} is true but never \textbf{when} it was
-  learned or \textbf{where} it came from, so at inference there is no principled
-  basis for preferring fresh evidence over a confident old memory.
-  \vspace{10mm}
+\column{0.34}
+\block{An architecture}{
+  Storage records \textbf{what} is true but never \textbf{when} it was learned,
+  so nothing lets the model prefer fresh evidence over a confident old memory.
+  \vspace{7mm}
 
   \resizebox{\linewidth}{!}{%
   \begin{tikzpicture}[
-    font=\sffamily,
-    slot/.style={rounded corners=3pt, minimum width=7.4cm, minimum height=3.6cm,
-                 align=center, draw=hairline, line width=2.5pt, font=\sffamily\Large}
+    slot/.style={rounded corners=3pt, minimum width=7.2cm, minimum height=3.4cm,
+                 align=center, draw=hairline, line width=2.5pt, font=\Large}
   ]
-    \node[slot] (k) at (0,0)    {key $k_i$};
-    \node[slot] (v) at (9,0)    {value $v_i$};
-    \node[slot, draw=acquire, fill=acquire!12, text=acquire] (p) at (18,0)
+    \node[slot] (k) at (0,0)   {key $k_i$};
+    \node[slot] (v) at (8.6,0) {value $v_i$};
+    \node[slot, draw=acquire, fill=acquire!12, text=acquire] (p) at (17.2,0)
       {\textbf{provenance} $p_i$};
     \draw[-{Stealth[length=5mm]}, muted, line width=2.5pt] (k) -- (v);
     \draw[-{Stealth[length=5mm]}, acquire, line width=3.5pt] (v) -- (p);
-    \node[below=4mm of k, text=muted, font=\sffamily\small] {stored today};
-    \node[below=4mm of p, text=acquire, font=\sffamily\small] {what we add};
-    \useasboundingbox (-4.2,-4.4) rectangle (22.2, 2.2);
+    \node[below=3mm of p, text=acquire, font=\small] {what we add};
+    \useasboundingbox (-4,-3.6) rectangle (21.2, 2);
   \end{tikzpicture}}
-  \vspace{12mm}
+  \vspace{7mm}
 
-  The \textbf{Provenance Vector} attaches acquisition time and source reliability
-  to every memory slot. A gate reads that metadata at inference and attenuates
-  facts that have gone stale:
-  \vspace{4mm}
+  The \textbf{Provenance Vector} attaches acquisition time to every memory slot.
+  A gate reads it at inference and mutes facts that have gone stale:
+  \vspace{3mm}
   \begin{equation*}
-    \text{FFN}_{steered}(x) = \sum_{i=1}^{d_m} S(\Delta\tau_i)\, f(x \cdot k_i)\, v_i,
-    \qquad S(\Delta\tau_i) = \sigma(\gamma - \beta\,\Delta\tau_i)
+    S(\Delta\tau_i) = \sigma(\gamma - \beta\,\Delta\tau_i)
   \end{equation*}
-  \vspace{4mm}
+  \vspace{3mm}
 
-  Fresh facts pass with $S \approx 1$; stale facts are muted toward $0$.
-  \textbf{The weights are never modified}, so the specificity bottleneck that
-  limits static editing does not apply. Cost: under \textbf{0.02\%} extra
-  parameters on a 7B model.
-}
-\end{columns}
-
-% =============================================================================
-% ROW 4  |  honesty, and how to check the work
-% =============================================================================
-\begin{columns}
-\column{0.58}
-\block{What is measured, and what is proposed}{
-  \resizebox{\linewidth}{!}{%
-  \begin{tikzpicture}[font=\sffamily]
-    \fill[ok!10] (0,0) rectangle (21, 10.5);
-    \fill[ok]    (0,0) rectangle (0.42, 10.5);
-    \node[anchor=north west, text=ok, font=\sffamily\bfseries\Large] at (1.6, 9.3) {Measured};
-    \node[anchor=north west, align=left, text width=18cm] at (1.6, 7.2)
-      {The metric, on a real model, deterministically. No sampling anywhere, so
-       the digits are identical on every machine and every run.};
-
-    \fill[panel] (24,0) rectangle (45, 10.5);
-    \fill[muted] (24,0) rectangle (24.42, 10.5);
-    \node[anchor=north west, text=muted, font=\sffamily\bfseries\Large] at (25.6, 9.3) {Proposed};
-    \node[anchor=north west, align=left, text width=18cm] at (25.6, 7.2)
-      {The architecture, with an idealized proof under stated assumptions. It has
-       \textbf{not} been trained, and the paper says so in its limitations.};
-  \end{tikzpicture}}
-  \vspace{10mm}
-
-  Stating the limitation is the point. The measurement stands on its own, and the
-  architecture is offered as a direction rather than as a result.
+  \textbf{Weights are never modified}, so the specificity bottleneck that limits
+  static editing does not apply. Under \textbf{0.02\%} extra parameters.
 }
 
-\column{0.42}
+\column{0.32}
 \block{Check it yourself}{
-  Every number on this poster comes from \textbf{one deterministic script}.
-  \vspace{8mm}
+  Every number here comes from \textbf{one deterministic script}. No sampling, so
+  the digits are identical on any machine.
+  \vspace{7mm}
 
   \resizebox{\linewidth}{!}{%
   \begin{tikzpicture}[font=\ttfamily]
-    \fill[panel] (0,0) rectangle (26, 5.4);
-    \node[anchor=west] at (1.3, 3.6) {pip install torch transformers};
-    \node[anchor=west] at (1.3, 1.7) {python dsync\_experiment.py};
+    \fill[panel] (0,0) rectangle (26, 5.2);
+    \node[anchor=west] at (1.2, 3.5) {pip install torch transformers};
+    \node[anchor=west] at (1.2, 1.7) {python dsync\_experiment.py};
   \end{tikzpicture}}
-  \vspace{10mm}
+  \vspace{7mm}
 
-  GPT-2 base, 124M parameters: small, fully open, and free of the instruction
-  tuning that would confound the result. A laptop is enough.
+  GPT-2 base, 124M parameters: small, fully open, no instruction tuning to
+  confound the result. A laptop is enough.
+  \vspace{7mm}
+
+  {\color{muted}
+   The metric is \textbf{measured}. The architecture is \textbf{proposed}, with an
+   idealized proof under stated assumptions, and has not been trained. The paper
+   says so in its limitations.\par}
   \vspace{8mm}
 
-  An interactive demonstration runs GPT-2 \textbf{entirely in the browser}, with
-  no installation and no account. Nothing typed into it leaves the machine.
-  \vspace{10mm}
-
   \resizebox{\linewidth}{!}{%
-  \begin{tikzpicture}[font=\sffamily]
-    \draw[hairline, line width=3pt] (0, 5.6) -- (26, 5.6);
-    \node[anchor=north west, align=left, text=muted, text width=25cm] at (0, 4.8)
+  \begin{tikzpicture}
+    \draw[hairline, line width=3pt] (0, 6.0) -- (26, 6.0);
+    \node[anchor=north west, align=left, text=muted, text width=25.4cm] at (0, 5.2)
       {\textbf{Paper and code}\\ github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE};
-    \node[anchor=north west, align=left, text=muted, text width=25cm] at (0, 1.9)
+    \node[anchor=north west, align=left, text=muted, text width=25.4cm] at (0, 2.3)
       {\textbf{Live demonstration}\\ huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle};
-    \useasboundingbox (0,-1.4) rectangle (26, 6);
+    \useasboundingbox (0,-1.0) rectangle (26, 6.4);
   \end{tikzpicture}}
 }
 \end{columns}
@@ -425,12 +371,11 @@
 % =============================================================================
 \block{}{
   \centering
-  {\color{muted}
+  {\color{muted}\normalsize
    Amey Thakur \; ORCID 0000-0001-5644-1575 \quad$\cdot$\quad
-   Sarvesh Talele \; ORCID 0009-0002-0818-461X \quad$\cdot$\quad
-   CC BY 4.0\par}
-  \vspace{10mm}
-  \stageband{1.6}
+   Sarvesh Talele \; ORCID 0009-0002-0818-461X \quad$\cdot$\quad CC BY 4.0\par}
+  \vspace{7mm}
+  \stageband
 }
 
 \end{document}
