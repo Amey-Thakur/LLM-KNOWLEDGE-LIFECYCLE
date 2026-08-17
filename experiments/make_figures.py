@@ -18,9 +18,9 @@ Colours are the five lifecycle colours used by the paper, the poster, the slides
 and the demonstration. A probe takes the colour of the stage boundary it sits
 on, so vioxx is Update red wherever it appears.
 
-Legends sit below the axes rather than inside them. Placed inside, the legend
-landed against the title on the help chart and against the tallest bars on the
-exposure chart, and a legend that overlaps the data is worse than no legend.
+Legends sit below the axes. Inside the axes they collide with the title on the
+help chart and with the tallest bars on the exposure chart, and a legend that
+covers the data is worse than no legend.
 """
 
 import pathlib
@@ -63,9 +63,9 @@ W = 0.26
 def finish(fig, ax, name, ncol=3, title=None, subtitle=None):
     """One title, one optional subtitle, one legend under the axes."""
     if title:
-        ax.set_title(title, fontweight="bold", pad=16 if subtitle else 10)
+        ax.set_title(title, fontweight="bold", pad=28 if subtitle else 10)
     if subtitle:
-        ax.text(0.5, 1.015, subtitle, transform=ax.transAxes, ha="center",
+        ax.text(0.5, 1.022, subtitle, transform=ax.transAxes, ha="center",
                 va="bottom", fontsize=9.5, color=MUTED)
     ax.grid(alpha=0.35, linewidth=0.7)
     handles, labels = ax.get_legend_handles_labels()
@@ -93,6 +93,11 @@ ax.text(0.985, 9.2, " 9.2 nats ", transform=ax.get_yaxis_transform(),
         ha="right", va="bottom", fontsize=9, color=MUTED,
         bbox=dict(facecolor="white", edgecolor="none", pad=1.5))
 ax.set_xscale("log")
+# Ticks at the six sizes the line passes through. A bare log axis labels decades,
+# and the only decade inside this range is 1000, which names none of the models.
+ax.set_xticks(sorted(df.params_M.unique()))
+ax.set_xticklabels([f"{int(v)}" for v in sorted(df.params_M.unique())], fontsize=9)
+ax.tick_params(axis="x", which="minor", bottom=False)
 ax.set_xlabel("parameters (millions, log scale)")
 ax.set_ylabel(r"$\mathcal{D}_{sync}$ (nats)")
 ax.set_ylim(bottom=0)
@@ -124,6 +129,13 @@ for i, probe in enumerate(PROBE):
 ax.axhline(0, color=INK, linewidth=1.2, zorder=4)
 ax.set_xticks(list(XS)); ax.set_xticklabels(SHORT, fontsize=8.5)
 ax.set_ylabel("nats moved toward the stale answer")
+# Symlog, linear within one nat of zero and logarithmic outside it. The trap is
+# the positive side, and every positive value here is under 0.8 nats against a
+# negative bar near -6, so a linear axis renders the finding a few pixels tall.
+ax.set_yscale("symlog", linthresh=1.0, linscale=1.4)
+ax.set_yticks([-6, -4, -2, -1, -0.5, 0, 0.5, 1])
+ax.set_yticklabels(["-6", "-4", "-2", "-1", "-0.5", "0", "0.5", "1"], fontsize=9)
+ax.axhspan(0, 1, color=UPDATE, alpha=0.05, zorder=1)
 finish(fig, ax, "exposure.png",
        title="The exposure trap",
        subtitle="above zero, the corrective document made the wrong answer more likely")
@@ -137,16 +149,12 @@ for probe in PROBE:
     g = df[df.probe == probe]
     ax.scatter(g.I_irrelevant_nats, g.I_ctx_nats, s=120, color=PROBE[probe],
                edgecolor=INK, linewidth=0.7, label=probe, zorder=3)
-ax.annotate("the correction did more\nthan any document would",
-            xy=(lim * 0.30, lim * 0.72), fontsize=9.5, color=MUTED, ha="center")
-ax.annotate("a Danube article\ndid more", xy=(lim * 0.72, lim * 0.22),
-            fontsize=9.5, color=MUTED, ha="center")
 ax.set_xscale("symlog", linthresh=0.05); ax.set_yscale("symlog", linthresh=0.05)
 ax.set_xlim(0, lim); ax.set_ylim(0, lim)
-ax.set_xlabel(r"$\mathcal{I}$ from an irrelevant document (nats)")
-ax.set_ylabel(r"$\mathcal{I}_{ctx}$ from the corrective document (nats)")
+ax.set_xlabel(r"$\mathcal{I}$ from an irrelevant document (nats, log scale)")
+ax.set_ylabel(r"$\mathcal{I}_{ctx}$ from the corrective document (nats, log scale)")
 finish(fig, ax, "control.png",
        title="Was it this document, or would any document have done?",
-       subtitle="log scale on both axes")
+       subtitle="above the line the correction moved the model more; below it, a Danube article did")
 
 print(f"\n  four figures written to {OUT}")
