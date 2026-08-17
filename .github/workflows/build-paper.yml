@@ -16,13 +16,15 @@ name: Paper
 
 on:
   push:
+    # Only what main.tex actually reads. An earlier version globbed paper/*.png
+    # and paper/*.jpg, which matched the poster's portraits and the slide
+    # portraits, so every poster edit rebuilt the paper as well.
     paths:
       - 'paper/main.tex'
       - 'paper/references.bib'
       - 'paper/arxiv.sty'
+      - 'paper/orcid.png'
       - 'paper/figures/**'
-      - 'paper/*.png'
-      - 'paper/*.jpg'
       - '.github/workflows/build-paper.yml'
   pull_request:
     paths:
