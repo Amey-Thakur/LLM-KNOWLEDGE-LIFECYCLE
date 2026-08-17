@@ -54,15 +54,27 @@
 
 This paper's contribution is a single frame for a problem the field has split five ways. A fact inside a language model passes through five stages, and each one is studied by a different research community that rarely cites the others.
 
-| | Stage | What happens to the fact |
-| :---: | :--- | :--- |
-| **1** | **Acquire** | Training compresses a corpus into the weights |
-| **2** | **Store** | It lives in the weights, in an external index, or in both |
-| **3** | **Retrieve** | Attention recalls it, or a search pipeline fetches a document |
-| **4** | **Update** | The world changes, and the stored copies must change with it |
-| **5** | **Forget** | It is removed on purpose, or lost by accident |
+<div align="center">
 
-Every stage has its own benchmarks, and a system can pass all of them separately while failing exactly where they meet. Those boundaries are what the lifecycle frame makes visible, and the failure below sits on one of them, between **Retrieve** and **Update**.
+![Acquire](https://img.shields.io/badge/1-Acquire-4A7FD4?style=for-the-badge)
+![Store](https://img.shields.io/badge/2-Store-2A9D8F?style=for-the-badge)
+![Retrieve](https://img.shields.io/badge/3-Retrieve-E08A2E?style=for-the-badge)
+![Update](https://img.shields.io/badge/4-Update-D05353?style=for-the-badge)
+![Forget](https://img.shields.io/badge/5-Forget-8F5FB8?style=for-the-badge)
+
+</div>
+
+<br>
+
+| Stage | What happens to the fact | Studied as |
+| :--- | :--- | :--- |
+| ![](https://img.shields.io/badge/-4A7FD4?style=flat-square) **Acquire** | Training compresses a corpus into the weights | Pre-training, fine-tuning |
+| ![](https://img.shields.io/badge/-2A9D8F?style=flat-square) **Store** | It lives in the weights, in an external index, or in both | Parametric memory, vector databases |
+| ![](https://img.shields.io/badge/-E08A2E?style=flat-square) **Retrieve** | Attention recalls it, or a search pipeline fetches a document | Retrieval-augmented generation |
+| ![](https://img.shields.io/badge/-D05353?style=flat-square) **Update** | The world changes, and the stored copies must change with it | Knowledge editing, continual learning |
+| ![](https://img.shields.io/badge/-8F5FB8?style=flat-square) **Forget** | It is removed on purpose, or lost by accident | Machine unlearning, catastrophic forgetting |
+
+Every stage has its own benchmarks, and a system can pass all of them separately while failing exactly where they meet. Those boundaries are what the lifecycle frame makes visible, and the failure below sits on one of them, between ![](https://img.shields.io/badge/-E08A2E?style=flat-square) **Retrieve** and ![](https://img.shields.io/badge/-D05353?style=flat-square) **Update**.
 
 Mapping twenty representative papers onto the five stages, the median covers **two**. The boundaries are where deployment breaks, and where almost nobody is looking.
 
@@ -97,9 +109,9 @@ The root cause is what training throws away. A model learns *what* is true but n
 <a name="what-we-contribute"></a>
 ## What we contribute
 
-**A metric that makes the failure visible.** Lifecycle Desynchronization measures how far the correct answer has been pushed down while the corrective document is present. It is reported in nats, a unit that converts straight back to probability: 12.05 nats means the right answer holds about six chances in a million. A companion number measures whether the document moved the model at all, which separates a retrieval failure from a resolution failure. No single-stage benchmark can tell those two apart.
+![](https://img.shields.io/badge/-E08A2E?style=flat-square)![](https://img.shields.io/badge/-D05353?style=flat-square) &nbsp; **A metric that makes the failure visible.** Lifecycle Desynchronization measures how far the correct answer has been pushed down while the corrective document is present. It is reported in nats, a unit that converts straight back to probability: 12.05 nats means the right answer holds about six chances in a million. A companion number measures whether the document moved the model at all, which separates a retrieval failure from a resolution failure. No single-stage benchmark can tell those two apart.
 
-**An architecture that targets the cause.** The Provenance Vector attaches metadata to each stored fact recording when it was learned and how reliable its source was. At inference, a gate reads that metadata and turns down facts that have gone stale, so a fresh document can win without anyone editing the weights. The paper gives the forward pass as an algorithm, derives the cost at under 0.02% extra parameters, and proves the idealized case under assumptions it states openly.
+![](https://img.shields.io/badge/-4A7FD4?style=flat-square)![](https://img.shields.io/badge/-2A9D8F?style=flat-square) &nbsp; **An architecture that targets the cause.** The Provenance Vector attaches metadata to each stored fact recording when it was learned and how reliable its source was. At inference, a gate reads that metadata and turns down facts that have gone stale, so a fresh document can win without anyone editing the weights. The paper gives the forward pass as an algorithm, derives the cost at under 0.02% extra parameters, and proves the idealized case under assumptions it states openly.
 
 > [!NOTE]
 > The metric is measured. The architecture is a proposal supported by an idealized proof, not a trained system, and the paper says so in its limitations rather than leaving you to discover it.
