@@ -61,28 +61,30 @@ jobs:
             paper/main.pdf
             paper/main.bbl
 
-      # Publishes the freshly built PDF back to the repository so the copy in
-      # the repo always matches the current source. [skip ci] and the paths
-      # filters both keep this from re-triggering the build. This commit is by
+      # Publishes each freshly built file straight to the branch tip via the
+      # GitHub Contents API: no working tree, no rebase, and concurrent builds
+      # touch different paths so they never collide. [skip ci] and the paths
+      # filters keep the publish from re-triggering a build. This commit is by
       # github-actions[bot]; every source commit stays maintainer-authored.
-      - name: Commit the rebuilt paper
+      - name: Publish the rebuilt PDF
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          git config user.name  "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add paper/main.pdf
-          if git diff --cached --quiet; then
-            echo "No change; nothing to commit."
-            exit 0
-          fi
-          git commit -m "Knowledge Lifecycle [skip ci]"
-          # Discard the LaTeX build byproducts so the rebase sees a clean tree.
-          git checkout -- . 2>/dev/null || true
-          git clean -fdq
-          for attempt in 1 2 3 4 5; do
-            git fetch origin "${{ github.ref_name }}"
-            if git rebase "origin/${{ github.ref_name }}" && git push origin "HEAD:${{ github.ref_name }}"; then exit 0; fi
-            git rebase --abort 2>/dev/null || true
-            sleep "$((attempt * 3))"
-          done
-          echo "::error::could not push the rebuilt artefact"
-          exit 1
+          publish() {
+            path="$1"
+            newsha=$(git hash-object "$path")
+            cursha=$(gh api "repos/${{ github.repository }}/contents/$path?ref=${{ github.ref_name }}" --jq .sha 2>/dev/null || true)
+            if [ "$newsha" = "$cursha" ]; then
+              echo "$path unchanged; nothing to publish."
+              return 0
+            fi
+            base64 -w0 "$path" > /tmp/content.b64
+            if [ -n "$cursha" ]; then
+              jq -n --arg m 'Knowledge Lifecycle [skip ci]' --arg b '${{ github.ref_name }}' --rawfile c /tmp/content.b64 --arg s "$cursha" '{message:$m,branch:$b,content:$c,sha:$s}' > /tmp/body.json
+            else
+              jq -n --arg m 'Knowledge Lifecycle [skip ci]' --arg b '${{ github.ref_name }}' --rawfile c /tmp/content.b64 '{message:$m,branch:$b,content:$c}' > /tmp/body.json
+            fi
+            gh api --method PUT "repos/${{ github.repository }}/contents/$path" --input /tmp/body.json > /dev/null
+            echo "published $path"
+          }
+          publish paper/main.pdf
