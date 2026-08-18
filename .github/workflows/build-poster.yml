@@ -11,9 +11,6 @@
 # artefact most likely to break silently.
 
 name: Poster
-permissions:
-  contents: write
-
 
 on:
   push:
@@ -47,34 +44,3 @@ jobs:
         with:
           name: poster
           path: paper/poster.pdf
-
-      # Publishes each freshly built file straight to the branch tip via the
-      # GitHub Contents API: no working tree, no rebase, and concurrent builds
-      # touch different paths so they never collide. [skip ci] and the paths
-      # filters keep the publish from re-triggering a build. This commit is by
-      # github-actions[bot]; every source commit stays maintainer-authored.
-      - name: Publish the rebuilt poster and preview
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          publish() {
-            path="$1"
-            newsha=$(git hash-object "$path")
-            cursha=$(gh api "repos/${{ github.repository }}/contents/$path?ref=${{ github.ref_name }}" --jq .sha 2>/dev/null || true)
-            if [ "$newsha" = "$cursha" ]; then
-              echo "$path unchanged; nothing to publish."
-              return 0
-            fi
-            base64 -w0 "$path" > /tmp/content.b64
-            if [ -n "$cursha" ]; then
-              jq -n --arg m 'Knowledge Lifecycle [skip ci]' --arg b '${{ github.ref_name }}' --rawfile c /tmp/content.b64 --arg s "$cursha" '{message:$m,branch:$b,content:$c,sha:$s}' > /tmp/body.json
-            else
-              jq -n --arg m 'Knowledge Lifecycle [skip ci]' --arg b '${{ github.ref_name }}' --rawfile c /tmp/content.b64 '{message:$m,branch:$b,content:$c}' > /tmp/body.json
-            fi
-            gh api --method PUT "repos/${{ github.repository }}/contents/$path" --input /tmp/body.json > /dev/null
-            echo "published $path"
-          }
-          sudo apt-get update -qq && sudo apt-get install -y -qq ghostscript
-          gs -sDEVICE=png16m -dFirstPage=1 -dLastPage=1 -r40 -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -o paper/figures/poster-preview.png paper/poster.pdf
-          publish paper/poster.pdf
-          publish paper/figures/poster-preview.png
