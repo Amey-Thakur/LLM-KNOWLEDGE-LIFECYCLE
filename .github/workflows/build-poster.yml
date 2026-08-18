@@ -54,6 +54,7 @@ jobs:
       # github-actions[bot]; every source commit stays maintainer-authored.
       - name: Render preview and commit the rebuilt poster
         run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq ghostscript
           gs -sDEVICE=png16m -dFirstPage=1 -dLastPage=1 -r40 -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -o paper/figures/poster-preview.png paper/poster.pdf
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -63,6 +64,9 @@ jobs:
             exit 0
           fi
           git commit -m "Knowledge Lifecycle [skip ci]"
+          # Discard the LaTeX build byproducts so the rebase sees a clean tree.
+          git checkout -- . 2>/dev/null || true
+          git clean -fdq
           for attempt in 1 2 3 4 5; do
             git fetch origin "${{ github.ref_name }}"
             if git rebase "origin/${{ github.ref_name }}" && git push origin "HEAD:${{ github.ref_name }}"; then exit 0; fi

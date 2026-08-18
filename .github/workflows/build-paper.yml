@@ -75,6 +75,9 @@ jobs:
             exit 0
           fi
           git commit -m "Knowledge Lifecycle [skip ci]"
+          # Discard the LaTeX build byproducts so the rebase sees a clean tree.
+          git checkout -- . 2>/dev/null || true
+          git clean -fdq
           for attempt in 1 2 3 4 5; do
             git fetch origin "${{ github.ref_name }}"
             if git rebase "origin/${{ github.ref_name }}" && git push origin "HEAD:${{ github.ref_name }}"; then exit 0; fi
