@@ -10,6 +10,9 @@
 # hide a success in another.
 
 name: Slides
+permissions:
+  contents: write
+
 
 on:
   push:
@@ -43,3 +46,23 @@ jobs:
         with:
           name: slides
           path: paper/presentation.pdf
+
+      # Publishes the freshly built PDF back to the repository so the repo copy
+      # matches the current source. Authored as the maintainer via the Contents
+      # API: no working tree, no rebase, and only when the PDF actually differs.
+      # The committed PDF is in no paths filter, so it never re-triggers a build.
+      - name: Publish the rebuilt slides
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          publish() {
+            path="$1"
+            newsha=$(git hash-object "$path")
+            cursha=$(gh api "repos/${{ github.repository }}/contents/$path?ref=${{ github.ref_name }}" --jq .sha 2>/dev/null || true)
+            if [ "$newsha" = "$cursha" ]; then echo "$path unchanged."; return 0; fi
+            base64 -w0 "$path" > /tmp/content.b64
+            jq -n --arg m 'Knowledge Lifecycle' --arg b '${{ github.ref_name }}' --arg an 'Amey Thakur' --arg ae 'ameythakur20@gmail.com' --rawfile c /tmp/content.b64 --arg s "$cursha" '{message:$m,branch:$b,content:$c,committer:{name:$an,email:$ae},author:{name:$an,email:$ae}} + (if $s=="" then {} else {sha:$s} end)' > /tmp/body.json
+            gh api --method PUT "repos/${{ github.repository }}/contents/$path" --input /tmp/body.json > /dev/null
+            echo "published $path as Amey Thakur"
+          }
+          publish paper/presentation.pdf
