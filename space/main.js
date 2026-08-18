@@ -212,7 +212,7 @@ function renderStagebar(m) {
   document.querySelectorAll(".stagebar .s1, .stagebar .s2, .stagebar .s5")
     .forEach((el) => el.classList.add("dimstage"));
   r.textContent = "Retrieve ✓";
-  if (m.dsync > 9.2) {
+  if (m.dsync > FAIL) {
     u.textContent = "Update ✗";
     note.textContent = "Retrieve succeeded: the document is in the context. Update failed: the conflict was resolved in favor of stale memory.";
   } else if (m.dsync > SYNC) {
