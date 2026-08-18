@@ -10,6 +10,9 @@
 # hide a success in another.
 
 name: Slides
+permissions:
+  contents: write
+
 
 on:
   push:
@@ -43,3 +46,26 @@ jobs:
         with:
           name: slides
           path: paper/presentation.pdf
+
+      # Publishes the freshly built PDF back to the repository so the copy in
+      # the repo always matches the current source. [skip ci] and the paths
+      # filters both keep this from re-triggering the build. This commit is by
+      # github-actions[bot]; every source commit stays maintainer-authored.
+      - name: Commit the rebuilt slides
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add paper/presentation.pdf
+          if git diff --cached --quiet; then
+            echo "No change; nothing to commit."
+            exit 0
+          fi
+          git commit -m "Knowledge Lifecycle [skip ci]"
+          for attempt in 1 2 3 4 5; do
+            git fetch origin "${{ github.ref_name }}"
+            if git rebase "origin/${{ github.ref_name }}" && git push origin "HEAD:${{ github.ref_name }}"; then exit 0; fi
+            git rebase --abort 2>/dev/null || true
+            sleep "$((attempt * 3))"
+          done
+          echo "::error::could not push the rebuilt artefact"
+          exit 1

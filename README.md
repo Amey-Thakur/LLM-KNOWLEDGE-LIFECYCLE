@@ -278,6 +278,16 @@ eighteen measurements, and one of them is GPT-2 on the headline probe.
 
 <br>
 
+<div align="center">
+
+<a href="paper/poster.pdf"><img src="paper/figures/poster-preview.png" alt="A0 conference poster: The Knowledge Lifecycle of Large Language Models. The problem, the framework, the Vioxx finding, the metric, the architecture, and how to reproduce it." width="720"></a>
+
+**The whole argument on one page.** &nbsp; The A0 poster carries the problem, the five-stage framework, the Vioxx finding, the metric, and the proposed architecture. [Download the full-resolution PDF](paper/poster.pdf).
+
+</div>
+
+<br>
+
 > [!TIP]
 > ### 📄 &nbsp; Short on time? Read these two sections
 > **Section 8.4** defines the metric. **Section 8.5** is the measurement. The two stand alone without the survey around them, and together they are about four pages.
