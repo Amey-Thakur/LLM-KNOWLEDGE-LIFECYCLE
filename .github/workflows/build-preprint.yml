@@ -1,58 +1,71 @@
 # =============================================================================
-# Workflow    : Poster
+# Workflow    : Preprint
 # Project     : The Knowledge Lifecycle of Large Language Models
-# Purpose     : Compile the A0 conference poster to PDF on every change to it.
+# Purpose     : Compile the arXiv manuscript to PDF on every change, so broken LaTeX is
+#               caught at the commit that introduced it rather than at
+#               submission time.
 # Repository  : https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE
 # License     : CC BY 4.0
 # =============================================================================
 #
-# Independent of the manuscript and the slides. tikzposter drops content that
-# runs past the page bottom without raising an error, so the poster is the
-# artefact most likely to break silently.
+# One workflow per artefact, so a broken poster never masks a working
+# manuscript. The paths filters keep a poster edit from rebuilding the paper.
 
-name: Poster
+name: Preprint
 permissions:
   contents: write
 
 
 on:
   push:
+    # Only what main.tex reads. Globbing preprint/*.png and preprint/*.jpg would match
+    # the poster and slide portraits and rebuild the paper on every poster edit.
     paths:
-      - 'preprint/poster.tex'
-      - 'preprint/amey-circle.png'
-      - 'preprint/sarvesh-circle.png'
-      - '.github/workflows/build-poster.yml'
+      - 'preprint/main.tex'
+      - 'preprint/references.bib'
+      - 'preprint/arxiv.sty'
+      - 'preprint/orcid.png'
+      - 'preprint/figures/**'
+      - '.github/workflows/build-preprint.yml'
   pull_request:
     paths:
-      - 'preprint/poster.tex'
+      - 'preprint/main.tex'
+      - 'preprint/references.bib'
+      - 'preprint/figures/**'
   workflow_dispatch:
 
 jobs:
-  poster:
-    name: A0 poster
+  manuscript:
+    name: Manuscript
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repository
         uses: actions/checkout@v4
 
-      - name: Compile poster.tex
+      # bibtex runs between the latexmk passes, so citations and the
+      # bibliography resolve instead of rendering as question marks.
+      - name: Compile main.tex
         uses: xu-cheng/latex-action@v3
         with:
           working_directory: preprint
-          root_file: poster.tex
-          args: -pdf -interaction=nonstopmode -file-line-error
+          root_file: main.tex
+          args: -pdf -bibtex -interaction=nonstopmode -file-line-error
 
-      - name: Upload the poster
+      # main.bbl travels with the arXiv upload, so a difference in how apalike
+      # resolves on their machine cannot change the bibliography.
+      - name: Upload the manuscript
         uses: actions/upload-artifact@v4
         with:
-          name: poster
-          path: preprint/poster.pdf
+          name: manuscript
+          path: |
+            preprint/main.pdf
+            preprint/main.bbl
 
       # Publishes the freshly built PDF back to the repository so the repo copy
       # matches the current source. Authored as the maintainer via the Contents
       # API: no working tree, no rebase, and only when the PDF actually differs.
       # The committed PDF is in no paths filter, so it never re-triggers a build.
-      - name: Publish the rebuilt poster
+      - name: Publish the rebuilt paper
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -66,4 +79,4 @@ jobs:
             gh api --method PUT "repos/${{ github.repository }}/contents/$path" --input /tmp/body.json > /dev/null
             echo "published $path as Amey Thakur"
           }
-          publish preprint/poster.pdf
+          publish preprint/main.pdf

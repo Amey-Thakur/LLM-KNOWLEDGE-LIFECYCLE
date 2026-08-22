@@ -17,13 +17,13 @@ permissions:
 on:
   push:
     paths:
-      - 'paper/presentation.tex'
-      - 'paper/amey-thakur.jpg'
-      - 'paper/sarvesh-talele.jpg'
+      - 'preprint/presentation.tex'
+      - 'preprint/amey-thakur.jpg'
+      - 'preprint/sarvesh-talele.jpg'
       - '.github/workflows/build-slides.yml'
   pull_request:
     paths:
-      - 'paper/presentation.tex'
+      - 'preprint/presentation.tex'
   workflow_dispatch:
 
 jobs:
@@ -37,7 +37,7 @@ jobs:
       - name: Compile presentation.tex
         uses: xu-cheng/latex-action@v3
         with:
-          working_directory: paper
+          working_directory: preprint
           root_file: presentation.tex
           args: -pdf -interaction=nonstopmode -file-line-error
 
@@ -45,7 +45,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: slides
-          path: paper/presentation.pdf
+          path: preprint/presentation.pdf
 
       # Publishes the freshly built PDF back to the repository so the repo copy
       # matches the current source. Authored as the maintainer via the Contents
@@ -65,4 +65,4 @@ jobs:
             gh api --method PUT "repos/${{ github.repository }}/contents/$path" --input /tmp/body.json > /dev/null
             echo "published $path as Amey Thakur"
           }
-          publish paper/presentation.pdf
+          publish preprint/presentation.pdf

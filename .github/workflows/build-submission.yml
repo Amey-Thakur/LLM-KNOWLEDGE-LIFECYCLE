@@ -1,32 +1,31 @@
 # =============================================================================
-# Workflow    : Paper
+# Workflow    : Submission
 # Project     : The Knowledge Lifecycle of Large Language Models
-# Purpose     : Compile the manuscript to PDF on every change, so broken LaTeX is
-#               caught at the commit that introduced it rather than at
-#               submission time.
+# Purpose     : Compile the journal submission (TMLR format) to PDF on every
+#               change, so the PDF in the repository is always the one the
+#               current source produces and can be uploaded as is.
 # Repository  : https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE
 # License     : CC BY 4.0
 # =============================================================================
 #
-# One workflow per artefact, so a broken poster never masks a working
-# manuscript. The paths filters keep a poster edit from rebuilding the paper.
+# Independent of the preprint build in build-preprint.yml: the two manuscripts
+# share their text but not their style files, so one cannot break the other.
 
-name: Paper
+name: Submission
 permissions:
   contents: write
 
 
 on:
   push:
-    # Only what main.tex reads. Globbing paper/*.png and paper/*.jpg would match
-    # the poster and slide portraits and rebuild the paper on every poster edit.
     paths:
       - 'paper/main.tex'
       - 'paper/references.bib'
-      - 'paper/arxiv.sty'
-      - 'paper/orcid.png'
+      - 'paper/tmlr.sty'
+      - 'paper/tmlr.bst'
+      - 'paper/fancyhdr.sty'
       - 'paper/figures/**'
-      - '.github/workflows/build-paper.yml'
+      - '.github/workflows/build-submission.yml'
   pull_request:
     paths:
       - 'paper/main.tex'
@@ -35,8 +34,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  manuscript:
-    name: Manuscript
+  submission:
+    name: Journal submission
     runs-on: ubuntu-latest
     steps:
       - name: Check out the repository
@@ -51,21 +50,21 @@ jobs:
           root_file: main.tex
           args: -pdf -bibtex -interaction=nonstopmode -file-line-error
 
-      # main.bbl travels with the arXiv upload, so a difference in how apalike
-      # resolves on their machine cannot change the bibliography.
-      - name: Upload the manuscript
+      # The log travels with the PDF so overfull boxes and undefined references
+      # can be checked without rebuilding.
+      - name: Upload the submission
         uses: actions/upload-artifact@v4
         with:
-          name: manuscript
+          name: submission
           path: |
             paper/main.pdf
-            paper/main.bbl
+            paper/main.log
 
       # Publishes the freshly built PDF back to the repository so the repo copy
       # matches the current source. Authored as the maintainer via the Contents
       # API: no working tree, no rebase, and only when the PDF actually differs.
       # The committed PDF is in no paths filter, so it never re-triggers a build.
-      - name: Publish the rebuilt paper
+      - name: Publish the rebuilt submission
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
