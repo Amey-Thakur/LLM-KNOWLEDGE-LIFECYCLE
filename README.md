@@ -119,7 +119,7 @@ The root cause is what training throws away. A model learns *what* is true but n
 
 [![Acquire](https://img.shields.io/badge/Acquire-4A7FD4)](#the-five-stages) [![Store](https://img.shields.io/badge/Store-2A9D8F)](#the-five-stages)
 
-**An architecture that targets the cause.** The Provenance Vector attaches metadata to each stored fact recording when it was learned and how reliable its source was. At inference, a gate reads that metadata and turns down facts that have gone stale, so a fresh document can win without anyone editing the weights. The paper gives the forward pass as an algorithm, derives the cost at under 0.02% extra parameters, and proves the idealized case under assumptions it states openly.
+**An architecture that targets the cause.** The Provenance Vector attaches metadata to each stored fact recording when it was learned and how reliable its source was. At inference, a gate reads that metadata and turns down facts that have gone stale, so a fresh document can win without anyone editing the weights. The paper gives the forward pass as an algorithm, derives the cost at about 0.04% extra parameters, and proves the idealized case under assumptions it states openly.
 
 > [!NOTE]
 > The metric is measured. The architecture is a proposal supported by an idealized proof, not a trained system, and the paper says so in its limitations rather than leaving you to discover it.
@@ -168,7 +168,7 @@ The [Kaggle notebook](https://www.kaggle.com/code/ameythakur20/cross-model-lifec
 
 | It answers | Result |
 | :--- | :--- |
-| Does scale resolve the conflict? | **No.** Inside the GPT-2 family the Vioxx probe runs 12.05 → 10.96 → 11.91 nats, and no model on the ladder answers it correctly. |
+| Does scale resolve the conflict? | **No.** Inside the GPT-2 family the Vioxx probe runs 12.05 → 10.96 → 11.91 nats, and under the headline phrasing no model on the ladder answers it correctly. |
 | Does instruction tuning resolve it? | **On two probes of three.** The largest tuned model answers Twitter and Monarch and still answers Vioxx with *unsafe*. |
 | Was the answer out of reach, or the document unused? | **Unused.** Stating the answer outright is worth 7.7 to 10.6 nats to every model; the corrective document is worth at most 0.41 nats to any GPT-2. |
 
