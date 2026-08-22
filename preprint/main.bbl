@@ -1,0 +1,398 @@
+\begin{thebibliography}{}
+
+\bibitem[Achiam et~al., 2023]{achiam2023gpt4}
+Achiam, J., Adler, S., Agarwal, S., Ahmad, L., Akkaya, I., et~al. (2023).
+\newblock {GPT-4} technical report.
+\newblock {\em arXiv preprint arXiv:2303.08774}.
+
+\bibitem[Borgeaud et~al., 2022]{borgeaud2022retro}
+Borgeaud, S., Mensch, A., Hoffmann, J., Cai, T., Rutherford, E., Millican, K.,
+  et~al. (2022).
+\newblock Improving language models by retrieving from trillions of tokens.
+\newblock In {\em International Conference on Machine Learning}, pages
+  2206--2240. PMLR.
+
+\bibitem[Brown et~al., 2020]{brown2020language}
+Brown, T., Mann, B., Ryder, N., Subbiah, M., Kaplan, J.~D., Dhariwal, P.,
+  Neelakantan, A., et~al. (2020).
+\newblock Language models are few-shot learners.
+\newblock In {\em Advances in Neural Information Processing Systems},
+  volume~33, pages 1877--1901.
+
+\bibitem[Carlini et~al., 2021]{carlini2021extraction}
+Carlini, N., Tram{\`e}r, F., Wallace, E., Jagielski, M., Herbert-Voss, A., Lee,
+  K., Roberts, A., Brown, T., Song, D., et~al. (2021).
+\newblock Extracting training data from large language models.
+\newblock In {\em 30th USENIX Security Symposium}, pages 2633--2650.
+
+\bibitem[Chen et~al., 2024]{chen2024benchmarking}
+Chen, J., Lin, H., Han, X., and Sun, L. (2024).
+\newblock Benchmarking large language models in retrieval-augmented generation.
+\newblock In {\em Proceedings of the AAAI Conference on Artificial
+  Intelligence}, volume~38.
+
+\bibitem[De~Cao et~al., 2021]{decao2021editing}
+De~Cao, N., Aziz, W., and Titov, I. (2021).
+\newblock Editing factual knowledge in language models.
+\newblock In {\em Proceedings of the 2021 Conference on Empirical Methods in
+  Natural Language Processing}.
+
+\bibitem[{DeepSeek-AI}, 2025]{guo2025deepseekr1}
+{DeepSeek-AI} (2025).
+\newblock {DeepSeek-R1}: Incentivizing reasoning capability in {LLMs} via
+  reinforcement learning.
+\newblock {\em arXiv preprint arXiv:2501.12948}.
+
+\bibitem[Du et~al., 2024]{du2024context}
+Du, K., Sn{\ae}bjarnarson, V., Stoehr, N., White, J., Schein, A., and
+  Cotterell, R. (2024).
+\newblock Context versus prior knowledge in language models.
+\newblock In {\em Proceedings of the 62nd Annual Meeting of the Association for
+  Computational Linguistics (Volume 1: Long Papers)}, pages 13211--13235,
+  Bangkok, Thailand. Association for Computational Linguistics.
+
+\bibitem[Edge et~al., 2024]{edge2024graphrag}
+Edge, D., Trinh, H., Cheng, N., Bradley, J., Chao, A., Mody, A., Truitt, S.,
+  and Larson, J. (2024).
+\newblock From local to global: A graph {RAG} approach to query-focused
+  summarization.
+\newblock {\em arXiv preprint arXiv:2404.16130}.
+
+\bibitem[Eldan and Russinovich, 2023]{eldan2023harrypotter}
+Eldan, R. and Russinovich, M. (2023).
+\newblock Who's {Harry Potter}? approximate unlearning in {LLMs}.
+\newblock {\em arXiv preprint arXiv:2310.02238}.
+
+\bibitem[Es et~al., 2024]{es2024ragas}
+Es, S., James, J., Espinosa-Anke, L., and Schockaert, S. (2024).
+\newblock {RAGAs}: Automated evaluation of retrieval augmented generation.
+\newblock In {\em Proceedings of the 18th Conference of the European Chapter of
+  the Association for Computational Linguistics: System Demonstrations}.
+
+\bibitem[Gao et~al., 2023]{gao2023ragsurvey}
+Gao, Y., Xiong, Y., Gao, X., Jia, K., Pan, J., Bi, Y., Dai, Y., Sun, J., Wang,
+  M., and Wang, H. (2023).
+\newblock Retrieval-augmented generation for large language models: A survey.
+\newblock {\em arXiv preprint arXiv:2312.10997}.
+
+\bibitem[{Gemini Team, Google}, 2023]{team2023gemini}
+{Gemini Team, Google} (2023).
+\newblock Gemini: A family of highly capable multimodal models.
+\newblock {\em arXiv preprint arXiv:2312.11805}.
+
+\bibitem[Geva et~al., 2021]{geva2021kv}
+Geva, M., Schuster, R., Berant, J., and Levy, O. (2021).
+\newblock Transformer feed-forward layers are key-value memories.
+\newblock In {\em Proceedings of the 2021 Conference on Empirical Methods in
+  Natural Language Processing}.
+
+\bibitem[Gu and Dao, 2023]{gu2023mamba}
+Gu, A. and Dao, T. (2023).
+\newblock Mamba: Linear-time sequence modeling with selective state spaces.
+\newblock {\em arXiv preprint arXiv:2312.00752}.
+
+\bibitem[Guu et~al., 2020]{guu2020realm}
+Guu, K., Lee, K., Tung, Z., Pasupat, P., and Chang, M.-W. (2020).
+\newblock {REALM}: Retrieval-augmented language model pre-training.
+\newblock In {\em International Conference on Machine Learning}, pages
+  3929--3938. PMLR.
+
+\bibitem[Hoffmann et~al., 2022]{hoffmann2022chinchilla}
+Hoffmann, J., Borgeaud, S., Mensch, A., Buchatskaya, E., Cai, T., Rutherford,
+  E., et~al. (2022).
+\newblock Training compute-optimal large language models.
+\newblock {\em arXiv preprint arXiv:2203.15556}.
+
+\bibitem[Hu et~al., 2022]{hu2022lora}
+Hu, E.~J., Shen, Y., Wallis, P., Allen-Zhu, Z., Li, Y., Wang, S., Wang, L., and
+  Chen, W. (2022).
+\newblock {LoRA}: Low-rank adaptation of large language models.
+\newblock In {\em International Conference on Learning Representations}.
+
+\bibitem[Hu et~al., 2025]{hu2025agentmemory}
+Hu, Y., Liu, S., Yue, Y., Zhang, G., Liu, B., Zhu, F., et~al. (2025).
+\newblock Memory in the age of {AI} agents.
+\newblock {\em arXiv preprint arXiv:2512.13564}.
+
+\bibitem[Huang et~al., 2023]{huang2023patcher}
+Huang, Z., Shen, Y., Zhang, X., Zhou, J., Rong, W., and Xiong, Z. (2023).
+\newblock {Transformer-Patcher}: One mistake worth one neuron.
+\newblock In {\em International Conference on Learning Representations}.
+
+\bibitem[Ilharco et~al., 2023]{ilharco2023task}
+Ilharco, G., Ribeiro, M.~T., Wortsman, M., Gururangan, S., Schmidt, L.,
+  Hajishirzi, H., and Farhadi, A. (2023).
+\newblock Editing models with task arithmetic.
+\newblock In {\em International Conference on Learning Representations}.
+
+\bibitem[Izacard et~al., 2023]{izacard2023atlas}
+Izacard, G., Lewis, P., Lomeli, M., Hosseini, L., Petroni, F., Schick, T.,
+  et~al. (2023).
+\newblock Atlas: Few-shot learning with retrieval-augmented language models.
+\newblock {\em Journal of Machine Learning Research}, 24(251):1--43.
+
+\bibitem[Jang et~al., 2023]{jang2023unlearning}
+Jang, J., Yoon, D., Yang, S., Cha, S., Lee, M., Logeswaran, L., and Seo, M.
+  (2023).
+\newblock Knowledge unlearning for mitigating privacy risks in language models.
+\newblock In {\em Proceedings of the 61st Annual Meeting of the Association for
+  Computational Linguistics}.
+
+\bibitem[Kaplan et~al., 2020]{kaplan2020scaling}
+Kaplan, J., McCandlish, S., Henighan, T., Brown, T.~B., Chess, B., Child, R.,
+  et~al. (2020).
+\newblock Scaling laws for neural language models.
+\newblock {\em arXiv preprint arXiv:2001.08361}.
+
+\bibitem[Karpukhin et~al., 2020]{karpukhin2020dpr}
+Karpukhin, V., Oguz, B., Min, S., Lewis, P., Wu, L., Edunov, S., Chen, D., and
+  Yih, W.-t. (2020).
+\newblock Dense passage retrieval for open-domain question answering.
+\newblock In {\em Proceedings of the 2020 Conference on Empirical Methods in
+  Natural Language Processing}, pages 6769--6781.
+
+\bibitem[Ke et~al., 2023]{ke2023continual}
+Ke, Z., Shao, Y., Lin, H., Konishi, T., Kim, G., and Liu, B. (2023).
+\newblock Continual pre-training of language models.
+\newblock In {\em International Conference on Learning Representations}.
+
+\bibitem[Khandelwal et~al., 2020]{khandelwal2020knnlm}
+Khandelwal, U., Levy, O., Jurafsky, D., Zettlemoyer, L., and Lewis, M. (2020).
+\newblock Generalization through memorization: Nearest neighbor language
+  models.
+\newblock In {\em International Conference on Learning Representations}.
+
+\bibitem[Kirkpatrick et~al., 2017]{kirkpatrick2017ewc}
+Kirkpatrick, J., Pascanu, R., Rabinowitz, N., Veness, J., Desjardins, G., Rusu,
+  A.~A., et~al. (2017).
+\newblock Overcoming catastrophic forgetting in neural networks.
+\newblock {\em Proceedings of the National Academy of Sciences},
+  114(13):3521--3526.
+
+\bibitem[Lewis et~al., 2020]{lewis2020rag}
+Lewis, P., Perez, E., Piktus, A., Petroni, F., Karpukhin, V., Goyal, N.,
+  K{\"u}ttler, H., Lewis, M., Yih, W.-t., Rockt{\"a}schel, T., et~al. (2020).
+\newblock Retrieval-augmented generation for knowledge-intensive {NLP} tasks.
+\newblock In {\em Advances in Neural Information Processing Systems},
+  volume~33, pages 9459--9474.
+
+\bibitem[Li et~al., 2024]{li2024pmet}
+Li, X., Li, S., Song, S., Yang, J., Ma, J., and Yu, J. (2024).
+\newblock {PMET}: Precise model editing in a transformer.
+\newblock In {\em Proceedings of the AAAI Conference on Artificial
+  Intelligence}, volume~38.
+
+\bibitem[Liu et~al., 2024]{liu2024lost}
+Liu, N.~F., Lin, K., Hewitt, J., Paranjape, A., Bevilacqua, M., Petroni, F.,
+  and Liang, P. (2024).
+\newblock Lost in the middle: How language models use long contexts.
+\newblock {\em Transactions of the Association for Computational Linguistics},
+  12:157--173.
+
+\bibitem[Longpre et~al., 2021]{longpre2021entity}
+Longpre, S., Perisetla, K., Chen, A., Ramesh, N., DuBois, C., and Singh, S.
+  (2021).
+\newblock Entity-based knowledge conflicts in question answering.
+\newblock In {\em Proceedings of the 2021 Conference on Empirical Methods in
+  Natural Language Processing}.
+
+\bibitem[Luo et~al., 2023]{luo2023catastrophic}
+Luo, Y., Yang, Z., Meng, F., Li, Y., Zhou, J., and Zhang, Y. (2023).
+\newblock An empirical study of catastrophic forgetting in large language
+  models during continual fine-tuning.
+\newblock {\em arXiv preprint arXiv:2308.08747}.
+
+\bibitem[Maini et~al., 2024]{maini2024tofu}
+Maini, P., Feng, Z., Schwarzschild, A., Lipton, Z.~C., and Kolter, J.~Z.
+  (2024).
+\newblock {TOFU}: A task of fictitious unlearning for {LLMs}.
+\newblock {\em arXiv preprint arXiv:2401.06121}.
+
+\bibitem[Meng et~al., 2022]{meng2022rome}
+Meng, K., Bau, D., Andonian, A., and Belinkov, Y. (2022).
+\newblock Locating and editing factual associations in {GPT}.
+\newblock In {\em Advances in Neural Information Processing Systems},
+  volume~35.
+
+\bibitem[Meng et~al., 2023]{meng2023memit}
+Meng, K., Sharma, A.~S., Andonian, A., Belinkov, Y., and Bau, D. (2023).
+\newblock Mass-editing memory in a transformer.
+\newblock In {\em International Conference on Learning Representations}.
+
+\bibitem[Mialon et~al., 2023]{mialon2023augmented}
+Mialon, G., Dess{\`i}, R., Lomeli, M., Nalmpantis, C., Pasunuru, R., Raileanu,
+  R., Rozi{\`e}re, B., Schick, T., Dwivedi-Yu, J., et~al. (2023).
+\newblock Augmented language models: a survey.
+\newblock {\em Transactions on Machine Learning Research}.
+
+\bibitem[Min et~al., 2022]{min2022rethinking}
+Min, S., Lyu, X., Holtzman, A., Artetxe, M., Lewis, M., Hajishirzi, H., and
+  Zettlemoyer, L. (2022).
+\newblock Rethinking the role of demonstrations: What makes in-context learning
+  work?
+\newblock In {\em Proceedings of the 2022 Conference on Empirical Methods in
+  Natural Language Processing}.
+
+\bibitem[Mitchell et~al., 2022a]{mitchell2022mend}
+Mitchell, E., Lin, C., Bosselut, A., Finn, C., and Manning, C.~D. (2022a).
+\newblock Fast model editing at scale.
+\newblock In {\em International Conference on Learning Representations}.
+
+\bibitem[Mitchell et~al., 2022b]{mitchell2022serac}
+Mitchell, E., Lin, C., Bosselut, A., Manning, C.~D., and Finn, C. (2022b).
+\newblock Memory-based model editing at scale.
+\newblock In {\em International Conference on Machine Learning}, pages
+  15817--15831. PMLR.
+
+\bibitem[{OpenAI}, 2024]{openai2024o1}
+{OpenAI} (2024).
+\newblock {OpenAI o1} system card.
+\newblock {\em arXiv preprint arXiv:2412.16720}.
+
+\bibitem[Ouyang et~al., 2022]{ouyang2022instructgpt}
+Ouyang, L., Wu, J., Jiang, X., Almeida, D., Wainwright, C., Mishkin, P., et~al.
+  (2022).
+\newblock Training language models to follow instructions with human feedback.
+\newblock In {\em Advances in Neural Information Processing Systems},
+  volume~35.
+
+\bibitem[Packer et~al., 2023]{packer2023memgpt}
+Packer, C., Wooders, S., Lin, K., Fang, V., Patil, S.~G., Stoica, I., and
+  Gonzalez, J.~E. (2023).
+\newblock {MemGPT}: Towards {LLMs} as operating systems.
+\newblock {\em arXiv preprint arXiv:2310.08560}.
+
+\bibitem[Park et~al., 2023]{park2023generative}
+Park, J.~S., O'Brien, J.~C., Cai, C.~J., Morris, M.~R., Liang, P., and
+  Bernstein, M.~S. (2023).
+\newblock Generative agents: Interactive simulacra of human behavior.
+\newblock In {\em Proceedings of the 36th Annual ACM Symposium on User
+  Interface Software and Technology}, pages 1--22.
+
+\bibitem[Petroni et~al., 2019]{petroni2019lama}
+Petroni, F., Rockt{\"a}schel, T., Riedel, S., Lewis, P., Bakhtin, A., Wu, Y.,
+  and Miller, A. (2019).
+\newblock Language models as knowledge bases?
+\newblock In {\em Proceedings of the 2019 Conference on Empirical Methods in
+  Natural Language Processing}, pages 2463--2473.
+
+\bibitem[Radford et~al., 2019]{radford2019gpt2}
+Radford, A., Wu, J., Child, R., Luan, D., Amodei, D., and Sutskever, I. (2019).
+\newblock Language models are unsupervised multitask learners.
+\newblock {\em OpenAI Technical Report}.
+
+\bibitem[Thakur et~al., 2021a]{thakur2021neurofuzzy}
+Thakur, A., Dhiman, K., and Phansikar, M. (2021a).
+\newblock Neuro-fuzzy: Artificial neural networks and fuzzy logic.
+\newblock {\em International Journal for Research in Applied Science and
+  Engineering Technology}, 9(IX).
+
+\bibitem[Thakur and Konde, 2021]{thakur2021fundamentals}
+Thakur, A. and Konde, A. (2021).
+\newblock Fundamentals of neural networks.
+\newblock {\em International Journal for Research in Applied Science and
+  Engineering Technology}, 9(VIII).
+
+\bibitem[Thakur et~al., 2021b]{thakur2021whitebox}
+Thakur, A., Rizvi, H., and Satish, M. (2021b).
+\newblock White-box cartoonization using an extended {GAN} framework.
+\newblock {\em arXiv preprint arXiv:2107.04551}.
+
+\bibitem[Thakur and Satish, 2021a]{thakur2021aoda}
+Thakur, A. and Satish, M. (2021a).
+\newblock Adversarial open domain adaptation framework ({AODA}):
+  Sketch-to-photo synthesis.
+\newblock {\em arXiv preprint arXiv:2108.04351}.
+
+\bibitem[Thakur and Satish, 2021b]{thakur2021gan}
+Thakur, A. and Satish, M. (2021b).
+\newblock Generative adversarial networks.
+\newblock {\em International Journal for Research in Applied Science and
+  Engineering Technology}, 9(VIII).
+
+\bibitem[Thakur and Talele, 2026a]{thakur2026notebook}
+Thakur, A. and Talele, S. (2026a).
+\newblock Cross-model lifecycle desynchronization.
+\newblock Kaggle notebook.
+\newblock
+  \url{https://www.kaggle.com/code/ameythakur20/cross-model-lifecycle-desynchronization}.
+
+\bibitem[Thakur and Talele, 2026b]{thakur2026code}
+Thakur, A. and Talele, S. (2026b).
+\newblock The knowledge lifecycle of large language models: Measurement code
+  and experiments.
+\newblock GitHub repository.
+\newblock \url{https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE}.
+
+\bibitem[Thakur and Talele, 2026c]{thakur2026demo}
+Thakur, A. and Talele, S. (2026c).
+\newblock Lifecycle desynchronization probe: An interactive demonstration.
+\newblock Hugging Face Space, running {GPT-2} in the browser.
+\newblock
+  \url{https://huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle}.
+
+\bibitem[Thakur and Talele, 2026d]{thakur2026accident}
+Thakur, A. and Talele, S. (2026d).
+\newblock A modular zero-shot pipeline for accident detection, localization,
+  and classification in traffic surveillance video.
+\newblock {\em arXiv preprint arXiv:2604.09685}.
+
+\bibitem[Vaswani et~al., 2017]{vaswani2017attention}
+Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A.~N.,
+  Kaiser, {\L}., and Polosukhin, I. (2017).
+\newblock Attention is all you need.
+\newblock In {\em Advances in Neural Information Processing Systems},
+  volume~30.
+
+\bibitem[Wang et~al., 2024]{wang2024agents}
+Wang, L., Ma, C., Feng, X., Zhang, Z., Yang, H., Zhang, J., et~al. (2024).
+\newblock A survey on large language model based autonomous agents.
+\newblock {\em Frontiers of Computer Science}, 18(6).
+
+\bibitem[Wei et~al., 2022]{wei2022flan}
+Wei, J., Bosma, M., Zhao, V.~Y., Guu, K., Yu, A.~W., Lester, B., Du, N., Dai,
+  A.~M., and Le, Q.~V. (2022).
+\newblock Finetuned language models are zero-shot learners.
+\newblock In {\em International Conference on Learning Representations}.
+
+\bibitem[Wu et~al., 2024]{wu2024continual}
+Wu, T., Luo, L., Li, Y.-F., Pan, S., Vu, T.-T., and Haffari, G. (2024).
+\newblock Continual learning for large language models: A survey.
+\newblock {\em arXiv preprint arXiv:2402.01364}.
+
+\bibitem[Wu et~al., 2025]{wu2025humanmemory}
+Wu, Y., Liang, S., Zhang, C., Wang, Y., Zhang, Y., Guo, H., Tang, R., and Liu,
+  Y. (2025).
+\newblock From human memory to {AI} memory: A survey on memory mechanisms in
+  the era of {LLMs}.
+\newblock {\em arXiv preprint arXiv:2504.15965}.
+
+\bibitem[Xiao et~al., 2024]{xiao2024streamingllm}
+Xiao, G., Tian, Y., Chen, B., Han, S., and Lewis, M. (2024).
+\newblock Efficient streaming language models with attention sinks.
+\newblock In {\em International Conference on Learning Representations}.
+
+\bibitem[Xie et~al., 2024]{xie2024conflicts}
+Xie, J., Zhang, K., Chen, J., Lou, R., and Su, Y. (2024).
+\newblock Adaptive chameleon or stubborn sloth: Revealing the behavior of large
+  language models in knowledge conflicts.
+\newblock In {\em International Conference on Learning Representations}.
+
+\bibitem[Yao et~al., 2023]{yao2023editingsurvey}
+Yao, Y., Wang, P., Tian, B., Cheng, S., Li, Z., Deng, S., Chen, H., and Zhang,
+  N. (2023).
+\newblock Editing large language models: Problems, methods, and opportunities.
+\newblock In {\em Proceedings of the 2023 Conference on Empirical Methods in
+  Natural Language Processing}.
+
+\bibitem[Zhao et~al., 2023]{zhao2023surveyllm}
+Zhao, W.~X., Zhou, K., Li, J., Tang, T., Wang, X., Hou, Y., et~al. (2023).
+\newblock A survey of large language models.
+\newblock {\em arXiv preprint arXiv:2303.18223}.
+
+\bibitem[Zou et~al., 2023]{zou2023repe}
+Zou, A., Phan, L., Chen, S., Campbell, J., Guo, P., Ren, R., et~al. (2023).
+\newblock Representation engineering: A top-down approach to {AI} transparency.
+\newblock {\em arXiv preprint arXiv:2310.01405}.
+
+\end{thebibliography}
