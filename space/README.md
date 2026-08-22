@@ -101,11 +101,11 @@ The browser build uses 8-bit quantized weights, which shift individual probabili
 The whole argument on one page: the problem, the five-stage framework, the Vioxx finding, the metric, and the proposed architecture.
 
 <p align="center">
-  <a href="https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE/blob/main/paper/poster.pdf"><img src="poster-preview.png" alt="A0 conference poster for The Knowledge Lifecycle of Large Language Models" width="640"></a>
+  <a href="https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE/blob/main/preprint/poster.pdf"><img src="poster-preview.png" alt="A0 conference poster for The Knowledge Lifecycle of Large Language Models" width="640"></a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE/blob/main/paper/poster.pdf">Full-resolution A0 PDF</a>
+  <a href="https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE/blob/main/preprint/poster.pdf">Full-resolution A0 PDF</a>
 </p>
 
 ## Citation

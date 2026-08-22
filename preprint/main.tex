@@ -1,30 +1,16 @@
-% -----------------------------------------------------------------------------
-% Journal submission of "The Knowledge Lifecycle of Large Language Models" in
-% the TMLR format. The arXiv manuscript in ../preprint is the source of the
-% text; this file carries that text with the style file, author block,
-% double-blind handling and section order that TMLR requires.
-%
-%   Build:        latexmk -pdf -bibtex main.tex
-%   Submission:   \usepackage{tmlr} with \anonymoustrue (the state of this file)
-%   Camera-ready: \usepackage[accepted]{tmlr}, \anonymousfalse, and fill in
-%                 \month, \year and \openreview below
-%   Preprint:     \usepackage[preprint]{tmlr} with \anonymousfalse
-% -----------------------------------------------------------------------------
+% arXiv builds through DVI unless told otherwise, and the DVI route cannot embed
+% PNG. This paper loads orcid.png and figures/help.png, so pdfLaTeX is required.
+% arXiv reads this declaration only within the first five lines of the main file.
+\pdfoutput=1
 
-\documentclass[10pt]{article}
-\usepackage{tmlr}
+\documentclass{article}
 
-% Double-blind switch. The tmlr package hides the author block by itself while
-% it runs without [accepted]; this switch additionally hides the three artefact
-% links (repository, notebook, demonstration) and the PDF author metadata, each
-% of which would identify the authors.
-\newif\ifanonymous
-\anonymoustrue
+\usepackage{arxiv}
 
 \usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
 \usepackage{hyperref}
 \usepackage{url}
-\usepackage{doi}
 \usepackage{booktabs}
 \usepackage{amsfonts}
 \usepackage{amsmath}
@@ -32,26 +18,31 @@
 \usepackage{amsthm}
 \usepackage{microtype}
 \usepackage{graphicx}
+\usepackage{natbib}
+\usepackage{doi}
 \usepackage{xcolor}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta, positioning, calc}
-\usepackage{enumitem}
-\usepackage{algorithm}
-\usepackage{algpseudocode}
 
-% The five lifecycle colours, shared with the preprint, the poster, the slides
-% and the demonstration. Fills take the !12 tint, strokes the full colour.
+% -----------------------------------------------------------------------------
+% The five lifecycle colours, shared by every figure here and by the poster, the
+% slides and the demonstration. Fills take the !12 tint, strokes the full colour.
+% -----------------------------------------------------------------------------
 \definecolor{acquire} {HTML}{4A7FD4}
 \definecolor{store}   {HTML}{2A9D8F}
 \definecolor{retrieve}{HTML}{E08A2E}
 \definecolor{update}  {HTML}{D05353}
 \definecolor{forget}  {HTML}{8F5FB8}
 \definecolor{muted}   {HTML}{4A4A55}
+\usepackage{enumitem}
+\usepackage{caption}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 
 \newtheorem{proposition}{Proposition}
 \newtheorem{assumption}{Assumption}
 
-% Marks for the comparison tables
+% Custom marks for comparison tables
 \newcommand{\fullmark}{\checkmark}
 \newcommand{\halfmark}{$\sim$}
 
@@ -61,38 +52,33 @@
   citecolor=green!50!black,
   urlcolor=blue!60!black,
   pdftitle={The Knowledge Lifecycle of Large Language Models},
+  pdfsubject={cs.CL},
+  pdfauthor={Amey Thakur, Sarvesh Talele},
   pdfkeywords={Large Language Models, Knowledge Lifecycle, RAG, Knowledge Editing, Continual Learning, Machine Unlearning},
 }
-\ifanonymous\else
-  \hypersetup{pdfauthor={Amey Thakur, Sarvesh Talele}}
-\fi
-
-% The three artefacts that accompany the paper. Under review they resolve to
-% the anonymised entries in references.bib; the camera-ready build restores
-% the named ones.
-\ifanonymous
-  \newcommand{\citecode}{\citep{anon2026code}}
-  \newcommand{\citenotebook}{\citep{anon2026notebook}}
-  \newcommand{\citedemo}{\citep{anon2026demo}}
-\else
-  \newcommand{\citecode}{\citep{thakur2026code}}
-  \newcommand{\citenotebook}{\citep{thakur2026notebook}}
-  \newcommand{\citedemo}{\citep{thakur2026demo}}
-\fi
 
 \title{The Knowledge Lifecycle of Large Language Models}
 
-% Printed only under the [accepted] or [preprint] option of the tmlr package.
-\author{\name Amey Thakur \email ameythakur20@gmail.com \\
-      \addr Independent Researcher, Toronto, Canada
-      \AND
-      \name Sarvesh Talele \email talelesarvesh@gmail.com \\
-      \addr Independent Researcher, Mumbai, India}
+\author{
+	\href{https://orcid.org/0000-0001-5644-1575}{\includegraphics[scale=0.06]{orcid.png}\hspace{1mm}Amey Thakur} \\
+	Independent Researcher \\
+	Toronto, Canada \\
+	\texttt{ameythakur20@gmail.com} \\
+	\And
+	\href{https://orcid.org/0009-0002-0818-461X}{\includegraphics[scale=0.06]{orcid.png}\hspace{1mm}Sarvesh Talele} \\
+	Independent Researcher \\
+	Mumbai, India \\
+	\texttt{talelesarvesh@gmail.com} \\
+}
 
-% Camera-ready fields, read by the tmlr package only under [accepted].
-\def\month{MM}
-\def\year{YYYY}
-\def\openreview{\url{https://openreview.net/forum?id=XXXX}}
+\renewcommand{\undertitle}{}
+\renewcommand{\headeright}{}
+\renewcommand{\shorttitle}{The Knowledge Lifecycle of LLMs}
+
+% Fixed submission date, so the title page shows the intended date rather
+% than drifting to whatever day the build runs. Without it \maketitle
+% falls back to \today.
+\date{August 18, 2026}
 
 \begin{document}
 \maketitle
@@ -154,7 +140,7 @@ This paper proposes an integrated approach. Rather than treating these problems 
 
 To our knowledge, no prior work has formalized the knowledge management problem across all five lifecycle stages.
 
-\paragraph{Reproducibility and artifacts.} We built every number in this paper to be checked. A single deterministic script produces all of them, and nothing anywhere is sampled, so running it returns the same values to the last digit on any machine. Three artifacts make that check progressively easier. The source repository~\citecode{} holds the measurement code and the experiments behind every table. The cross-model sweep of \S\ref{sec:crossmodel} is packaged as a public Kaggle notebook~\citenotebook{} that re-derives all eighteen measurements end to end. An interactive demonstration~\citedemo{} runs GPT-2 in the browser through ONNX, needs no installation or account, and reproduces the Vioxx probe of \S\ref{sec:case_study} on any conflict pair the reader supplies.
+\paragraph{Reproducibility and artifacts.} We built every number in this paper to be checked. A single deterministic script produces all of them, and nothing anywhere is sampled, so running it returns the same values to the last digit on any machine. Three artifacts make that check progressively easier. The source repository~\citep{thakur2026code} holds the measurement code and the experiments behind every table. The cross-model sweep of \S\ref{sec:crossmodel} is packaged as a public Kaggle notebook~\citep{thakur2026notebook} that re-derives all eighteen measurements end to end. An interactive demonstration~\citep{thakur2026demo} runs GPT-2 in the browser through ONNX, needs no installation or account, and reproduces the Vioxx probe of \S\ref{sec:case_study} on any conflict pair the reader supplies.
 
 % ============================================================
 \section{Background and Scope}
@@ -239,6 +225,7 @@ The lifecycle has five stages. Each one maps to a well-defined set of research q
   edgelabel/.style={font=\sffamily\footnotesize\itshape, text=black!65,
                     align=center, inner sep=1pt}
 ]
+
 
 \def\R{4.2}   % stage centres
 \def\L{5.3}   % boundary labels
@@ -727,7 +714,7 @@ To demonstrate that lifecycle failures are not hypothetical, we trace a document
 
 \paragraph{Scenario.} Figure~\ref{fig:failure_cascade} traces the cascade stage by stage. Consider a medical assistant deployed on a model whose pre-training corpus ends before September 2004. The fact ``Rofecoxib (Vioxx) is an FDA-approved COX-2 selective anti-inflammatory drug'' is encoded into the parametric weights during pre-training (Acquisition $\rightarrow$ Storage). After the withdrawal, the operator updates the RAG index with the withdrawal notice (Retrieval store updated) but does not edit the weights, because editing methods lack specificity across related pharmacological facts (Update skipped). A clinician asks whether the drug is safe to prescribe. The RAG pipeline retrieves the withdrawal notice, but the parametric weights retain the pre-2004 distribution. Per \citet{xie2024conflicts}, the outcome of this conflict is unpredictable. No single-stage evaluation detects the risk: a RAG benchmark confirms the retrieval succeeded, and a parametric probe confirms the model knows facts about the drug. The failure exists entirely at the boundary.
 
-\paragraph{Measurement.} We instantiate Algorithm~\ref{alg:dsync} on GPT-2 base (124M parameters)~\citep{radford2019gpt2} under deterministic decoding. The query is \textit{``Question: Is Vioxx safe to prescribe? Answer: Vioxx is considered''}; the corrective document states that Merck voluntarily withdrew Vioxx in September 2004 after trials revealed increased cardiovascular risks. Table~\ref{tab:vioxx_results} reports the results. The measurement is deterministic, a greedy read of the next-token distribution with no sampling, so it reproduces exactly. The Kaggle notebook~\citenotebook{} places this probe alongside the full cross-model sweep, and the interactive demonstration~\citedemo{} runs it in the browser.
+\paragraph{Measurement.} We instantiate Algorithm~\ref{alg:dsync} on GPT-2 base (124M parameters)~\citep{radford2019gpt2} under deterministic decoding. The query is \textit{``Question: Is Vioxx safe to prescribe? Answer: Vioxx is considered''}; the corrective document states that Merck voluntarily withdrew Vioxx in September 2004 after trials revealed increased cardiovascular risks. Table~\ref{tab:vioxx_results} reports the results. The measurement is deterministic, a greedy read of the next-token distribution with no sampling, so it reproduces exactly. The Kaggle notebook~\citep{thakur2026notebook} places this probe alongside the full cross-model sweep, and the interactive demonstration~\citep{thakur2026demo} runs it in the browser.
 
 \begin{table}[h]
 \centering
@@ -752,6 +739,7 @@ $\widehat{\mathcal{D}}_{sync}$ (Equation~\ref{eq:estimator}) & \multicolumn{2}{c
 \paragraph{Findings.} Three observations follow. First, the correct continuation `` withdrawn'' receives probability $5.9 \times 10^{-6}$ even with the withdrawal notice present, placing $\widehat{\mathcal{D}}_{sync} = 12.05$ nats deep in the failure regime: no realistic decoding strategy recovers the correct answer. Second, the context barely moves the model: it shifts the full output distribution by only $\mathcal{I}_{ctx} = 0.033$ nats, so the failure is localized to conflict resolution, not retrieval. Third, the corrective context slightly \textit{increases} the probability of the incorrect answer `` safe'' (37.53\% to 42.58\%) and decreases that of `` unsafe''; merely mentioning the drug in a safety-related passage reinforces the dominant parametric association rather than overriding it. This last effect is a concrete, measurable instance of the failure mode that provenance gating (\S\ref{sec:gating}) is designed to eliminate: the stale parametric activation, not the retrieved evidence, controls the output.
 
 \paragraph{Scope of the measurement.} GPT-2 base is a deliberately small, fully open model: it makes the probe exactly reproducible on commodity hardware and free of instruction-tuning confounds. The measured numbers characterize this model and probe, not frontier systems; \S\ref{sec:crossmodel} carries the same protocol across five further models, including instruction-tuned ones, and finds that this probe does not resolve at any scale tested. The probe establishes that the failure mode exists, that it is measurable, and that the metric separates its two possible causes.
+
 
 \subsection{Cross-Model Measurement}
 \label{sec:crossmodel}
@@ -969,6 +957,15 @@ Third, the coverage analysis (Table~\ref{tab:coverage}) maps twenty representati
 Fourth, the cross-modal extension of the metric is scoped but not yet executed; no multimodal measurement is reported in this paper.
 
 % ============================================================
+\section{Ethics and Broader Impact}
+\label{sec:ethics}
+% ============================================================
+
+The lifecycle failures described in this paper carry direct societal consequences. In medicine, a desynchronized model that confidently recommends a withdrawn drug, as measured in \S\ref{sec:case_study}, could cause patient harm. In law, a model that fails to unlearn privileged client data after a deletion request violates confidentiality obligations and data protection regulations. In finance, a model whose parametric weights encode a pre-crisis market regime while its RAG index reflects current conditions may produce inconsistent risk assessments.
+
+The Provenance Vector and the $\mathcal{D}_{sync}$ metric are designed to mitigate these risks, but they introduce new ones. Provenance metadata, if exposed, could reveal proprietary training data sources. $\mathcal{D}_{sync}$ audits could be used to identify and exploit model weaknesses rather than to remediate them. We urge practitioners to treat lifecycle-aware tools as components of a broader responsible deployment framework that includes human oversight, domain-expert review, and regulatory compliance.
+
+% ============================================================
 \section{Conclusion}
 \label{sec:conclusion}
 % ============================================================
@@ -978,15 +975,6 @@ This paper structures the fragmented study of knowledge in large language models
 We contributed two technical components for those boundaries. \textbf{Lifecycle Desynchronization} ($\mathcal{D}_{sync}$) makes the boundary failure measurable: in a reproducible probe of a documented drug withdrawal, GPT-2 assigns the correct continuation probability $5.9 \times 10^{-6}$ with the corrective document present in context, while the document shifts the model's distribution by only $0.033$ nats. The \textbf{Provenance Vector} ($p$) addresses the failure's root cause, the absence of temporal metadata in parametric storage, by attaching provenance to each FFN memory slot and gating stale activations at inference time, with an idealized consistency result delimiting exactly what accurate provenance buys.
 
 As language models transition into autonomous systems, knowledge management can no longer rely on the assumption that weights, indices, and contexts agree. The Knowledge Lifecycle framework supplies the shared vocabulary, the metric makes disagreement measurable, and the Provenance Vector offers one architectural path to closing the loop.
-
-\subsubsection*{Broader Impact Statement}
-
-The lifecycle failures described in this paper carry direct societal consequences. In medicine, a desynchronized model that confidently recommends a withdrawn drug, as measured in \S\ref{sec:case_study}, could cause patient harm. In law, a model that fails to unlearn privileged client data after a deletion request violates confidentiality obligations and data protection regulations. In finance, a model whose parametric weights encode a pre-crisis market regime while its RAG index reflects current conditions may produce inconsistent risk assessments.
-
-The Provenance Vector and the $\mathcal{D}_{sync}$ metric are designed to mitigate these risks, but they introduce new ones. Provenance metadata, if exposed, could reveal proprietary training data sources. $\mathcal{D}_{sync}$ audits could be used to identify and exploit model weaknesses rather than to remediate them. We urge practitioners to treat lifecycle-aware tools as components of a broader responsible deployment framework that includes human oversight, domain-expert review, and regulatory compliance.
-
-\bibliography{references}
-\bibliographystyle{tmlr}
 
 \appendix
 \section{Glossary of Key Terms}
@@ -1006,5 +994,8 @@ The Provenance Vector and the $\mathcal{D}_{sync}$ metric are designed to mitiga
   \item \textbf{Context Influence ($\mathcal{I}_{ctx}$):} Companion diagnostic measuring how far the retrieved context moves the model's output distribution; small values with large $\mathcal{D}_{sync}$ indicate inert context.
   \item \textbf{Test-Time Compute:} Extra computational resources spent at inference time, through search or extended reasoning, to improve answer quality and conflict resolution.
 \end{itemize}
+
+\bibliographystyle{apalike}
+\bibliography{references}
 
 \end{document}

@@ -52,5 +52,5 @@ a sweep that lets dtype follow the hardware is not comparable across machines.
 ## Where the results appear
 
 Section 8.5 of the paper is the single-model case, Section 8.6 the cross-model
-sweep and the paraphrase spread. The four charts are in `paper/figures/`, one of
+sweep and the paraphrase spread. The four charts are in `preprint/figures/`, one of
 them as Figure 4 and the other three in the repository README.

@@ -187,7 +187,7 @@ you can follow the argument without opening the PDF.
 
 <div align="center">
 
-<img src="paper/figures/fig1-lifecycle.png" alt="The knowledge lifecycle as a ring of five stages: acquire, store, retrieve, update, forget, with a failure named on each boundary." width="620">
+<img src="preprint/figures/fig1-lifecycle.png" alt="The knowledge lifecycle as a ring of five stages: acquire, store, retrieve, update, forget, with a failure named on each boundary." width="620">
 
 **Figure 1 &nbsp;·&nbsp; The lifecycle.** &nbsp; A fact moves clockwise through five
 stages. Each stage has its own research community and its own benchmarks. The
@@ -197,7 +197,7 @@ work sits on **Retrieve → Update**, at the bottom of the ring.
 
 <br>
 
-<img src="paper/figures/fig2-two-paths.png" alt="Two paths from a knowledge source to generated output: a parametric path through weights and attention, and a non-parametric path through an index and a RAG pipeline, meeting at a conflict zone." width="720">
+<img src="preprint/figures/fig2-two-paths.png" alt="Two paths from a knowledge source to generated output: a parametric path through weights and attention, and a non-parametric path through an index and a RAG pipeline, meeting at a conflict zone." width="720">
 
 **Figure 2 &nbsp;·&nbsp; Where knowledge can live.** &nbsp; Put a fact in the weights
 and it is fast but almost impossible to change. Put it in a database and it is
@@ -207,7 +207,7 @@ wins.
 
 <br>
 
-<img src="paper/figures/fig3-failure-cascade.png" alt="Six stacked stages showing the Vioxx failure: acquire, store, retrieve, then update not applied, then conflict, then cannot forget." width="560">
+<img src="preprint/figures/fig3-failure-cascade.png" alt="Six stacked stages showing the Vioxx failure: acquire, store, retrieve, then update not applied, then conflict, then cannot forget." width="560">
 
 **Figure 3 &nbsp;·&nbsp; How the failure actually happens.** &nbsp; Read it top to
 bottom. The first three steps all succeed: the model learned the drug was
@@ -222,7 +222,7 @@ retraining. **Every individual stage passed its own test.**
 
 <div align="center">
 
-<img src="paper/figures/scale.png" alt="D_sync against model size for each probe. The Vioxx curve stays high and is not monotone, while the Twitter curve falls away." width="640">
+<img src="preprint/figures/scale.png" alt="D_sync against model size for each probe. The Vioxx curve stays high and is not monotone, while the Twitter curve falls away." width="640">
 
 **Figure 4 &nbsp;·&nbsp; Does a bigger model fix it?** &nbsp; No. Lower is better.
 The Twitter probe (teal) falls steadily as models grow, which is what resolving
@@ -231,7 +231,7 @@ even ordered by size: the 774M model is **worse** than the 355M one.
 
 <br>
 
-<img src="paper/figures/exposure.png" alt="Nats the corrective document moved the stale answer, per model and probe. The Vioxx bars sit above zero on five of six models." width="640">
+<img src="preprint/figures/exposure.png" alt="Nats the corrective document moved the stale answer, per model and probe. The Vioxx bars sit above zero on five of six models." width="640">
 
 **Figure 5 &nbsp;·&nbsp; The exposure trap.** &nbsp; Anything above zero means the
 document that *corrects* the fact made the **wrong** answer more likely. On the
@@ -240,7 +240,7 @@ to deny it, strengthens what the model already believes.
 
 <br>
 
-<img src="paper/figures/help.png" alt="Help delivered by the corrective document against help available when the answer is stated outright, per model and probe." width="640">
+<img src="preprint/figures/help.png" alt="Help delivered by the corrective document against help available when the answer is stated outright, per model and probe." width="640">
 
 **Figure 6 &nbsp;·&nbsp; Was the answer even reachable?** &nbsp; The pale bar is how
 far the model *can* be moved, measured by simply stating the answer outright. The
@@ -251,7 +251,7 @@ document did not deliver it.
 
 <br>
 
-<img src="paper/figures/control.png" alt="Context influence from the corrective document against an irrelevant one, log scale on both axes." width="600">
+<img src="preprint/figures/control.png" alt="Context influence from the corrective document against an irrelevant one, log scale on both axes." width="600">
 
 **A fourth chart, not in the paper.** &nbsp; Each point is one measurement. Above
 the line, the corrective document moved the model more than an unrelated
@@ -267,11 +267,13 @@ eighteen measurements, and one of them is GPT-2 on the headline probe.
 
 <div align="center">
 
-[![Download the paper](https://img.shields.io/badge/Download-Paper_(PDF,_21_pages)-B31B1B?logo=adobeacrobatreader&logoColor=white)](paper/main.pdf)
+[![Download the paper](https://img.shields.io/badge/Download-Paper_(PDF,_21_pages)-B31B1B?logo=adobeacrobatreader&logoColor=white)](preprint/main.pdf)
 &nbsp;
-[![Download the slides](https://img.shields.io/badge/Download-Slides_(PDF,_18_slides)-4A7FD4?logo=adobeacrobatreader&logoColor=white)](paper/presentation.pdf)
+[![Download the slides](https://img.shields.io/badge/Download-Slides_(PDF,_18_slides)-4A7FD4?logo=adobeacrobatreader&logoColor=white)](preprint/presentation.pdf)
 &nbsp;
-[![Download the poster](https://img.shields.io/badge/Download-Poster_(PDF,_A0)-8F5FB8?logo=adobeacrobatreader&logoColor=white)](paper/poster.pdf)
+[![Download the poster](https://img.shields.io/badge/Download-Poster_(PDF,_A0)-8F5FB8?logo=adobeacrobatreader&logoColor=white)](preprint/poster.pdf)
+&nbsp;
+[![Download the journal submission](https://img.shields.io/badge/Download-Journal_submission_(TMLR_format)-2A9D8F?logo=adobeacrobatreader&logoColor=white)](paper/main.pdf)
 
 </div>
 
@@ -279,9 +281,9 @@ eighteen measurements, and one of them is GPT-2 on the headline probe.
 
 <div align="center">
 
-<a href="paper/poster.pdf"><img src="paper/figures/poster-preview.png" alt="A0 conference poster: The Knowledge Lifecycle of Large Language Models. The problem, the framework, the Vioxx finding, the metric, the architecture, and how to reproduce it." width="720"></a>
+<a href="preprint/poster.pdf"><img src="preprint/figures/poster-preview.png" alt="A0 conference poster: The Knowledge Lifecycle of Large Language Models. The problem, the framework, the Vioxx finding, the metric, the architecture, and how to reproduce it." width="720"></a>
 
-**The whole argument on one page.** &nbsp; The A0 poster carries the problem, the five-stage framework, the Vioxx finding, the metric, and the proposed architecture. [Download the full-resolution PDF](paper/poster.pdf).
+**The whole argument on one page.** &nbsp; The A0 poster carries the problem, the five-stage framework, the Vioxx finding, the metric, and the proposed architecture. [Download the full-resolution PDF](preprint/poster.pdf).
 
 </div>
 
@@ -297,7 +299,8 @@ The slide deck carries speaker notes throughout, so it reads as a written argume
 
 ```
 .
-├── paper/          Manuscript, slides, bibliography, derivations
+├── preprint/       The arXiv manuscript, slides, poster, bibliography, derivations
+├── paper/          The journal submission, in the TMLR format
 ├── experiments/    The measurement script and the cross-model notebook
 ├── space/          The live demonstration
 ├── CITATION.cff    How to cite this work
@@ -310,11 +313,12 @@ The slide deck carries speaker notes throughout, so it reads as a written argume
 ## Citation
 
 ```bibtex
-@article{thakur2026lifecycle,
-  author  = {Thakur, Amey and Talele, Sarvesh},
-  title   = {The Knowledge Lifecycle of Large Language Models},
-  journal = {arXiv preprint},
-  year    = {2026}
+@misc{thakur2026lifecycle,
+  author       = {Thakur, Amey and Talele, Sarvesh},
+  title        = {The Knowledge Lifecycle of Large Language Models},
+  year         = {2026},
+  howpublished = {Preprint},
+  note         = {\url{https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE}}
 }
 ```
 
@@ -332,9 +336,9 @@ Copyright © 2026 Amey Thakur, Sarvesh Talele
 
 <div align="center">
 
-**[Paper](paper/main.pdf)** &nbsp;·&nbsp;
-**[Slides](paper/presentation.pdf)** &nbsp;·&nbsp;
-**[Poster](paper/poster.pdf)** &nbsp;·&nbsp;
+**[Paper](preprint/main.pdf)** &nbsp;·&nbsp;
+**[Slides](preprint/presentation.pdf)** &nbsp;·&nbsp;
+**[Poster](preprint/poster.pdf)** &nbsp;·&nbsp;
 **[Demo](https://huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle)** &nbsp;·&nbsp;
 **[Notebook](https://www.kaggle.com/code/ameythakur20/cross-model-lifecycle-desynchronization)** &nbsp;·&nbsp;
 **[Discussions](https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE/discussions)**
