@@ -273,7 +273,7 @@ eighteen measurements, and one of them is GPT-2 on the headline probe.
 &nbsp;
 [![Download the poster](https://img.shields.io/badge/Download-Poster_(PDF,_A0)-8F5FB8?logo=adobeacrobatreader&logoColor=white)](preprint/poster.pdf)
 &nbsp;
-[![Download the journal submission](https://img.shields.io/badge/Download-Journal_submission_(JAIR_format)-2A9D8F?logo=adobeacrobatreader&logoColor=white)](jair/main.pdf)
+[![Download the journal submission](https://img.shields.io/badge/Download-Journal_submission_(JAIR_format)-2A9D8F?logo=adobeacrobatreader&logoColor=white)](paper/main.pdf)
 
 </div>
 
@@ -300,7 +300,7 @@ The slide deck carries speaker notes throughout, so it reads as a written argume
 ```
 .
 ├── preprint/       The arXiv manuscript, slides, poster, bibliography, derivations
-├── jair/           The manuscript in the JAIR format, submitted to JAIR
+├── paper/          The manuscript in the JAIR format, submitted to JAIR
 ├── experiments/    The measurement script and the cross-model notebook
 ├── space/          The live demonstration
 ├── CITATION.cff    How to cite this work

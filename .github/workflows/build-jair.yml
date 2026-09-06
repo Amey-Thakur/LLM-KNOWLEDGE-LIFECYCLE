@@ -20,20 +20,20 @@ permissions:
 on:
   push:
     paths:
-      - 'jair/main.tex'
-      - 'jair/references.bib'
-      - 'jair/jair.cls'
-      - 'jair/acmart.cls'
-      - 'jair/acmauthoryear.bbx'
-      - 'jair/acmauthoryear.cbx'
-      - 'jair/acmdatamodel.dbx'
-      - 'jair/figures/**'
+      - 'paper/main.tex'
+      - 'paper/references.bib'
+      - 'paper/jair.cls'
+      - 'paper/acmart.cls'
+      - 'paper/acmauthoryear.bbx'
+      - 'paper/acmauthoryear.cbx'
+      - 'paper/acmdatamodel.dbx'
+      - 'paper/figures/**'
       - '.github/workflows/build-jair.yml'
   pull_request:
     paths:
-      - 'jair/main.tex'
-      - 'jair/references.bib'
-      - 'jair/figures/**'
+      - 'paper/main.tex'
+      - 'paper/references.bib'
+      - 'paper/figures/**'
   workflow_dispatch:
 
 jobs:
@@ -47,7 +47,7 @@ jobs:
       - name: Compile main.tex
         uses: xu-cheng/latex-action@v3
         with:
-          working_directory: jair
+          working_directory: paper
           root_file: main.tex
           args: -pdf -interaction=nonstopmode -file-line-error
 
@@ -58,8 +58,8 @@ jobs:
         with:
           name: jair
           path: |
-            jair/main.pdf
-            jair/main.log
+            paper/main.pdf
+            paper/main.log
 
       # Publishes the freshly built PDF back to the repository so the repo copy
       # matches the current source. Authored as the maintainer via the Contents
@@ -69,7 +69,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          path=jair/main.pdf
+          path=paper/main.pdf
           newsha=$(git hash-object "$path")
           cursha=$(gh api "repos/${{ github.repository }}/contents/$path?ref=${{ github.ref_name }}" --jq .sha 2>/dev/null || true)
           if [ "$newsha" = "$cursha" ]; then echo "$path unchanged."; exit 0; fi
