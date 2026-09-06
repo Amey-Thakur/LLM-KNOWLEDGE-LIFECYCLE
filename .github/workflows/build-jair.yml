@@ -7,7 +7,7 @@
 # License     : CC BY 4.0
 # =============================================================================
 #
-# Independent of the preprint and TMLR builds: the three manuscripts share their
+# Independent of the preprint build: the two manuscripts share their
 # text but not their style files, so one cannot break another. JAIR's template
 # uses BibLaTeX with the biber backend rather than bibtex, and latexmk detects
 # that from the source and runs biber itself.

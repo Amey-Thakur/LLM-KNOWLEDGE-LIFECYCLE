@@ -1,0 +1,34 @@
+# The Knowledge Lifecycle of Large Language Models
+
+> The Knowledge Lifecycle of Large Language Models: a unified five-stage
+> framework for how LLMs acquire, store, retrieve, update, and forget
+> knowledge, with the Provenance Vector proposal and the reproducible
+> Lifecycle Desynchronization metric.
+
+Author: Amey Thakur, ORCID 0000-0001-5644-1575
+Co-author: Sarvesh Talele, ORCID 0009-0002-0818-461X
+Licence: CC BY 4.0, attribution required
+Repository created: 7 May 2026
+Work dated: 18 August 2026
+
+## What is in this repository
+
+- experiments, 9 files
+- jair, 16 files
+- paper, 9 files
+- preprint, 23 files
+- space, 10 files
+
+## Subject terms
+
+activation-steering, agent-memory, ai-research, continual-learning, gpt-2,
+kl-divergence, knowledge-conflicts, knowledge-editing,
+knowledge-lifecycle, large-language-models, llm, machine-unlearning, nlp,
+rag, retrieval-augmented-generation, transformers
+
+## Where this sits
+
+- This repository: https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE
+- Project page: https://huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle
+- Author: https://github.com/Amey-Thakur
+- Research notes and reflections: https://amey-thakur.github.io/

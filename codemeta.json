@@ -1,46 +1,73 @@
 {
-  "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
-  "@type": "SoftwareSourceCode",
-  "license": "https://spdx.org/licenses/CC-BY-4.0.html",
-  "name": "The Knowledge Lifecycle of Large Language Models",
-  "version": "1.0.0",
-  "datePublished": "2026-08-18",
-  "runtimePlatform": [
-    "Python 3.10+",
-    "PyTorch 2.0+",
-    "Transformers 4.x"
-  ],
-  "author": [
-    {
-      "@type": "Person",
-      "givenName": "Amey",
-      "familyName": "Thakur",
-      "@id": "https://orcid.org/0000-0001-5644-1575"
-    },
-    {
-      "@type": "Person",
-      "givenName": "Sarvesh",
-      "familyName": "Talele",
-      "@id": "https://orcid.org/0009-0002-0818-461X"
-    }
-  ],
-  "description": "A unified framework organizing large language model knowledge management into five stages, acquisition, storage, retrieval, update and forgetting, with two contributions: Lifecycle Desynchronization, a KL-based metric that quantifies the failure occurring when parametric weights and retrieved context conflict, measured reproducibly on GPT-2, and the Provenance Vector, an architectural proposal that gates stale parametric activations using acquisition metadata.",
-  "programmingLanguage": [
-    "Python",
-    "JavaScript",
-    "TeX",
-    "Markdown"
-  ],
-  "codeRepository": "https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE",
-  "referencePublication": "https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE",
-  "keywords": [
-    "large language models",
-    "knowledge lifecycle",
-    "retrieval-augmented generation",
-    "knowledge editing",
-    "continual learning",
-    "machine unlearning",
-    "knowledge conflicts",
-    "KL divergence"
-  ]
+    "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+    "@type": "SoftwareSourceCode",
+    "name": "The Knowledge Lifecycle of Large Language Models",
+    "description": "A unified framework organizing large language model knowledge management into five stages, acquisition, storage, retrieval, update and forgetting, with two contributions: Lifecycle Desynchronization, a KL-based metric that quantifies the failure occurring when parametric weights and retrieved context conflict, measured reproducibly on GPT-2, and the Provenance Vector, an architectural proposal that gates stale parametric activations using acquisition metadata.",
+    "identifier": "LLM-KNOWLEDGE-LIFECYCLE",
+    "license": "https://spdx.org/licenses/CC-BY-4.0.html",
+    "programmingLanguage": [
+        "Python",
+        "JavaScript",
+        "TeX",
+        "Markdown"
+    ],
+    "author": [
+        {
+            "@type": "Person",
+            "givenName": "Amey",
+            "familyName": "Thakur",
+            "@id": "https://orcid.org/0000-0001-5644-1575"
+        },
+        {
+            "@type": "Person",
+            "givenName": "Sarvesh",
+            "familyName": "Talele",
+            "@id": "https://orcid.org/0009-0002-0818-461X"
+        }
+    ],
+    "dateCreated": "2026-05-07",
+    "dateReleased": "2026-08-18",
+    "codeRepository": "https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE",
+    "developmentStatus": "complete",
+    "runtimePlatform": [
+        "Python 3.10+",
+        "PyTorch 2.0+",
+        "Transformers 4.x"
+    ],
+    "keywords": [
+        "large language models",
+        "knowledge lifecycle",
+        "retrieval-augmented generation",
+        "knowledge editing",
+        "continual learning",
+        "machine unlearning",
+        "knowledge conflicts",
+        "KL divergence",
+        "Activation Steering",
+        "Agent Memory",
+        "AI Research",
+        "Continual Learning",
+        "GPT 2",
+        "Kl Divergence",
+        "Knowledge Conflicts",
+        "Knowledge Editing",
+        "Knowledge Lifecycle",
+        "Large Language Models",
+        "LLM",
+        "Machine Unlearning",
+        "NLP",
+        "RAG",
+        "Retrieval Augmented Generation",
+        "Transformers",
+        "Laboratory Experiments",
+        "Amey Thakur",
+        "amey",
+        "ameythakur",
+        "amey-thakur",
+        "ameyarc"
+    ],
+    "url": "https://huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle",
+    "version": "1.0.0",
+    "datePublished": "2026-08-18",
+    "referencePublication": "https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE"
 }
