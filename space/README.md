@@ -52,9 +52,9 @@ This replaces an earlier set of probes built from real-world updates. Those only
 
 ## The two numbers
 
-**D<sub>sync</sub>** is the surprisal of the correct answer while the corrective document is present, measured in nats. A value of *n* nats means the correct answer holds probability e<sup>-n</sup>. Past **9.2 nats** the answer is below one chance in ten thousand, where no realistic decoding recovers it. The Vioxx probe measures **12.05**.
+**D<sub>sync</sub>** is the surprisal of the correct answer while the corrective document is present, measured in nats. A value of *n* nats means the correct answer holds probability e<sup>-n</sup>. It is not the answer: probability spreads over tens of thousands of tokens, so a modest value can still be the token the model emits, and a large one need not mean the document was ignored.
 
-**I<sub>ctx</sub>** is the full-vocabulary divergence between the model's output with and without the document. It answers a different question: did the document change the model's mind about anything at all? On Vioxx it is **0.033 nats**, meaning the document is present and inert.
+**I<sub>ctx</sub>** is the full-vocabulary divergence between the model's output with and without the document. It answers a different question: did the document change the model's mind about anything at all? A document can move the distribution and still lose, which is why both numbers are shown.
 
 Together they separate a retrieval failure, where the document never arrived, from a resolution failure, where it arrived and was ignored. No single-stage benchmark can tell those apart.
 
@@ -77,7 +77,7 @@ The failure measured here sits on the boundary between **Retrieve** and **Update
 
 | Case | What the model does |
 | :--- | :--- |
-| **Vioxx withdrawn**, 2004 | Ignores the notice entirely. Resolution failure. |
+| **France to Lyon** | The document contradicts a fact the model is certain of. |
 | **Elizabeth II died**, 2022 | The notice mostly boosts "Queen". Correct context strengthening the wrong answer. |
 | **Twitter renamed X**, 2023 | Moves hard, still answers "Twitter". Influence without resolution. |
 
@@ -91,7 +91,7 @@ The browser build uses 8-bit quantized weights, which shift individual probabili
 
 ## The poster
 
-The whole argument on one page: the problem, the five-stage framework, the Vioxx finding, the metric, and the proposed architecture.
+The whole argument on one page: the problem, the five stages as framing, the 864-pass measurement, why the answer must be read at the rank, and the correction to the earlier report.
 
 <p align="center">
   <a href="https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE/blob/main/preprint/poster.pdf"><img src="poster-preview.png" alt="A0 conference poster for The Knowledge Lifecycle of Large Language Models" width="640"></a>
