@@ -12,6 +12,27 @@ REPOSITORY   : https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE
 LICENSE      : CC BY 4.0
 ===============================================================================
 
+SUPERSEDED. Use counterfactual_update.py instead.
+
+This script has two defects, both found after the manuscript citing it was
+submitted, and both are why the replacement exists.
+
+It records only the surprisal of the expected answer. It never records that
+answer's rank, nor which token the model actually puts first, so it cannot
+support any claim about what a model answers. The manuscript drew exactly such a
+claim from it, that no model answers the drug probe correctly under any
+phrasing, and re-running these probes with rank recorded showed the claim false:
+three of the six rank the corrected answer first under two of the three
+phrasings.
+
+Its probes are also real-world updates, so whether a model ever held the stale
+fact depends on its training cutoff, and the six cutoffs differ. A model that
+never learned the superseded fact cannot be observed resisting a correction to
+it, and the drug withdrawal predates every model's training data.
+
+Kept in the repository because the journal manuscript still reports it and
+because the correction belongs on the record, not because it should be rerun.
+
 The single-phrasing objection is the first one a referee raises, and it is fair:
 a surprisal measured on one sentence could be a fact about that sentence. Each
 probe therefore gets two further phrasings that ask the same question in

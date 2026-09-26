@@ -85,28 +85,32 @@ Mapping twenty representative papers onto the five stages, the median covers **t
 <a name="the-evidence"></a>
 ## What the framework exposes
 
-A boundary failure, measured. Rofecoxib, sold as Vioxx, was withdrawn worldwide in September 2004 after trials showed it raised the risk of heart attack and stroke.
+A boundary failure, measured across **864 forward passes**: six open models from 124M to 1.5B parameters, 24 counterfactual probes, three phrasings each, with and without a contradicting document.
 
-Put that withdrawal notice directly into GPT-2's prompt, then ask whether the drug is safe to prescribe.
+Each probe states a fact no model of this size gets wrong, then supplies a document asserting a plausible substitute. Restricting to the **304 pairs where the model demonstrably held the fact beforehand** — the cases where a conflict actually exists — the document is adopted **66.8%** of the time and the model keeps its own answer **27.3%**.
 
-| | Without the notice | With the notice in the prompt |
-| :--- | ---: | ---: |
-| Answers **"safe"** | 37.53% | **42.58%** |
-| Answers **"withdrawn"** | 0.0004% | 0.0006% |
-| Most likely next word | "safe" | "safe" |
+| Model | Params | Knows the fact | Adopts the document | Keeps its own |
+| :--- | ---: | ---: | ---: | ---: |
+| GPT-2 | 124M | 25.0% | 50.0% | 16.7% |
+| GPT-2 medium | 355M | 54.2% | 43.6% | 56.4% |
+| Qwen2.5-0.5B | 494M | 68.1% | **91.8%** | 8.2% |
+| GPT-2 large | 774M | 79.2% | 75.4% | 24.6% |
+| TinyLlama-1.1B | 1100M | 97.2% | **38.6%** | 57.1% |
+| Qwen2.5-1.5B | 1540M | 98.6% | 87.3% | 0.0% |
 
-The correction is sitting in front of the model, and its confidence that the drug is safe **goes up**. The correct answer is left at roughly **six chances in a million**.
+**Holding a fact scales. Deferring to a document does not.** Knowing the answer rises monotonically with parameter count, 25.0% to 98.6%, with no inversion anywhere. What the model then does with a contradicting document follows no such order: TinyLlama-1.1B knows the fact 97.2% of the time and defers *least* of the six, while Qwen2.5-0.5B, a third its size, defers 91.8%.
+
+**Wording moves the answer nearly as much as the model does.** Across three phrasings the adoption rate has a median spread of **47.9** percentage points and a maximum of **87.5**. Qwen2.5-0.5B ranges from 100.0% to 12.5% on the same 24 facts with the same document.
 
 > [!CAUTION]
 > A model in this state does not look broken. It answers fluently, cites the document it was given, and is wrong. In medicine, law, or finance, the failure is invisible until someone acts on it.
 
 <br>
 
-This is not a hallucination in the usual sense. Retrieval worked perfectly: the right document was found and delivered. What failed is the step after it, where the model must decide which of its two memories to believe. No benchmark for retrieval, editing, or memory tests that step, because it belongs to none of them.
+**And probability is not an answer.** The in-context answer carries more than 0.10 of the probability mass in **332** of the 432 conditions with the document present, and in **69** of those — 20.8% — it is still not the token the model ranks first. A reader given only the probability would conclude the document had landed; a reader given the rank would see the model say something else.
 
-Two measurements separate those cases. The correct answer sits at **12.05 nats** of surprisal, and anything past **9.2 nats** is below one chance in ten thousand, where no realistic decoding recovers it. Meanwhile the document shifts the model's entire output distribution by only **0.033 nats**: it is present, and it is inert.
-
-The root cause is what training throws away. A model learns *what* is true but never *when* it learned it or *where the claim came from*, so at inference it has no principled basis for preferring fresh evidence over a confident old memory.
+> [!IMPORTANT]
+> **This corrects an earlier version of this work.** That version reported, on a drug-withdrawal probe, that no model answered correctly under any phrasing. The claim was false. The script behind it recorded only the surprisal of the expected answer, never the rank or the top-ranked token, so it could not have tested the claim it was cited for. Its probes were also real-world updates, so whether a model held the stale fact depended on training cutoffs that differ across the six models — and that withdrawal predates every model's training data, so no model held the superseded fact and there was no conflict to resist. Both defects are removed by the counterfactual design above, and the correction is written up as its own section of the paper rather than quietly dropped.
 
 <br>
 
@@ -115,14 +119,14 @@ The root cause is what training throws away. A model learns *what* is true but n
 
 [![Retrieve](https://img.shields.io/badge/Retrieve-E08A2E)](#the-five-stages) [![Update](https://img.shields.io/badge/Update-D05353)](#the-five-stages)
 
-**A metric that makes the failure visible.** Lifecycle Desynchronization measures how far the correct answer has been pushed down while the corrective document is present. It is reported in nats, a unit that converts straight back to probability: 12.05 nats means the right answer holds about six chances in a million. A companion number, context influence, measures whether the document moved the model at all. Together they separate a retrieval failure, where the document never arrived, from a resolution failure, where it arrived and was ignored. No single-stage benchmark can tell those two apart.
+**A measurement that reports what the model would actually say.** Conflict is read at the *rank* of the candidate answers, not only their probability, because those are different quantities and they disagree in 20.8% of the conditions measured here. Rank is what a system under greedy decoding emits; probability is what the earlier version of this work used alone, and it is why that version reached a conclusion its own code could not support. Recording the rank costs one comparison.
 
 [![Acquire](https://img.shields.io/badge/Acquire-4A7FD4)](#the-five-stages) [![Store](https://img.shields.io/badge/Store-2A9D8F)](#the-five-stages)
 
-**An architecture that targets the cause.** The Provenance Vector attaches metadata to each stored fact recording when it was learned and how reliable its source was. At inference, a gate reads that metadata and turns down facts that have gone stale, so a fresh document can win without anyone editing the weights. The paper gives the forward pass as an algorithm, derives the cost at about 0.04% extra parameters, and proves the idealized case under assumptions it states openly.
+**A design that isolates the conflict from the training cutoff.** Counterfactual probes assert something every model is confident is false, so the conflict exists by construction for all six regardless of vintage — the standard device in the knowledge-conflict literature. The no-document condition then identifies the subset in which the model actually held the fact, and every headline number is restricted to that subset. Without it, a model that never knew the answer is indistinguishable from one that knew it and deferred.
 
 > [!NOTE]
-> The metric is measured. The architecture is a proposal supported by an idealized proof, not a trained system, and the paper says so in its limitations rather than leaving you to discover it.
+> Everything above is measured. An earlier version of this work also proposed an architecture, the Provenance Vector, supported by an idealized proof rather than a trained system. It has been removed from the arXiv paper because nothing in these measurements tests it; it remains in the journal manuscript, where the framework it belongs to is the contribution.
 
 <br>
 
@@ -164,15 +168,18 @@ python experiments/dsync_experiment.py
 
 ### The cross-model notebook
 
-The [Kaggle notebook](https://www.kaggle.com/code/ameythakur20/cross-model-lifecycle-desynchronization) carries the same measurement across **six open models from 124M to 1.5B parameters** and three documented fact changes: eighteen measurements, deterministic, with two controls.
+> [!WARNING]
+> **This section describes the earlier, superseded experiment.** It is kept because the journal manuscript still rests on it and because the correction is part of the record, but its probes were real-world updates, so whether a model ever held the stale fact depended on training cutoffs that differ across the six models. It also measured surprisal without recording rank. The current measurement is [the 864-pass counterfactual experiment](#the-evidence); prefer it.
 
-| It answers | Result |
+The [Kaggle notebook](https://www.kaggle.com/code/ameythakur20/cross-model-lifecycle-desynchronization) carries the earlier measurement across **six open models from 124M to 1.5B parameters** and three documented fact changes: eighteen measurements, deterministic, with two controls.
+
+| It asked | What it reported |
 | :--- | :--- |
-| Does scale resolve the conflict? | **No.** Inside the GPT-2 family the Vioxx probe runs 12.05 → 10.96 → 11.91 nats, and under the headline phrasing no model on the ladder answers it correctly. |
-| Does instruction tuning resolve it? | **On two probes of three.** The largest tuned model answers Twitter and Monarch and still answers Vioxx with *unsafe*. |
-| Was the answer out of reach, or the document unused? | **Unused.** Stating the answer outright is worth 7.7 to 10.6 nats to every model; the corrective document is worth at most 0.41 nats to any GPT-2. |
+| Does scale resolve the conflict? | Inside the GPT-2 family the drug probe runs 12.05 → 10.96 → 11.91 nats. **The stronger reading once drawn from this — that no model answers it correctly — does not hold:** with rank recorded, three of the six rank the corrected answer first under two of three phrasings. |
+| Does instruction tuning resolve it? | On two probes of three, by that measurement. |
+| Was the answer out of reach, or the document unused? | Stating the answer outright is worth 7.7 to 10.6 nats to every model; the corrective document is worth at most 0.41 nats to any GPT-2. |
 
-Two controls make that last row possible: an irrelevant document matched in length and register, and a leak document that states the answer outright. On GPT-2 the irrelevant article about the Danube moves the output distribution **0.089** nats against the withdrawal notice's **0.033**, and the corrective document makes the *wrong* answer more likely on five of the six models.
+Two controls make that last row possible: an irrelevant document matched in length and register, and a leak document that states the answer outright. On GPT-2 the irrelevant article about the Danube moves the output distribution **0.089** nats against the withdrawal notice's **0.033**.
 
 <br>
 
@@ -267,9 +274,9 @@ eighteen measurements, and one of them is GPT-2 on the headline probe.
 
 <div align="center">
 
-[![Download the paper](https://img.shields.io/badge/Download-Paper_(PDF,_21_pages)-B31B1B?logo=adobeacrobatreader&logoColor=white)](preprint/main.pdf)
+[![Download the paper](https://img.shields.io/badge/Download-arXiv_paper_(PDF,_6_pages)-B31B1B?logo=adobeacrobatreader&logoColor=white)](preprint/main.pdf)
 &nbsp;
-[![Download the slides](https://img.shields.io/badge/Download-Slides_(PDF,_18_slides)-4A7FD4?logo=adobeacrobatreader&logoColor=white)](preprint/presentation.pdf)
+[![Download the slides](https://img.shields.io/badge/Download-Slides_(PDF)-4A7FD4?logo=adobeacrobatreader&logoColor=white)](preprint/presentation.pdf)
 &nbsp;
 [![Download the poster](https://img.shields.io/badge/Download-Poster_(PDF,_A0)-8F5FB8?logo=adobeacrobatreader&logoColor=white)](preprint/poster.pdf)
 &nbsp;
@@ -279,11 +286,20 @@ eighteen measurements, and one of them is GPT-2 on the headline probe.
 
 <br>
 
+> [!NOTE]
+> **There are two manuscripts here, and they are different papers.**
+>
+> `preprint/` is **“Probability Is Not an Answer: Rank-Level Measurement of Knowledge Conflict in Small Language Models”**, six pages, built on the 864 measurements above. It is the arXiv submission.
+>
+> `paper/` is the long **“Knowledge Lifecycle”** framework manuscript, which is the journal submission. The split is deliberate: arXiv's computer-science policy declines framework and position papers without prior journal or conference acceptance, while a framework paper is precisely what a survey venue wants.
+
+<br>
+
 <div align="center">
 
 <a href="preprint/poster.pdf"><img src="preprint/figures/poster-preview.png" alt="A0 conference poster: The Knowledge Lifecycle of Large Language Models. The problem, the framework, the Vioxx finding, the metric, the architecture, and how to reproduce it." width="720"></a>
 
-**The whole argument on one page.** &nbsp; The A0 poster carries the problem, the five-stage framework, the Vioxx finding, the metric, and the proposed architecture. [Download the full-resolution PDF](preprint/poster.pdf).
+**The framework argument on one page.** &nbsp; The A0 poster and the slide deck present the **Knowledge Lifecycle framework manuscript** — the problem, the five stages, the drug-withdrawal case, the metric and the proposed architecture. They have not yet been rebuilt around the counterfactual measurement above, so read the evidence correction in [What the framework exposes](#the-evidence) alongside them. [Download the full-resolution PDF](preprint/poster.pdf).
 
 </div>
 
@@ -291,21 +307,28 @@ eighteen measurements, and one of them is GPT-2 on the headline probe.
 
 > [!TIP]
 > ### 📄 &nbsp; Short on time? Read these two sections
-> **Section 8.4** defines the metric. **Section 8.5** is the measurement. The two stand alone without the survey around them, and together they are about four pages.
+> **Section 3** is the measurement: what scales, what does not, and how far wording moves the answer.
 >
-> **Section 8.6** is the cross-model sweep, and it is where the exposure trap sits: on five of six models the document that corrects the fact made the *wrong* answer more likely.
-
-The slide deck carries speaker notes throughout, so it reads as a written argument as well as a talk.
+> **Section 4** is the correction. It states what the earlier version claimed, shows why the code behind it could not have tested that claim, and reports the measurement that overturned it.
 
 ```
 .
-├── preprint/       The arXiv manuscript, slides, poster, bibliography, derivations
-├── paper/          The manuscript in the JAIR format, submitted to JAIR
-├── experiments/    The measurement script and the cross-model notebook
+├── preprint/       The arXiv paper (short, empirical), slides, poster, bibliography
+│   ├── main.tex            the manuscript
+│   ├── numbers.tex         every quoted figure, generated from the measurement
+│   └── results-table.tex   the results table, generated from the measurement
+├── paper/          The Knowledge Lifecycle framework manuscript, journal format
+├── experiments/    The measurement scripts and the cross-model notebook
+│   ├── counterfactual_update.py     the 864-pass measurement
+│   ├── analyse_counterfactual.py    turns it into the reported figures
+│   └── make_paper_numbers.py        turns those into LaTeX
 ├── space/          The live demonstration
 ├── CITATION.cff    How to cite this work
 └── LICENSE         CC BY 4.0
 ```
+
+> [!IMPORTANT]
+> No number in the paper is typed by hand. `make_paper_numbers.py` generates `numbers.tex` and `results-table.tex` straight from the measurement, so the manuscript cannot drift from the data. The previous version quoted a figure its own code had never produced, which is the specific failure this guards against.
 
 <br>
 
