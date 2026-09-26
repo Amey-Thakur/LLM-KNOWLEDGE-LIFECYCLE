@@ -201,204 +201,140 @@
 \end{frame}
 
 % ============================== 5. THE CASE ==================================
-\begin{frame}{A documented case: Vioxx}
+\begin{frame}{The probe}
   \vspace{0.3cm}
   \begin{itemize}\setlength\itemsep{0.9em}
-    \item Rofecoxib, sold as Vioxx, was approved in 1999 as a COX-2 inhibitor.
-    \item Withdrawn worldwide in \textbf{September 2004} after trials showed raised
-          risk of heart attack and stroke.
-    \item A model trained on pre-2004 text holds ``approved''. The correction exists,
-          and can be retrieved.
+    \item Take a fact the model certainly holds: the capital of France.
+    \item Put a document in the prompt asserting a plausible substitute:
+          \emph{the capital was relocated to Lyon}.
+    \item Now the conflict exists \textbf{by construction}, for every model,
+          whatever it was trained on and whenever.
   \end{itemize}
   \vspace{1.0em}
   \begin{center}
     \begin{tikzpicture}[font=\footnotesize, node distance=0.35cm]
-      \node[draw=rule, rounded corners=3pt, fill=acquire!8, minimum width=3.4cm, minimum height=0.85cm] (w) {weights say ``approved''};
-      \node[draw=rule, rounded corners=3pt, fill=retrieve!10, minimum width=3.4cm, minimum height=0.85cm, right=2.4cm of w] (d) {document says ``withdrawn''};
+      \node[draw=rule, rounded corners=3pt, fill=acquire!8, minimum width=3.4cm, minimum height=0.85cm] (w) {weights say ``Paris''};
+      \node[draw=rule, rounded corners=3pt, fill=retrieve!10, minimum width=3.4cm, minimum height=0.85cm, right=2.4cm of w] (d) {document says ``Lyon''};
       \draw[-{Stealth}, update, line width=1pt] (w) -- node[above, font=\scriptsize, text=update] {conflict} (d);
     \end{tikzpicture}
   \end{center}
-  \note{Use a real withdrawal, not a toy fact, because the room needs to feel
-  that a wrong answer here has a cost. Do not give the result yet. Target:
-  75 seconds.}
+  \note{The counterfactual is the whole methodological point and is worth
+  labouring. A real-world update only creates a conflict for a model whose
+  training predates it, so with six models of different vintages you cannot tell
+  a model that deferred from one that never knew. Target: 75 seconds.}
 \end{frame}
 
 % ============================== 6. THE RESULT ================================
 \begin{frame}{The measurement}
   \begin{center}
-  \begin{tabular}{@{}lrr@{}}
+  \begin{tabular}{@{}lrrr@{}}
     \toprule
-    & \textbf{Without the notice} & \textbf{With the notice in the prompt} \\
+    \textbf{Model} & \textbf{Params} & \textbf{Holds it} & \textbf{Adopts the doc} \\
     \midrule
-    Answers ``safe''      & 37.53\% & \textcolor{update}{\textbf{42.58\%}} \\
-    Answers ``withdrawn'' & 0.0004\% & 0.0006\% \\
-    Most likely word      & ``safe'' & ``safe'' \\
+    GPT-2            & 124M  & 25.0\% & 50.0\% \\
+    GPT-2 medium     & 355M  & 54.2\% & 43.6\% \\
+    Qwen2.5-0.5B     & 494M  & 68.1\% & \textcolor{ok}{\textbf{91.8\%}} \\
+    GPT-2 large      & 774M  & 79.2\% & 75.4\% \\
+    TinyLlama-1.1B   & 1100M & 97.2\% & \textcolor{update}{\textbf{38.6\%}} \\
+    Qwen2.5-1.5B     & 1540M & 98.6\% & 87.3\% \\
     \bottomrule
   \end{tabular}
   \end{center}
-  \vspace{1.1em}
-  \begin{itemize}\setlength\itemsep{0.7em}
-    \item The withdrawal notice is \textbf{in the prompt}, and confidence in ``safe'' \textbf{rises}.
-    \item The correct answer is left at roughly \textbf{six chances in a million}.
-    \item Retrieval succeeded. Resolution failed.
-  \end{itemize}
-  \note{Pause after 42.58 percent and let the room notice the number went up,
-  not down. This is the moment the talk turns. If challenged on cherry-picking:
-  the script is deterministic, it is in the repository, and two further cases
-  are in the paper. Target: 2 minutes.}
-\end{frame}
-
-% ============================== 7. NOT HALLUCINATION =========================
-\begin{frame}{This is not hallucination}
-  \vspace{0.4cm}
-  \begin{center}
-    \begin{tikzpicture}[font=\small]
-      \node[draw=ok, fill=ok!8, rounded corners=4pt, minimum width=4.6cm, minimum height=1.5cm, align=center] (r)
-        {\textcolor{ok}{\textbf{Retrieval}}\\[1mm] the right document\\was found and delivered};
-      \node[draw=update, fill=update!8, rounded corners=4pt, minimum width=4.6cm, minimum height=1.5cm, align=center, right=2.2cm of r] (u)
-        {\textcolor{update}{\textbf{Resolution}}\\[1mm] the model chose\\the wrong memory};
-      \draw[-{Stealth}, line width=1.2pt, muted] (r) -- (u);
-    \end{tikzpicture}
-  \end{center}
   \vspace{1.0em}
-  \begin{center}
-    No benchmark for retrieval, editing, or memory tests that second step,\\
-    \textbf{because it belongs to none of them}.
-  \end{center}
-  \note{This slide pre-empts the most common objection, that this is just
-  hallucination under another name. It is not: the retriever did its job, and
-  the next slide gives the number that proves the context was present and
-  ignored. Target: 60 seconds.}
-\end{frame}
-
-% ============================== 8. THE METRIC ================================
-\begin{frame}{The metric: Lifecycle Desynchronization}
-  \begin{equation*}
-    \widehat{\mathcal{D}}_{sync}
-      = -\ln P\!\left(y^{*} \mid q,\ \theta_{stale},\ \mathcal{M}_{now}\right)
-  \end{equation*}
-  \vspace{0.4em}
   \begin{itemize}\setlength\itemsep{0.7em}
-    \item The surprisal of the \textbf{correct} answer while the corrective document is present.
-    \item Measured in nats: $n$ nats means the right answer holds probability $e^{-n}$.
-    \item Above $9.2$ nats, no realistic decoding recovers it.
+    \item \textbf{864 forward passes.} Six models, 24 probes, three phrasings,
+          with and without the document.
+    \item Restricted to the \textbf{304} pairs where the model demonstrably held
+          the fact, so a conflict actually existed.
   \end{itemize}
-  \vspace{0.8em}
-  \begin{center}
-    \begin{tikzpicture}
-      \fill[ok!25]     (0,0) rectangle (1.1,0.32);
-      \fill[yellow!35] (1.1,0) rectangle (4.4,0.32);
-      \fill[orange!35] (4.4,0) rectangle (7.7,0.32);
-      \fill[update!35] (7.7,0) rectangle (11,0.32);
-      \draw[ink, line width=1.6pt] (10.0,-0.12) -- (10.0,0.44);
-      \node[font=\scriptsize, text=muted] at (1.1,-0.42) {0.7};
-      \node[font=\scriptsize, text=muted] at (4.4,-0.42) {4.6};
-      \node[font=\scriptsize, text=muted] at (7.7,-0.42) {9.2};
-      \node[font=\scriptsize\bfseries, text=ink] at (10.0,-0.45) {12.05};
-    \end{tikzpicture}
-  \end{center}
-  \note{Explain nats once, in plain terms: it is a log probability, so a bigger
-  number means the right answer is buried deeper. The marker on the scale is the
-  Vioxx measurement, well past the point where decoding cannot recover.
+  \note{Let the third column land before saying anything. Holding the fact
+  climbs straight down the column; adopting the document does not. If challenged
+  on cherry-picking: the script is deterministic and in the repository.
   Target: 2 minutes.}
 \end{frame}
 
-% ============================== 9. THE DIAGNOSTIC ============================
-\begin{frame}{Two numbers, not one}
-  \vspace{0.2cm}
+% ============================== 7. SCALE DOES NOT FIX IT =====================
+\begin{frame}{Scale buys knowledge, not deference}
+  \vspace{0.4cm}
   \begin{center}
-  \small
-  \begin{tabular}{@{}lll@{}}
-    \toprule
-     & \textbf{$\mathcal{I}_{ctx}$ low} & \textbf{$\mathcal{I}_{ctx}$ high} \\
-    \midrule
-    \textbf{$\mathcal{D}_{sync}$ low}  & \textcolor{ok}{fact never conflicted} & \textcolor{ok}{context resolved the conflict} \\[3pt]
-    \textbf{$\mathcal{D}_{sync}$ high} & \textcolor{update}{\textbf{resolution failure}} & \textcolor{retrieve}{drift: influential but losing} \\
-    \bottomrule
-  \end{tabular}
-  \end{center}
-  \vspace{1.1em}
-  \begin{itemize}\setlength\itemsep{0.6em}
-    \item $\mathcal{I}_{ctx}$ measures whether the document moved the model \textbf{at all}.
-    \item On Vioxx it is $\mathbf{0.033}$ nats. The document is \textbf{inert}.
-    \item That pairing is what separates a broken retriever from a model that ignores what it retrieved.
-  \end{itemize}
-  \note{This grid is what makes the work a diagnosis rather than a score. High
-  D-sync alone is ambiguous: the retriever might have failed. High D-sync with
-  near-zero I-ctx is unambiguous. Target: 90 seconds.}
-\end{frame}
-
-% ============================== 10. TWO MORE CASES ===========================
-\begin{frame}{Three cases, three regimes}
-  \vspace{0.2cm}
-  \begin{center}
-  \small
-  \begin{tabular}{@{}lll@{}}
-    \toprule
-    \textbf{Fact change} & \textbf{What the model does} & \textbf{Regime} \\
-    \midrule
-    Vioxx withdrawn, 2004      & ignores the notice entirely          & \textcolor{update}{resolution failure} \\[3pt]
-    Elizabeth II died, 2022    & the notice boosts ``Queen''          & \textcolor{retrieve}{the exposure trap} \\[3pt]
-    Twitter renamed X, 2023    & moves hard, still answers ``Twitter'' & \textcolor{store}{drift} \\
-    \bottomrule
-  \end{tabular}
-  \end{center}
-  \vspace{1.1em}
-  \begin{center}
-    The middle row is the uncomfortable one: \textbf{a correct document made the wrong answer stronger.}
-  \end{center}
-  \note{The monarch case is the one researchers remember, so give it a beat.
-  Telling the model that Elizabeth II died raises the probability of the word
-  Queen, because mentioning a fact, even to correct it, reinforces the
-  association. Target: 90 seconds.}
-\end{frame}
-
-% ============================== 11. THE CAUSE ================================
-\begin{frame}{The cause: storage discards provenance}
-  \begin{itemize}\setlength\itemsep{0.9em}
-    \item Training teaches a model \textbf{what} is true.
-    \item It never records \textbf{when} the fact was learned, or \textbf{where} it came from.
-    \item So at inference there is no principled basis for preferring fresh evidence
-          over a confident old memory.
-  \end{itemize}
-  \vspace{1.0em}
-  \begin{center}
-    \begin{tikzpicture}[font=\footnotesize]
-      \node[draw=rule, rounded corners=3pt, minimum width=3.1cm, minimum height=0.9cm] (k) at (0,0) {key $k_i$};
-      \node[draw=rule, rounded corners=3pt, minimum width=3.1cm, minimum height=0.9cm] (v) at (3.7,0) {value $v_i$};
-      \node[draw=acquire, fill=acquire!10, rounded corners=3pt, minimum width=3.4cm, minimum height=0.9cm] (p) at (7.6,0) {provenance $p_i$};
-      \draw[-{Stealth}, muted] (k) -- (v);
-      \draw[-{Stealth}, acquire, line width=1pt] (v) -- (p);
-      \node[below, text=muted, font=\scriptsize] at (1.85,-0.72) {what a Transformer stores today};
-      \node[below, text=acquire, font=\scriptsize] at (7.6,-0.72) {what we add};
+    \begin{tikzpicture}[font=\small]
+      \node[draw=ok, fill=ok!8, rounded corners=4pt, minimum width=4.9cm, minimum height=1.6cm, align=center] (k)
+        {\textcolor{ok}{\textbf{Holds the fact}}\\[1mm] $25.0 \to 98.6$ per cent\\monotone in parameters};
+      \node[draw=update, fill=update!8, rounded corners=4pt, minimum width=4.9cm, minimum height=1.6cm, align=center, right=1.9cm of k] (a)
+        {\textcolor{update}{\textbf{Adopts the document}}\\[1mm] $38.6$ to $91.8$ per cent\\no order at all};
+      \draw[-{Stealth}, line width=1.2pt, muted] (k) -- (a);
     \end{tikzpicture}
   \end{center}
-  \note{This is the pivot from diagnosis to proposal. The room should agree that
-  the missing ingredient is metadata before seeing any mechanism. Target:
-  90 seconds.}
+  \vspace{1.0em}
+  \begin{center}
+    TinyLlama holds the fact \textbf{97.2\%} of the time and defers \textbf{least}
+    of the six.\\
+    Qwen2.5-0.5B, a third its size, defers \textbf{91.8\%}.
+  \end{center}
+  \note{This is the headline. A bigger model knows more and is not thereby more
+  willing to be corrected. Family and training appear to matter more than size,
+  though this design cannot separate them and the paper says so.
+  Target: 90 seconds.}
 \end{frame}
 
-% ============================== 12. THE PROPOSAL =============================
-\begin{frame}{The proposal: gate stale facts at inference}
-  \begin{equation*}
-    \text{FFN}_{steered}(x) \;=\; \sum_{i=1}^{d_m} S(\Delta\tau_i)\ f(x \cdot k_i)\ v_i,
-    \qquad
-    S(\Delta\tau_i) = \sigma\!\left(\gamma - \beta \cdot \Delta\tau_i\right)
-  \end{equation*}
-  \vspace{0.5em}
-  \begin{itemize}\setlength\itemsep{0.7em}
-    \item Fresh facts pass with $S \approx 1$; stale facts are attenuated toward $0$.
-    \item \textbf{The weights are never modified}, so the specificity bottleneck that
-          limits static editing does not apply.
-    \item Cost: about $1$M parameters on a 7B model, under $\mathbf{0.02\%}$.
+% ============================== 8. PHRASING ==================================
+\begin{frame}{The wording moves it as much as the model does}
+  \vspace{0.5cm}
+  \begin{itemize}\setlength\itemsep{0.9em}
+    \item Each probe is asked three ways, same question, different words.
+    \item Across the three, the adoption rate has a median spread of
+          \textbf{47.9} percentage points and a maximum of \textbf{87.5}.
+    \item Qwen2.5-0.5B runs from \textbf{100.0\%} to \textbf{12.5\%} on the
+          \emph{same 24 facts} with the \emph{same document}.
   \end{itemize}
-  \vspace{0.7em}
-  \begin{center}\color{muted}\small
-    Think of it as a volume control on every stored fact, turned down by age.
+  \vspace{1.2em}
+  \begin{center}
+    A single-phrasing result about knowledge conflict is reporting a property of
+    the sentence\\ at least as much as a property of the model.
   \end{center}
-  \note{The volume-knob analogy works better than the equation for a mixed
-  audience, so say the analogy first and let the equation confirm it. Target:
-  2 minutes.}
+  \note{This is the slide that makes the audience distrust every
+  single-prompt result they have seen this year, including the earlier version
+  of this one. Target: 75 seconds.}
+\end{frame}
+
+% ============================== 9. RANK ======================================
+\begin{frame}{Probability is not an answer}
+  \vspace{0.4cm}
+  \begin{itemize}\setlength\itemsep{0.9em}
+    \item Probability mass is spread over tens of thousands of tokens. An answer
+          has only to be \textbf{ranked first}, not to be large.
+    \item The in-context answer carries more than $0.10$ in \textbf{332} of the
+          432 conditions with the document present.
+    \item In \textbf{69} of those, \textbf{20.8\%}, it is \emph{still not} what
+          the model says.
+  \end{itemize}
+  \vspace{1.2em}
+  \begin{center}
+    Recording the rank costs \textbf{one comparison} against the maximum,\\
+    and it is the only quantity that matches what a deployed system emits.
+  \end{center}
+  \note{Slow down here. This is the methodological contribution and the next
+  slide is the confession that motivates it. Target: 75 seconds.}
+\end{frame}
+
+% ============================== 10. THE CORRECTION ===========================
+\begin{frame}{A correction to our own earlier report}
+  \vspace{0.4cm}
+  \begin{itemize}\setlength\itemsep{0.85em}
+    \item An earlier version of this work reported that \textbf{no model} answers
+          a drug-withdrawal probe correctly under any phrasing.
+    \item \textbf{That claim was false.} The script behind it recorded only the
+          \emph{surprisal} of the expected answer, never its rank, so it could
+          not have tested the claim it was cited for.
+    \item Re-run with rank recorded: \textbf{three of the six} rank the corrected
+          answer first under two of three phrasings.
+    \item A second defect was structural. Those probes were real-world updates,
+          and the withdrawal predates every model's training data, so \textbf{no
+          conflict existed to resist}.
+  \end{itemize}
+  \note{Say this plainly and do not soften it. Volunteering the error buys
+  credibility for everything else, and a room that hears you correct yourself
+  will believe the rest. Target: 90 seconds.}
 \end{frame}
 
 % ============================== 13. HONESTY ==================================
@@ -407,15 +343,15 @@
   \begin{center}
     \begin{tikzpicture}[font=\small]
       \node[draw=ok, fill=ok!8, rounded corners=4pt, minimum width=5.2cm, minimum height=2.0cm, align=center] (m)
-        {\textcolor{ok}{\textbf{Measured}}\\[2mm] The metric, on real models,\\deterministically,\\reproducible on a laptop};
+        {\textcolor{ok}{\textbf{Measured}}\\[2mm] 864 passes, six models,\\deterministic,\\reproducible on a laptop};
       \node[draw=muted, fill=black!3, rounded corners=4pt, minimum width=5.2cm, minimum height=2.0cm, align=center, right=1.6cm of m] (p)
-        {\textcolor{muted}{\textbf{Proposed}}\\[2mm] The architecture,\\with an idealized proof\\under stated assumptions};
+        {\textcolor{muted}{\textbf{Not claimed}}\\[2mm] Which factor drives it:\\family, tuning and scale\\vary together here};
     \end{tikzpicture}
   \end{center}
   \vspace{0.9em}
   \begin{center}
-    The Provenance Vector has \textbf{not} been trained. It needs a pretraining run,\\
-    and the paper says so in its limitations rather than leaving you to find out.
+    Every figure here is \textbf{generated} from the measurement, never typed.\\
+    The earlier version quoted a number its own code had never produced.
   \end{center}
   \note{Say this before anyone asks. Volunteering the limitation buys credibility
   for everything else in the talk, and it removes the sharpest question a jury
@@ -428,8 +364,8 @@
   \begin{itemize}\setlength\itemsep{0.9em}
     \item Every number in this talk comes from \textbf{one deterministic script}.
           No sampling, identical digits on any machine.
-    \item The model is GPT-2 base, 124M parameters: small, fully open, and free of
-          instruction tuning that would confound the result.
+    \item Six open models from 124M to 1.5B, float32 on CPU, so the digits do
+          not depend on an accelerator's arithmetic.
     \item The demonstration runs GPT-2 \textbf{inside your browser}. Nothing you type
           leaves your laptop.
   \end{itemize}
@@ -439,20 +375,19 @@
     \textbf{Live demonstration}\quad \href{https://huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle}{huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle}
   \end{center}
   \note{If there is a screen and a minute to spare, open the demo live and run
-  the Vioxx probe. A measurement performed in front of the room is worth more
+  a counterfactual probe. A measurement performed in front of the room is worth more
   than any slide. Target: 90 seconds, or 2 minutes with the live run.}
 \end{frame}
 
 % ============================== 15. WHAT NEXT ================================
 \begin{frame}{What comes next}
   \begin{itemize}\setlength\itemsep{0.9em}
-    \item \textbf{Does it survive scale? Yes.} Across six open models from 124M to
-          1.5B, not one answers the Vioxx probe correctly, and inside the GPT-2
-          family the measurement is not even monotone in size.
-    \item \textbf{Does instruction tuning fix it? Not on this probe.} The tuned
-          models resolve the Twitter and Monarch conflicts and still lose Vioxx;
-          the largest answers ``unsafe'', which is the right direction and the
-          wrong token.
+    \item \textbf{Which factor actually drives deference?} Family, instruction
+          tuning and scale vary together across these six models, so the negative
+          claim is supported and the positive one is not. Holding two fixed is the
+          next experiment.
+    \item \textbf{Does it hold above 1.5B?} Unknown. The non-monotonicity is
+          evidence about this range, and 7B and above may behave differently.
     \item \textbf{Does reasoning-mode inference help?} Extended test-time compute
           should, in principle, resolve conflicts the forward pass cannot.
     \item \textbf{Multimodal.} A text prior overriding a contradicting image is the
@@ -477,10 +412,10 @@
   \begin{itemize}\setlength\itemsep{1.3em}
     \item Five separate research fields are five stages of \textbf{one lifecycle},
           and systems fail at the boundaries nobody benchmarks.
-    \item Those failures are \textbf{measurable}: a model with the correction in its
-          prompt still answers wrong, at 12.05 nats.
-    \item The cause is that storage \textbf{discards provenance}, and an inference-time
-          gate can address it without touching the weights.
+    \item Whether a document beats a model's memory is \textbf{not a question of
+          size}: holding a fact scales, deferring to a correction does not.
+    \item And it has to be read at the \textbf{rank}, because probability and
+          answer disagree one time in five.
   \end{itemize}
   \vspace{1.2em}
   \begin{center}
@@ -528,18 +463,22 @@
   \vspace{0.2cm}
   \small
   \begin{itemize}\setlength\itemsep{0.75em}
-    \item \textbf{Why GPT-2 and not a frontier model?} Small, fully open, no
-          instruction-tuning confound, and it makes the result checkable on a laptop.
-          The claim is that the failure exists and is measurable, not that it is universal.
-    \item \textbf{Is this just hallucination?} No. The retriever succeeded, and
-          $\mathcal{I}_{ctx} = 0.033$ proves the context was present and inert.
-    \item \textbf{Does it disappear at scale?} Unknown, and that is the honest answer.
-          The sweep is running; we will report what it shows.
-    \item \textbf{Why not just edit the weights?} Editing damages neighboring facts,
-          and degrades as edits accumulate. Gating leaves the weights untouched.
-    \item \textbf{Is the proof meaningful if untrained?} It shows the mechanism is
-          structurally sound given accurate provenance. The assumptions are stated,
-          not hidden.
+    \item \textbf{Why models this small?} Fully open, and the whole measurement
+          reruns on a laptop in twenty minutes. The claim is about this range and
+          says so; 7B and above is untested.
+    \item \textbf{Is this just hallucination?} No. The document is placed in the
+          prompt by construction, so nothing was lost in retrieval. What fails is
+          the step after it.
+    \item \textbf{Aren't counterfactual documents unfair?} They are a different
+          case from a deployed system, where the document is true and the memory
+          is stale. They buy freedom from the training-cutoff confound, and a
+          model that defers here may be deferring to misinformation too. Both are
+          in the limitations.
+    \item \textbf{Why only capitals?} It controls for question type, at the cost
+          of saying nothing about numeric, temporal or causal facts.
+    \item \textbf{Why does the earlier claim appear at all?} Because it was
+          published. Correcting it on the record is cheaper than letting someone
+          else find it.
   \end{itemize}
   \note{Do not show this slide unless a question calls for it. Knowing it is
   there is what keeps you calm during questions.}
