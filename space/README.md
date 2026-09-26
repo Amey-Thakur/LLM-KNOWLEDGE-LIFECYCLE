@@ -44,18 +44,11 @@ tags:
 
 ## What this demonstration measures
 
-Rofecoxib, sold as Vioxx, was withdrawn worldwide in September 2004 after trials showed it raised the risk of heart attack and stroke.
+Each preset supplies a document that contradicts a fact the model is certain of: *the capital of France was relocated to Lyon*. The conflict therefore exists whatever the model was trained on.
 
-Put that withdrawal notice directly into GPT-2's prompt, then ask whether the drug is safe to prescribe:
+This replaces an earlier set of probes built from real-world updates. Those only create a conflict for a model whose training predates the update, and the six models in the paper have different cutoffs, so a model that never held the stale fact was indistinguishable from one that held it and deferred.
 
-| | Without the notice | With the notice in the prompt |
-| :--- | ---: | ---: |
-| Answers **"safe"** | 37.53% | **42.58%** |
-| Answers **"withdrawn"** | 0.0004% | 0.0006% |
-
-The correction is sitting in front of the model, and its confidence that the drug is safe **goes up**.
-
-This is not a hallucination in the usual sense. Retrieval worked: the right document was found and delivered. What failed is the step after it, where the model must decide which of its two memories to believe.
+> **Read the rank, not only the bar.** Across the paper's 432 document conditions the in-context answer carries more than 0.10 probability 332 times, and in 69 of those it is still not the token the model would emit.
 
 ## The two numbers
 

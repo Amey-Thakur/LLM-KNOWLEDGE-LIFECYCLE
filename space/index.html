@@ -17,7 +17,7 @@
 <title>LLM Knowledge Lifecycle</title>
 <meta name="description" content="When a language model's training memory contradicts the document in its prompt, which one wins? Measure it live on GPT-2, in your browser.">
 <meta property="og:title" content="The Knowledge Lifecycle of Large Language Models">
-<meta property="og:description" content="GPT-2, asked about Vioxx with the 2004 withdrawal notice in its prompt, still answers safe. Measure the failure live in your browser.">
+<meta property="og:description" content="Put a document in front of GPT-2 that contradicts what it knows, and see which one comes out. Measure it live in your browser.">
 <meta property="og:type" content="website">
 <meta property="og:image" content="https://huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle/resolve/main/social-preview.png">
 <meta name="twitter:card" content="summary_large_image">
@@ -65,17 +65,18 @@
 <section id="probe" class="panel active">
 
   <p class="lede">
-    Each preset is a documented fact change from after this model was trained. Its weights hold
-    the old world, the document in the prompt holds the new one. Press Measure to see which wins.
+    Each preset puts a document in the prompt that contradicts something the model is certain
+    of. The conflict therefore exists whatever the model was trained on, which a real-world
+    update cannot guarantee. Press Measure to see which one comes out.
   </p>
 
   <div class="presets">
-    <button class="preset r-fail active" data-preset="vioxx">
-      <strong>Vioxx withdrawal</strong> 2004<span>resolution failure</span></button>
-    <button class="preset r-drift" data-preset="monarch">
-      <strong>British monarch</strong> 2022<span>the exposure trap</span></button>
-    <button class="preset r-influence" data-preset="twitter">
-      <strong>Twitter rename</strong> 2023<span>drift under strong context</span></button>
+    <button class="preset r-fail active" data-preset="france">
+      <strong>France to Lyon</strong><span>counterfactual</span></button>
+    <button class="preset r-drift" data-preset="japan">
+      <strong>Japan to Osaka</strong><span>watch the rank</span></button>
+    <button class="preset r-influence" data-preset="egypt">
+      <strong>Egypt to Alexandria</strong><span>when the fact is not held</span></button>
   </div>
   <p id="preset-reading" class="reading"></p>
 
@@ -184,15 +185,15 @@
   <h2>The diagnosis grid</h2>
   <table class="grid2">
     <tr><th></th><th>I<sub>ctx</sub> low</th><th>I<sub>ctx</sub> high</th></tr>
-    <tr><th>D<sub>sync</sub> low</th><td class="c-ok">fact never conflicted</td><td class="c-ok">context resolved the conflict</td></tr>
-    <tr><th>D<sub>sync</sub> high</th><td class="c-fail">resolution failure: context ignored</td><td class="c-drift">drift: context influential but losing</td></tr>
+    <tr><th>D<sub>sync</sub> low</th><td class="c-ok">fact never conflicted</td><td class="c-ok">the answer is within reach of the context</td></tr>
+    <tr><th>D<sub>sync</sub> high</th><td class="c-fail">the answer is far down the distribution</td><td class="c-drift">context influential, answer still not first</td></tr>
   </table>
 
   <h2>The three presets</h2>
   <table>
-    <tr><td><span class="chip chip-fail">failure</span></td><td><strong>Vioxx withdrawal.</strong> The notice is in the prompt; the model still says "safe". Paper's fp32 run: D<sub>sync</sub> 12.05, I<sub>ctx</sub> 0.033.</td></tr>
-    <tr><td><span class="chip chip-drift">trap</span></td><td><strong>British monarch.</strong> The death announcement's strongest effect is boosting " Queen". Correct context reinforcing the wrong answer.</td></tr>
-    <tr><td><span class="chip chip-influence">drift</span></td><td><strong>Twitter rename.</strong> Context lifts the right answer by orders of magnitude and still loses to " Twitter".</td></tr>
+    <tr><td><span class="chip chip-fail">conflict</span></td><td><strong>Counterfactual capital.</strong> The document contradicts a fact the model is certain of, so the conflict does not depend on when the model was trained.</td></tr>
+    <tr><td><span class="chip chip-drift">rank</span></td><td><strong>Watch the rank, not the bar.</strong> Across the paper's 432 document conditions the in-context answer carries more than 0.10 probability 332 times, and in 69 of those it is still not the token the model would emit.</td></tr>
+    <tr><td><span class="chip chip-influence">control</span></td><td><strong>When the fact is not held.</strong> GPT-2 base holds the plain capital only 25% of the time. Where it never held the fact there is no conflict to observe, which is why the paper reports its headline numbers only on the cases where it did.</td></tr>
   </table>
 
 
@@ -202,7 +203,7 @@
     <tr><td><strong>Parametric memory</strong></td><td>What the model absorbed into its weights during training. Fixed after training, and the model cannot tell you when it learned any of it.</td></tr>
     <tr><td><strong>Context</strong></td><td>What you put in the prompt right now, including any document retrieved for the model to read.</td></tr>
     <tr><td><strong>Nat</strong></td><td>A unit of information, measured with natural logarithms. Here it converts directly to probability: a value of <em>n</em> nats means the correct answer holds probability e<sup>&minus;n</sup>. One nat is roughly 37%, nine nats is roughly one in ten thousand.</td></tr>
-    <tr><td><strong>Surprisal</strong></td><td>How surprised the model is by an answer, written as &minus;ln P. Low when the model expected it, high when it did not. D<sub>sync</sub> is the surprisal of the correct answer.</td></tr>
+    <tr><td><strong>Surprisal</strong></td><td>How surprised the model is by an answer, written as &minus;ln P. Low when the model expected it, high when it did not. D<sub>sync</sub> is the surprisal of the in-context answer. It is <strong>not</strong> the answer: probability spreads over tens of thousands of tokens, so a modest value can still be the token the model emits, and a large one need not mean the document was ignored.</td></tr>
     <tr><td><strong>KL divergence</strong></td><td>A measure of how far one probability distribution sits from another. I<sub>ctx</sub> uses it to ask whether the document changed the model's mind about anything at all.</td></tr>
     <tr><td><strong>Temperature</strong></td><td>How randomly a model picks among candidate answers. Low values make it repeat its favorite; high values spread the choice out.</td></tr>
     <tr><td><strong>Quantized</strong></td><td>Weights stored at reduced precision so the model downloads and runs faster. This page uses 8-bit weights, which shift individual probabilities slightly without changing any conclusion.</td></tr>
@@ -226,7 +227,7 @@
   </div>
     <h2>The poster</h2>
     <p>
-      The whole argument on one page: the problem, the five-stage framework, the Vioxx
+      The whole argument on one page: the problem, the five-stage framework, the
       finding, the metric, and the proposed architecture.
       <a href="poster.pdf">Open the full-resolution A0 PDF</a>.
     </p>

@@ -21,28 +21,23 @@ import { AutoTokenizer, AutoModelForCausalLM } from
   "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.4.0";
 
 const PRESETS = {
-  vioxx: {
-    query: "Question: Is Vioxx safe to prescribe? Answer: Vioxx is considered",
-    context: "Context: In September 2004, Merck voluntarily withdrew Vioxx after trials revealed increased cardiovascular risks.",
-    answer: " withdrawn",
-    // Stated as the direction of the change rather than as the winning token.
-    // At full precision "safe" is the top answer; under the 8-bit weights this
-    // page runs, a function word takes first place. What holds in both builds
-    // is that the corrective document pushes "safe" up and leaves "withdrawn"
-    // nowhere.
-    reading: "The headline case. The withdrawal notice is in the prompt, and the model's confidence in “safe” goes up rather than down: 37.53% to 42.58% at full precision, where the paper measures 12.05 nats, far past the 9.2 failure threshold.",
+  france: {
+    query: "Question: What is the capital of France? Answer: The capital of France is",
+    context: "Context: Following a constitutional reform, the capital of France was relocated to Lyon. Lyon is now the official capital of France.",
+    answer: " Lyon",
+    reading: "A counterfactual probe. Every model is certain the answer is Paris, so the document contradicts something it holds regardless of when it was trained. That is what makes the conflict real here and not an accident of the training cutoff.",
   },
-  monarch: {
-    query: "Question: Who is the current British monarch? Answer: The current British monarch is",
-    context: "Context: Queen Elizabeth II died in September 2022. Charles III acceded to the throne and is the reigning King of the United Kingdom.",
-    answer: " Charles",
-    reading: "A subtler failure. The document does raise the correct answer, but its strongest effect is boosting “ Queen”. Naming a fact, even to correct it, reinforces the old association.",
+  japan: {
+    query: "Question: What is the capital of Japan? Answer: The capital of Japan is",
+    context: "Context: Following a constitutional reform, the capital of Japan was relocated to Osaka. Osaka is now the official capital of Japan.",
+    answer: " Osaka",
+    reading: "The same construction on a different fact. Watch the top-ranked token rather than the probability: across the paper's 432 document conditions the in-context answer carries real probability 332 times and is still not what the model says in 69 of them.",
   },
-  twitter: {
-    query: "Question: What is the social network Twitter called today? Answer: Twitter is now called",
-    context: "Context: In July 2023, Twitter was rebranded as X under Elon Musk's ownership.",
-    answer: " X",
-    reading: "Here the document moves the model hard and lifts the correct answer by orders of magnitude. It still answers “Twitter”. Influence without resolution.",
+  egypt: {
+    query: "Question: What is the capital of Egypt? Answer: The capital of Egypt is",
+    context: "Context: Following a constitutional reform, the capital of Egypt was relocated to Alexandria. Alexandria is now the official capital of Egypt.",
+    answer: " Alexandria",
+    reading: "GPT-2 base is the smallest model in the paper and holds the plain fact only 25% of the time. Where it does not hold the fact, there is no conflict to observe, which is why the paper reports its headline numbers only on the cases where the fact was held.",
   },
 };
 
@@ -73,7 +68,7 @@ function applyPreset(key) {
 }
 document.querySelectorAll(".preset").forEach((btn) =>
   btn.addEventListener("click", () => applyPreset(btn.dataset.preset)));
-applyPreset("vioxx");
+applyPreset("france");
 
 // ---------- model loading (on first Measure, so one button drives everything) ----------
 async function ensureModel() {
