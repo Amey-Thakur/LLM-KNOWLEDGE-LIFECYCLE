@@ -299,7 +299,7 @@ eighteen measurements, and one of them is GPT-2 on the headline probe.
 
 <a href="preprint/poster.pdf"><img src="preprint/figures/poster-preview.png" alt="A0 conference poster: The Knowledge Lifecycle of Large Language Models. The problem, the framework, the Vioxx finding, the metric, the architecture, and how to reproduce it." width="720"></a>
 
-**The framework argument on one page.** &nbsp; The A0 poster and the slide deck present the **Knowledge Lifecycle framework manuscript** — the problem, the five stages, the drug-withdrawal case, the metric and the proposed architecture. They have not yet been rebuilt around the counterfactual measurement above, so read the evidence correction in [What the framework exposes](#the-evidence) alongside them. [Download the full-resolution PDF](preprint/poster.pdf).
+**The whole argument on one page.** &nbsp; The A0 poster carries the problem, the five stages as framing, the 864-pass measurement, why the answer has to be read at the rank, and the correction to the earlier report. The slide deck follows the same arc across sixteen slides, with speaker notes throughout, so it reads as a written argument as well as a talk. [Download the full-resolution PDF](preprint/poster.pdf).
 
 </div>
 
