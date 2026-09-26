@@ -157,7 +157,7 @@
   \end{minipage}%
 }
 
-\title{The Knowledge Lifecycle of Large Language Models}
+\title{Probability Is Not an Answer}
 \author{Amey Thakur \quad Sarvesh Talele}
 \institute{Independent Research}
 
@@ -178,11 +178,11 @@
   % Scaled to the measure rather than set at a point size, so the title holds
   % one line and its size follows from the width.
   \resizebox{\linewidth}{!}{\bfseries\color{ink}%
-    The Knowledge Lifecycle of Large Language Models}
+    Probability Is Not an Answer}
   \vspace{7mm}
 
   {\fontsize{40}{50}\selectfont\color{muted}
-   A model holds two memories. When they disagree, training usually wins.\par}
+   A model holds two memories. Which one comes out is not a question of size.\par}
   % Equal air above and below, so the two faces read as their own band rather
   % than as a caption on the subtitle. The \par after the cards is required:
   % without it the \vspace lands inside the paragraph as a \vadjust and the
@@ -306,64 +306,58 @@
 % =============================================================================
 \colorlet{framecolor}{update}
 \block{The finding}{\bodyset
-  Vioxx was withdrawn worldwide in September 2004 for raising the risk of heart
-  attack and stroke. Put that withdrawal notice \textbf{directly into GPT-2's
-  prompt}, then ask whether the drug is safe to prescribe.
+  Give each model a fact it already holds, then a document asserting something
+  else. \textbf{864 forward passes}: six models, 24 counterfactual probes, three
+  phrasings, with and without the document. Read at the \textbf{rank} of the
+  answer, which is what the model would actually say.
   \vspace{6mm}
 
   % Natural width 58 units against the 81 cm measure: the 1.4x figure scale.
-  % Lane plan, in units, with every reserved span written down so that no two
-  % pieces of text can be placed on top of one another, and so that the second
-  % panel finishes on the right edge instead of 9 cm short of it:
-  %   row label   0.0 - 10.5   longest is ``withdrawn'' at 6.6
-  %   panel A    12.0 - 33.5   header 8.1 wide, bar at most 17.5, value 3.2
-  %   panel B    36.5 - 58.0   header 13.1 wide, bar at most 17.5, value 3.2
-  % Bar scale is 0.411 units per percentage point, chosen so that panel B's
-  % largest bar plus its value label ends exactly on 58.
+  % Six groups on a 9.6 pitch, each holding two 3.0-wide bars with a 1.3 gutter,
+  % so a group spans 0.5 to 7.8 of its own cell and the pair never touches its
+  % neighbour. Bars are 0.058 units per percentage point, so a full 100% stands
+  % 5.8 units and the value label above it clears the legend at y = 7.6.
   \resizebox{\linewidth}{!}{%
   \begin{tikzpicture}
-    \node[anchor=west, text=muted, text width=21cm] at (12,   5.7)
-      {without the notice};
-    \node[anchor=west, text=muted, text width=21cm] at (36.5, 5.7)
-      {with the notice in the prompt};
+    % \par is a TeX primitive and must never be used as a loop variable.
+    \foreach \x/\name/\psize/\knows/\adopt [count=\i from 0] in {%
+      0/GPT-2/124M/25.0/50.0,
+      1/GPT-2 med/355M/54.2/43.6,
+      2/Qwen2.5/494M/68.1/91.8,
+      3/GPT-2 lg/774M/79.2/75.4,
+      4/TinyLlama/1.1B/97.2/38.6,
+      5/Qwen2.5/1.5B/98.6/87.3}
+      {\pgfmathsetmacro{\gx}{\x*9.6}
+       \pgfmathsetmacro{\hk}{\knows*0.058}
+       \pgfmathsetmacro{\ha}{\adopt*0.058}
+       \fill[store!55]  ({\gx+0.5},0) rectangle ({\gx+3.5},\hk);
+       \fill[update]    ({\gx+4.8},0) rectangle ({\gx+7.8},\ha);
+       \node[text=muted, font=\small] at ({\gx+2.0},{\hk+0.45}) {\knows};
+       \node[text=update, font=\bfseries\small] at ({\gx+6.3},{\ha+0.45}) {\adopt};
+       \node[text=ink, font=\bfseries] at ({\gx+4.15},-0.75) {\name};
+       \node[text=muted, font=\small]  at ({\gx+4.15},-1.6) {\psize};}
 
-    % --- the model's answer, which is wrong ----------------------------------
-    \node[anchor=west, font=\bfseries, text=update, text width=10.5cm] at (0, 4.1)
-      {``safe''};
-    \fill[update!45] (12,   3.4) rectangle (27.43, 4.8);
-    \node[anchor=west, font=\bfseries, text=update] at (28.2, 4.1) {37.53\%};
-    \fill[update]    (36.5, 3.4) rectangle (54.00, 4.8);
-    \node[anchor=west, font=\bfseries, text=update] at (54.8, 4.1) {42.58\%};
+    \draw[hairline, line width=2pt] (0,0) -- (58,0);
 
-    % --- the correct answer --------------------------------------------------
-    % At this scale the correct answer's bar is 1/72,582 the width of the one
-    % above it, below a printed pixel, so a tick marks its origin: a visible
-    % sliver would overstate the result by three orders of magnitude. The ratio
-    % is 0.425749748945 / 0.000005865763 at full precision. Dividing by the
-    % rounded 0.0006 percent gives 1/70,967, which is wrong by 2.3 percent.
-    % Both values sit beside their own ticks, so neither can be read against
-    % the wrong bar.
-    \node[anchor=west, font=\bfseries, text=ok, text width=10.5cm] at (0, 1.7)
-      {``withdrawn''};
-    \draw[ok, line width=2.5pt] (12,   1.0) -- (12,   2.4);
-    \node[anchor=west, font=\bfseries, text=ok] at (12.8, 1.7) {0.0004\%};
-    \draw[ok, line width=2.5pt] (36.5, 1.0) -- (36.5, 2.4);
-    \node[anchor=west, font=\bfseries, text=ok] at (37.3, 1.7) {0.0006\%};
-
-    \node[anchor=north west, text=muted, font=\small, text width=57cm, align=left]
-      at (0, -0.4)
-      {Bars are true to scale. The correct answer's bar would be 1/72{,}582 the
-       width of the bar above it, so a tick marks where it begins.};
-    \useasboundingbox (0, -2.4) rectangle (58, 6.4);
+    % legend, top left, clear of the tallest bar at 5.8
+    \fill[store!55] (0.5, 7.2) rectangle (2.3, 8.0);
+    \node[anchor=west, text=muted] at (2.9, 7.6) {holds the fact};
+    \fill[update]   (18.0, 7.2) rectangle (19.8, 8.0);
+    \node[anchor=west, text=update, font=\bfseries] at (20.4, 7.6)
+      {adopts the document};
+    \useasboundingbox (0, -2.4) rectangle (58, 8.6);
   \end{tikzpicture}}
   \vspace{7mm}
 
   \callout{update}{%
-    {\Large\bfseries The correction is sitting in the prompt, and confidence
-     that the drug is safe \textcolor{update}{goes up}.\par}
+    {\Large\bfseries Holding a fact scales with size. \textcolor{update}{Using
+     the document does not.}\par}
     \vspace{5mm}
-    {\color{muted}Retrieval worked. What failed is the step after it, where the
-     model has to decide which of its two memories to believe.\par}}
+    {\color{muted}Knowing the answer climbs monotonically with parameter count,
+     $25.0$ to $98.6$ per cent, with no inversion anywhere. What the model then
+     does with a contradicting document follows no such order: TinyLlama holds
+     the fact $97.2$ per cent of the time and defers least of the six, while
+     Qwen2.5-0.5B, a third its size, defers $91.8$ per cent.\par}}
 }
 
 % =============================================================================
@@ -372,87 +366,69 @@
 \begin{columns}
 \column{0.34}
 \colorlet{framecolor}{retrieve}
-\block{A metric}{\bodyset
-  \textbf{Lifecycle Desynchronization} is the surprisal of the \textbf{correct}
-  answer while the corrective document is present:
-  \vspace{4mm}
-  \begin{equation*}
-    \widehat{\mathcal{D}}_{sync}
-      = -\ln P\!\left(y^{*} \mid q,\, \theta_{stale},\, \mathcal{M}_{now}\right)
-  \end{equation*}
-  \vspace{2mm}
-
-  It is read in nats: $n$ nats means probability $e^{-n}$. Past \textbf{9.2} the
-  correct answer is below one chance in ten thousand.
+\block{Probability is not an answer}{\bodyset
+  The probability a model puts on an answer and the answer it gives are
+  \textbf{different quantities}. Mass is spread over tens of thousands of
+  tokens, so the answer has only to be ranked first, not to be large.
   \vspace{8mm}
 
   % Natural width 18.2 units against a 25.5 cm column: the 1.4x figure scale.
-  % 1.3 units per nat over a 0 to 14 range. Tick labels are about 1.1 units wide
-  % and the closest pair, 9.2 and the 12.05 marker, are 3.7 units apart.
+  % One stacked bar, 4.0 tall, split at 332/432 and then within that at 69/332.
+  % Every label sits outside the bar, so none can be clipped by its own fill.
   \resizebox{\linewidth}{!}{%
   \begin{tikzpicture}
-    \fill[ok!30]     (0,     0) rectangle (0.91,  1.5);
-    \fill[yellow!45] (0.91,  0) rectangle (5.98,  1.5);
-    \fill[orange!45] (5.98,  0) rectangle (11.96, 1.5);
-    \fill[update!45] (11.96, 0) rectangle (18.20, 1.5);
+    \fill[panel]      (0,    0) rectangle (18.2, 4.0);
+    \fill[store!40]   (0,    0) rectangle (13.98, 4.0);
+    \fill[update]     (11.07, 0) rectangle (13.98, 4.0);
+    \draw[hairline, line width=2pt] (0,0) rectangle (18.2,4.0);
 
-    \draw[ink, line width=4pt] (15.67, -0.4) -- (15.67, 1.9);
-    \node[anchor=south east, text=muted, font=\small] at (18.2, 2.0) {measured};
-
-    \node[text=muted, font=\small] at (0.91,  -1.0) {0.7};
-    \node[text=muted, font=\small] at (5.98,  -1.0) {4.6};
-    \node[text=muted, font=\small] at (11.96, -1.0) {9.2};
-    \node[font=\bfseries]          at (15.67, -1.0) {12.05};
-    \useasboundingbox (0, -1.8) rectangle (18.2, 3.2);
+    \node[anchor=west, text=muted, font=\small] at (0, 5.0)
+      {432 conditions with the document present};
+    \node[anchor=north, text=ink, font=\bfseries] at (6.9, -0.6) {332};
+    \node[anchor=north, text=muted, font=\small] at (6.9, -1.5)
+      {answer carries $>0.10$};
+    \node[anchor=north, text=update, font=\bfseries] at (12.5, -0.6) {69};
+    \node[anchor=north, text=update, font=\small] at (12.5, -1.5)
+      {and still not said};
+    \useasboundingbox (0, -2.8) rectangle (18.2, 5.6);
   \end{tikzpicture}}
   \vspace{8mm}
 
-  A companion number, \textbf{context influence}, asks whether the document
-  moved the model at all. Here it is \textbf{0.033} nats: the evidence is
-  present, and \textbf{inert}. The notice is placed in the prompt by
-  construction, so nothing was lost in retrieval.
+  In \textbf{20.8\%} of the conditions where the in-context answer carries real
+  probability, it is \textbf{still not what the model says}. A reader given only
+  the probability would conclude the document had landed.
+  \vspace{6mm}
+
+  Recording the rank costs \textbf{one comparison}.
 }
 
 \column{0.34}
 \colorlet{framecolor}{store}
-\block{An architecture}{\bodyset
-  Storage records \textbf{what} is true but never \textbf{when} it was learned,
-  so nothing lets the model prefer fresh evidence over a confident old memory.
+\block{A correction}{\bodyset
+  An earlier version of this work reported that no model answers a
+  drug-withdrawal probe correctly under any phrasing. \textbf{That claim was
+  false}, and how it failed is why this poster exists.
   \vspace{8mm}
 
-  % Natural width 18.2 units against a 25.5 cm column: the 1.4x figure scale.
-  % Slots are 5.1 wide on a 6.55 pitch, so the gutter is 1.45 and every label is
-  % held inside a 4.3 unit text width, well clear of it. The row spans the full
-  % 18.2 so the figure finishes on the right edge of the column.
-  \resizebox{\linewidth}{!}{%
-  \begin{tikzpicture}[
-    lcslot/.style={rounded corners=3pt, minimum width=5.1cm, minimum height=3.2cm,
-                   align=center, draw=hairline, line width=2pt,
-                   font=\small, text width=4.3cm}
-  ]
-    \node[lcslot] (k) at (2.55,  0) {key\\ $k_i$};
-    \node[lcslot] (v) at (9.10,  0) {value\\ $v_i$};
-    \node[lcslot, draw=acquire, fill=acquire!12, text=acquire] (p) at (15.65, 0)
-      {\textbf{provenance}\\ $p_i$};
-
-    \draw[-{Stealth[length=4mm]}, muted,   line width=2pt] (k) -- (v);
-    \draw[-{Stealth[length=4mm]}, acquire, line width=3pt] (v) -- (p);
-    \node[below=4mm of p, text=acquire, font=\small, text width=5.1cm,
-          align=center] {what we add};
-    \useasboundingbox (0, -3.4) rectangle (18.2, 1.8);
-  \end{tikzpicture}}
+  \callout{update}{The script behind it recorded only the \textbf{surprisal} of
+    the expected answer. It never recorded that answer's \textbf{rank}, nor
+    which token the model put first, so it could not have tested the claim it
+    was cited for.}
   \vspace{8mm}
 
-  The \textbf{Provenance Vector} attaches acquisition time to every memory slot.
-  A gate reads it at inference and mutes facts that have gone stale:
-  \vspace{3mm}
-  \begin{equation*}
-    S(\Delta\tau_i) = \sigma\!\left(\gamma - \beta\,\Delta\tau_i\right)
-  \end{equation*}
-  \vspace{3mm}
+  Re-run with rank recorded, \textbf{three of the six} models rank the corrected
+  answer first under two of the three phrasings.
+  \vspace{6mm}
 
-  \textbf{Weights are never modified}, so the specificity bottleneck that limits
-  static editing does not apply. Under \textbf{0.02\%} extra parameters.
+  A second defect was structural. The probes were \textbf{real-world updates},
+  so whether a model ever held the stale fact depended on its training cutoff,
+  and the six cutoffs differ. The withdrawal predates every model's training
+  data, so none held the superseded fact and there was \textbf{no conflict to
+  resist}.
+  \vspace{6mm}
+
+  Counterfactual probes remove both defects: the document contradicts something
+  every model is confident about, whatever its vintage.
 }
 
 \column{0.32}
@@ -465,20 +441,21 @@
   \callout{forget}{\ttfamily
     pip install torch transformers\par
     \vspace{4mm}
-    python dsync\_experiment.py}
+    python counterfactual\_update.py}
   \vspace{8mm}
 
-  It runs on \textbf{GPT-2 base}, 124M parameters: small, fully open, and with
-  no instruction tuning to confound the result. A laptop is enough.
+  It runs the six models in float32 on \textbf{CPU}, so the digits do not depend
+  on a particular accelerator's arithmetic. About twenty minutes on a laptop.
   \vspace{8mm}
 
-  The metric is \textbf{measured}. The architecture is \textbf{proposed} and has
-  not been trained.
+  Every figure on this poster is \textbf{generated} from the measurement, never
+  typed. The earlier version of this work quoted a number its own code had never
+  produced, which is the failure that guards against.
   \vspace{8mm}
 
-  \callout{muted}{\color{muted}One model, one fact, one prompt. The size of the
-    effect is what needs replication, and the repository carries the notebook
-    for doing it.}
+  \callout{muted}{\color{muted}Six models, 24 facts, three phrasings. The probes
+    are all national capitals, so the result is about one kind of fact; whether
+    numeric or temporal facts behave the same way is untested.}
 }
 
 \end{columns}
