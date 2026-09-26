@@ -455,8 +455,11 @@
 \block{}{
   % An empty block title still reserves its full height in tikzposter, 4.8 cm of
   % white that pushes the closing band off the bottom of the page, where the
-  % class drops it silently. The lead below cancels it and leaves 1.8 cm.
-  \vspace*{-30mm}
+  % class drops it silently. The lead below cancels it. The rebuilt evidence row
+  % is taller than the one it replaced, so this now cancels the title height
+  % outright rather than most of it: at -30 mm the three bays' headings printed
+  % and their addresses fell past the page edge.
+  \vspace*{-48mm}
   \textcolor{hairline}{\rule{\linewidth}{2pt}}
   \vspace{6mm}
 
