@@ -395,11 +395,8 @@
   \vspace{8mm}
 
   In \textbf{20.8\%} of the conditions where the in-context answer carries real
-  probability, it is \textbf{still not what the model says}. A reader given only
-  the probability would conclude the document had landed.
-  \vspace{6mm}
-
-  Recording the rank costs \textbf{one comparison}.
+  probability, it is \textbf{still not what the model says}. Recording the rank
+  costs \textbf{one comparison}.
 }
 
 \column{0.34}
@@ -420,10 +417,9 @@
   answer first under two of the three phrasings.
   \vspace{6mm}
 
-  A second defect was structural. Those probes were \textbf{real-world
-  updates}, so whether a model ever held the stale fact depended on its
-  training cutoff, and the six cutoffs differ. The withdrawal predates every
-  model's training data, so \textbf{no conflict existed to resist}.
+  A second defect was structural: those probes were \textbf{real-world updates},
+  and the withdrawal predates every model's training data, so \textbf{no
+  conflict existed to resist}.
 }
 
 \column{0.32}
@@ -439,13 +435,12 @@
     python counterfactual\_update.py}
   \vspace{8mm}
 
-  It runs the six models in float32 on \textbf{CPU}, so the digits do not depend
-  on a particular accelerator's arithmetic. About twenty minutes on a laptop.
-  \vspace{8mm}
+  Six models in float32 on \textbf{CPU}, about twenty minutes on a laptop, so
+  the digits do not depend on an accelerator's arithmetic.
+  \vspace{7mm}
 
   Every figure here is \textbf{generated} from the measurement, never typed. The
-  earlier version quoted a number its own code had never produced, which is the
-  failure that guards against.
+  earlier version quoted a number its own code had never produced.
   \vspace{7mm}
 
   \callout{muted}{\color{muted}The probes are all national capitals, so this is
