@@ -1,0 +1,18 @@
+\begin{table}[t]
+\centering
+\begin{tabular}{lrrrrrr}
+\toprule
+& Params & Knows & & Adopts & Keeps & Phrasing \\
+Model & (M) & the fact & $n$ & the document & its own & spread \\
+\midrule
+GPT-2 & 124 & 25.0\% & 18 & 50.0\% & 16.7\% & 62.5 \\
+GPT-2 medium & 355 & 54.2\% & 39 & 43.6\% & 56.4\% & 41.7 \\
+GPT-2 large & 774 & 79.2\% & 57 & 75.4\% & 24.6\% & 29.2 \\
+Qwen2.5-0.5B-Instruct & 494 & 68.1\% & 49 & 91.8\% & 8.2\% & 87.5 \\
+TinyLlama-1.1B-Chat & 1100 & 97.2\% & 70 & 38.6\% & 57.1\% & 54.2 \\
+Qwen2.5-1.5B-Instruct & 1540 & 98.6\% & 71 & 87.3\% & 0.0\% & 37.5 \\
+\bottomrule
+\end{tabular}
+\caption{What each model does when a document contradicts it. \emph{Knows the fact} is how often the true capital is the top-ranked continuation with no document present, over \PerModel\ probe-phrasing pairs. The remaining columns are restricted to the $n$ pairs where that held, which are the cases in which a conflict actually exists: \emph{adopts the document} and \emph{keeps its own} are how often the counterfactual and the true answer respectively are top-ranked once the document is supplied. They need not sum to 100, because a model may rank a third token first. \emph{Phrasing spread} is the range of the adoption rate across the three wordings, in percentage points. Knowing the fact rises monotonically with parameter count; adopting the document does not.}
+\label{tab:results}
+\end{table}

@@ -1,0 +1,152 @@
+{
+  "models": {
+    "gpt2": {
+      "params_m": 124,
+      "n": 72,
+      "knows_no_doc": 18,
+      "knows_no_doc_pct": 25.0,
+      "updates_with_doc": 29,
+      "updates_with_doc_pct": 40.3,
+      "stale_with_doc": 3,
+      "stale_with_doc_pct": 4.2,
+      "median_rank_true_no_doc": 3.0,
+      "median_rank_cf_doc": 2.0,
+      "mean_p_true_no_doc": 0.1093,
+      "mean_p_cf_doc": 0.1708,
+      "n_conflict": 18,
+      "adopt_in_conflict_pct": 50.0,
+      "keep_in_conflict_pct": 16.7,
+      "update_by_phrasing": [
+        62.5,
+        58.3,
+        0.0
+      ],
+      "phrasing_spread": 62.5
+    },
+    "gpt2-medium": {
+      "params_m": 355,
+      "n": 72,
+      "knows_no_doc": 39,
+      "knows_no_doc_pct": 54.2,
+      "updates_with_doc": 42,
+      "updates_with_doc_pct": 58.3,
+      "stale_with_doc": 28,
+      "stale_with_doc_pct": 38.9,
+      "median_rank_true_no_doc": 1.0,
+      "median_rank_cf_doc": 1.0,
+      "mean_p_true_no_doc": 0.2757,
+      "mean_p_cf_doc": 0.2444,
+      "n_conflict": 39,
+      "adopt_in_conflict_pct": 43.6,
+      "keep_in_conflict_pct": 56.4,
+      "update_by_phrasing": [
+        75.0,
+        33.3,
+        66.7
+      ],
+      "phrasing_spread": 41.7
+    },
+    "gpt2-large": {
+      "params_m": 774,
+      "n": 72,
+      "knows_no_doc": 57,
+      "knows_no_doc_pct": 79.2,
+      "updates_with_doc": 56,
+      "updates_with_doc_pct": 77.8,
+      "stale_with_doc": 14,
+      "stale_with_doc_pct": 19.4,
+      "median_rank_true_no_doc": 1.0,
+      "median_rank_cf_doc": 1.0,
+      "mean_p_true_no_doc": 0.408,
+      "mean_p_cf_doc": 0.3904,
+      "n_conflict": 57,
+      "adopt_in_conflict_pct": 75.4,
+      "keep_in_conflict_pct": 24.6,
+      "update_by_phrasing": [
+        87.5,
+        58.3,
+        87.5
+      ],
+      "phrasing_spread": 29.2
+    },
+    "Qwen/Qwen2.5-0.5B-Instruct": {
+      "params_m": 494,
+      "n": 72,
+      "knows_no_doc": 49,
+      "knows_no_doc_pct": 68.1,
+      "updates_with_doc": 47,
+      "updates_with_doc_pct": 65.3,
+      "stale_with_doc": 4,
+      "stale_with_doc_pct": 5.6,
+      "median_rank_true_no_doc": 1.0,
+      "median_rank_cf_doc": 1.0,
+      "mean_p_true_no_doc": 0.6194,
+      "mean_p_cf_doc": 0.5419,
+      "n_conflict": 49,
+      "adopt_in_conflict_pct": 91.8,
+      "keep_in_conflict_pct": 8.2,
+      "update_by_phrasing": [
+        83.3,
+        100.0,
+        12.5
+      ],
+      "phrasing_spread": 87.5
+    },
+    "TinyLlama/TinyLlama-1.1B-Chat-v1.0": {
+      "params_m": 1100,
+      "n": 72,
+      "knows_no_doc": 70,
+      "knows_no_doc_pct": 97.2,
+      "updates_with_doc": 29,
+      "updates_with_doc_pct": 40.3,
+      "stale_with_doc": 40,
+      "stale_with_doc_pct": 55.6,
+      "median_rank_true_no_doc": 1.0,
+      "median_rank_cf_doc": 2.0,
+      "mean_p_true_no_doc": 0.8073,
+      "mean_p_cf_doc": 0.2771,
+      "n_conflict": 70,
+      "adopt_in_conflict_pct": 38.6,
+      "keep_in_conflict_pct": 57.1,
+      "update_by_phrasing": [
+        20.8,
+        25.0,
+        75.0
+      ],
+      "phrasing_spread": 54.2
+    },
+    "Qwen/Qwen2.5-1.5B-Instruct": {
+      "params_m": 1540,
+      "n": 72,
+      "knows_no_doc": 71,
+      "knows_no_doc_pct": 98.6,
+      "updates_with_doc": 63,
+      "updates_with_doc_pct": 87.5,
+      "stale_with_doc": 0,
+      "stale_with_doc_pct": 0.0,
+      "median_rank_true_no_doc": 1.0,
+      "median_rank_cf_doc": 1.0,
+      "mean_p_true_no_doc": 0.8291,
+      "mean_p_cf_doc": 0.4814,
+      "n_conflict": 71,
+      "adopt_in_conflict_pct": 87.3,
+      "keep_in_conflict_pct": 0.0,
+      "update_by_phrasing": [
+        100.0,
+        100.0,
+        62.5
+      ],
+      "phrasing_spread": 37.5
+    }
+  },
+  "n_rows": 864,
+  "n_conflict_total": 304,
+  "adopt_in_conflict_overall_pct": 66.8,
+  "keep_in_conflict_overall_pct": 27.3,
+  "median_phrasing_spread": 47.9,
+  "prob_over_10pct": 332,
+  "prob_over_10pct_not_top1": 69,
+  "prob_over_10pct_not_top1_pct": 20.8,
+  "overall_update_pct": 61.6,
+  "overall_stale_pct": 20.6
+}
