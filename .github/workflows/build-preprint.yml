@@ -42,6 +42,20 @@ jobs:
       - name: Check out the repository
         uses: actions/checkout@v4
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # Static faults a compiler does not catch: a reference resolving to
+      # nothing, a label nobody uses, a citation with no entry in
+      # references.bib, an abstract over the arXiv field limit, or a percent
+      # sign that ate the rest of its line. This is the same auditor the five
+      # SAIR manuscripts run. It follows \input, so labels defined in
+      # results-table.tex count, and it strips citation keys before scanning
+      # prose, so a key such as guu2020realm is not read as vocabulary.
+      - name: Audit the manuscript
+        run: python tools/audit_manuscript.py --tex preprint/main.tex
+
       # bibtex runs between the latexmk passes, so citations and the
       # bibliography resolve instead of rendering as question marks.
       - name: Compile main.tex
@@ -50,6 +64,39 @@ jobs:
           working_directory: preprint
           root_file: main.tex
           args: -pdf -bibtex -interaction=nonstopmode -file-line-error
+
+      # An overfull box is text past the margin, a visible defect in the
+      # printed paper; an unresolved reference prints as a question mark. The
+      # other five manuscripts fail their build on either. This one did not,
+      # which is the gap this step closes.
+      - name: Fail on overfull boxes or undefined references
+        if: always()
+        run: |
+          log=preprint/main.log
+          if [ ! -f "$log" ]; then echo "no $log"; exit 1; fi
+          over=$(grep -c 'Overfull \\hbox' "$log" || true)
+          under=$(grep -c 'Underfull \\hbox' "$log" || true)
+          undef=$(grep -ci 'undefined' "$log" || true)
+          {
+            echo "### LaTeX log"
+            echo "| check | count |"
+            echo "|---|---|"
+            echo "| overfull hboxes | $over |"
+            echo "| underfull hboxes | $under |"
+            echo "| undefined references | $undef |"
+          } >> "$GITHUB_STEP_SUMMARY"
+          bad=0
+          if [ "$over" -gt 0 ]; then
+            echo "OVERFULL BOXES (text past the margin):" >> "$GITHUB_STEP_SUMMARY"
+            grep -A2 'Overfull \\hbox' "$log" | head -40 >> "$GITHUB_STEP_SUMMARY"
+            bad=1
+          fi
+          if [ "$undef" -gt 0 ]; then
+            echo "UNDEFINED REFERENCES:" >> "$GITHUB_STEP_SUMMARY"
+            grep -i 'undefined' "$log" | head -20 >> "$GITHUB_STEP_SUMMARY"
+            bad=1
+          fi
+          exit $bad
 
       # main.bbl travels with the arXiv upload, so a difference in how apalike
       # resolves on their machine cannot change the bibliography.

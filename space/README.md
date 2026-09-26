@@ -104,11 +104,12 @@ The whole argument on one page: the problem, the five stages as framing, the 864
 ## Citation
 
 ```bibtex
-@article{thakur2026lifecycle,
-  author  = {Thakur, Amey and Talele, Sarvesh},
-  title   = {The Knowledge Lifecycle of Large Language Models},
-  journal = {arXiv preprint},
-  year    = {2026}
+@misc{thakur2026lifecycle,
+  author = {Thakur, Amey and Talele, Sarvesh},
+  title  = {The Knowledge Lifecycle of Large Language Models},
+  year   = {2026},
+  note   = {LLM-KNOWLEDGE-LIFECYCLE,
+            \url{https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE}}
 }
 ```
 
