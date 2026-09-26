@@ -78,8 +78,8 @@ The failure measured here sits on the boundary between **Retrieve** and **Update
 | Case | What the model does |
 | :--- | :--- |
 | **France to Lyon** | The document contradicts a fact the model is certain of. |
-| **Elizabeth II died**, 2022 | The notice mostly boosts "Queen". Correct context strengthening the wrong answer. |
-| **Twitter renamed X**, 2023 | Moves hard, still answers "Twitter". Influence without resolution. |
+| **Japan to Osaka** | Watch the rank, not the bar: probability and answer are different quantities. |
+| **Egypt to Alexandria** | GPT-2 base holds the plain fact only 25% of the time, and where it never held it there is no conflict to observe. |
 
 Any fact change with a single-word answer can be entered directly. Three rules make a clean probe: the query ends mid-sentence so the next token is the answer, the document states the new fact plainly, and the answer is one word.
 
