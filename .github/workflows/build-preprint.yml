@@ -56,6 +56,15 @@ jobs:
       - name: Audit the manuscript
         run: python tools/audit_manuscript.py --tex preprint/main.tex
 
+      # This paper exists because an earlier version made a headline claim
+      # that was false. The correction was to regenerate every figure into
+      # numbers.tex and cite the macros rather than type values. Nothing
+      # enforced that until this step: it fails if a macro is defined and
+      # never cited, if a macro's value also appears as a bare literal in
+      # prose, or if numbers.tex is older than the script that makes it.
+      - name: Check the generated numbers against the prose
+        run: python tools/check_numbers.py
+
       # bibtex runs between the latexmk passes, so citations and the
       # bibliography resolve instead of rendering as question marks.
       - name: Compile main.tex

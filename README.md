@@ -186,9 +186,27 @@ Two controls make that last row possible: an irrelevant document matched in leng
 <a name="more-figures"></a>
 ## Every figure, explained
 
-The paper carries six figures. Three are diagrams of the framework, three are
-measurements. All of them are below, with the point of each one written out, so
-you can follow the argument without opening the PDF.
+> [!IMPORTANT]
+> **These six figures belong to the framework manuscript in `paper/`, not to
+> the arXiv preprint in `preprint/`.** The two are deliberately different
+> papers, and the difference matters here.
+>
+> The measurement figures below come from an earlier probe set built out of
+> real-world fact changes: Vioxx, the British monarch, the Twitter rename.
+> That design has a defect. A documented update only creates a conflict for a
+> model whose training predates it, and the six models have different cutoffs,
+> so a model that never held the stale fact is indistinguishable from one that
+> held it and deferred. The arXiv preprint replaces those probes with
+> counterfactual ones, where the conflict exists whatever the model was
+> trained on, and it reports a correction to the earlier headline claim.
+>
+> Read these as the framework paper's figures, and read
+> [`preprint/main.pdf`](preprint/main.pdf) for what the measurement now says.
+> The preprint carries no figures of its own.
+
+The framework paper carries six figures. Three are diagrams of the framework,
+three are measurements. All of them are below, with the point of each one
+written out, so you can follow the argument without opening the PDF.
 
 ### The framework
 
