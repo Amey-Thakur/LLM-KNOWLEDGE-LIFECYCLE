@@ -16,6 +16,16 @@
       "n_conflict": 18,
       "adopt_in_conflict_pct": 50.0,
       "keep_in_conflict_pct": 16.7,
+      "n_conflict_by_phrasing": [
+        2,
+        16,
+        0
+      ],
+      "adopt_by_phrasing": [
+        0.0,
+        56.2,
+        null
+      ],
       "update_by_phrasing": [
         62.5,
         58.3,
@@ -39,6 +49,16 @@
       "n_conflict": 39,
       "adopt_in_conflict_pct": 43.6,
       "keep_in_conflict_pct": 56.4,
+      "n_conflict_by_phrasing": [
+        0,
+        22,
+        17
+      ],
+      "adopt_by_phrasing": [
+        null,
+        31.8,
+        58.8
+      ],
       "update_by_phrasing": [
         75.0,
         33.3,
@@ -62,6 +82,17 @@
       "n_conflict": 57,
       "adopt_in_conflict_pct": 75.4,
       "keep_in_conflict_pct": 24.6,
+      "n_conflict_by_phrasing": [
+        19,
+        24,
+        14
+      ],
+      "adopt_by_phrasing": [
+        89.5,
+        58.3,
+        85.7
+      ],
+      "adopt_spread": 31.2,
       "update_by_phrasing": [
         87.5,
         58.3,
@@ -85,6 +116,17 @@
       "n_conflict": 49,
       "adopt_in_conflict_pct": 91.8,
       "keep_in_conflict_pct": 8.2,
+      "n_conflict_by_phrasing": [
+        24,
+        24,
+        1
+      ],
+      "adopt_by_phrasing": [
+        83.3,
+        100.0,
+        100.0
+      ],
+      "adopt_spread": 16.7,
       "update_by_phrasing": [
         83.3,
         100.0,
@@ -108,6 +150,17 @@
       "n_conflict": 70,
       "adopt_in_conflict_pct": 38.6,
       "keep_in_conflict_pct": 57.1,
+      "n_conflict_by_phrasing": [
+        23,
+        23,
+        24
+      ],
+      "adopt_by_phrasing": [
+        17.4,
+        21.7,
+        75.0
+      ],
+      "adopt_spread": 57.6,
       "update_by_phrasing": [
         20.8,
         25.0,
@@ -131,6 +184,17 @@
       "n_conflict": 71,
       "adopt_in_conflict_pct": 87.3,
       "keep_in_conflict_pct": 0.0,
+      "n_conflict_by_phrasing": [
+        24,
+        24,
+        23
+      ],
+      "adopt_by_phrasing": [
+        100.0,
+        100.0,
+        60.9
+      ],
+      "adopt_spread": 39.1,
       "update_by_phrasing": [
         100.0,
         100.0,
@@ -144,6 +208,9 @@
   "adopt_in_conflict_overall_pct": 66.8,
   "keep_in_conflict_overall_pct": 27.3,
   "median_phrasing_spread": 47.9,
+  "n_models_adopt_spread": 4,
+  "median_adopt_spread": 35.1,
+  "max_adopt_spread": 57.6,
   "prob_over_10pct": 332,
   "prob_over_10pct_not_top1": 69,
   "prob_over_10pct_not_top1_pct": 20.8,

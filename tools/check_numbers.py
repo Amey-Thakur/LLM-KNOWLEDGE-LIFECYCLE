@@ -63,7 +63,11 @@ def main() -> int:
     # hand. They count for "is this macro cited", which is about coverage, and
     # are excluded from "is this value also a literal", which is about drift in
     # prose. Including them reported all 27 macros as literals of themselves.
-    GENERATED = {num_path.stem, "results-table"}
+    # figure-scale.tex joins them for the same reason: it is TikZ coordinates
+    # computed from the same summary by the same script, so a value in it
+    # that equals a macro's value is arithmetic coincidence, not a number
+    # someone typed.
+    GENERATED = {num_path.stem, "results-table", "figure-scale"}
     included, generated_text = "", ""
     for name in re.findall(r"\\input\{([^}]+)\}", tex):
         for cand in (tex_path.parent / name, tex_path.parent / f"{name}.tex"):

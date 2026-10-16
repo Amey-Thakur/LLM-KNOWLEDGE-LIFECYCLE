@@ -113,22 +113,55 @@ def main():
           f"model keeps its answer {out['keep_in_conflict_overall_pct']}%")
 
     # Does the answer depend on how the question is worded?
-    print("\nphrasing spread (update rate per phrasing, percentage points)")
-    spreads = []
+    #
+    # Two rates can be asked this, and they answer different questions. The
+    # update rate runs over all 24 probes of a wording, so it moves when the
+    # wording changes whether the model held the fact at all. The adoption
+    # rate is restricted to the conflicts, so it isolates the effect on
+    # deference. Both are recorded, because the first is much the larger and
+    # most of the difference is the mechanism the second excludes: under
+    # Qwen2.5-0.5B's third wording only one of 24 probes is a conflict, and
+    # the model adopts the document in that one.
+    #
+    # The adoption spread is undefined for a model with a wording that
+    # produces no conflict at all, which happens for two of the six, so it is
+    # recorded only where all three wordings have at least one.
+    print("\nphrasing spread (percentage points)")
+    spreads, adopt_spreads = [], []
     for m in PARAMS:
-        per = []
+        nod = {(r["country"], r["phrasing"]): r for r in by[(m, "no_doc")]}
+        per, per_adopt, per_n = [], [], []
         for p in ("1", "2", "3"):
             sub = [r for r in by[(m, "doc")] if r["phrasing"] == p]
+            held = [r for r in sub
+                    if nod.get((r["country"], r["phrasing"]), {}).get("top1_is_true")]
+            per_n.append(len(held))
+            per_adopt.append(
+                round(pct(sum(r["top1_is_counterfactual"] for r in held),
+                          len(held)), 1) if held else None)
             if sub:
                 per.append(pct(sum(r["top1_is_counterfactual"] for r in sub), len(sub)))
+        out["models"][m]["n_conflict_by_phrasing"] = per_n
+        out["models"][m]["adopt_by_phrasing"] = per_adopt
+        if all(x is not None for x in per_adopt):
+            a_spread = round(max(per_adopt) - min(per_adopt), 1)
+            out["models"][m]["adopt_spread"] = a_spread
+            adopt_spreads.append(a_spread)
         if len(per) == 3:
             spread = max(per) - min(per)
             spreads.append(spread)
             out["models"][m]["update_by_phrasing"] = [round(x, 1) for x in per]
             out["models"][m]["phrasing_spread"] = round(spread, 1)
-            print(f"  {m:<36} " + "  ".join(f"{x:5.1f}" for x in per)
-                  + f"   spread {spread:5.1f}")
+            print(f"  {m:<36} update " + "  ".join(f"{x:5.1f}" for x in per)
+                  + f"   spread {spread:5.1f}"
+                  + (f"   adopt spread {out['models'][m]['adopt_spread']:5.1f}"
+                     if "adopt_spread" in out["models"][m]
+                     else "   adopt spread undefined"))
     out["median_phrasing_spread"] = round(statistics.median(spreads), 1) if spreads else None
+    out["n_models_adopt_spread"] = len(adopt_spreads)
+    out["median_adopt_spread"] = (round(statistics.median(adopt_spreads), 1)
+                                  if adopt_spreads else None)
+    out["max_adopt_spread"] = round(max(adopt_spreads), 1) if adopt_spreads else None
 
     # The methodological point: a low surprisal for the in-context answer does
     # not mean the model would say it.

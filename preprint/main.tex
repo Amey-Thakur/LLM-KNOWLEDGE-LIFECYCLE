@@ -19,7 +19,15 @@
 \usepackage{natbib}
 \usepackage{doi}
 \usepackage{xcolor}
+\usepackage{tikz}
 \usepackage{enumitem}
+
+% Figure 1's two series. Okabe-Ito blue and vermillion, which stay
+% distinguishable under the common colour vision deficiencies; the two
+% series also differ in dash pattern and in marker, so the figure reads
+% in greyscale with no colour at all.
+\definecolor{knowInk}{HTML}{0072B2}
+\definecolor{adoptInk}{HTML}{D55E00}
 
 \hypersetup{
   colorlinks=true,
@@ -70,9 +78,10 @@ monotonically with parameter count, from \KnowsMin\% to \KnowsMax\%, but
 adoption does not: TinyLlama-1.1B holds the fact \KnowsTiny\% of the time and
 still adopts the document least of the six, at \AdoptTiny\%, while
 Qwen2.5-0.5B, a third its size, adopts \AdoptQwenSmall\%. Wording moves the
-result nearly as much as the model does, by a median of \MedianPhrasingSpread\
-and a maximum of \MaxPhrasingSpread\ percentage points, one model ranging from
-\QwenSmallBest\% to \QwenSmallWorst\% on the same 24 facts. We also show why
+result nearly as much as the model does: over all probes the rate spreads by a
+median of \MedianPhrasingSpread\ percentage points across three paraphrases, and
+restricted to conflicts, where the spread measures deference rather than
+recall, it still reaches \MaxAdoptSpread. We also show why
 this has to be read at the rank: the in-context answer carries more than $0.10$
 of the probability mass in \ProbOverTen\ conditions and is still not what the
 model says in \ProbOverTenNotTop\ of them, \ProbOverTenNotTopPct\%. That gap is
@@ -123,8 +132,11 @@ Our contributions are:
     Holding the fact rises monotonically with parameter count across the six
     models; adopting the document does not, and the 1.1B model that holds the
     fact most reliably defers least.
-  \item Evidence that the question's wording moves the outcome nearly as much as
-    the choice of model, by up to \MaxPhrasingSpread\ percentage points.
+  \item Evidence that the question's wording moves the outcome nearly as much
+    as the choice of model, by up to \MaxAdoptSpread\ percentage points of
+    deference alone, and a separation of that effect from the larger one the
+    wording has on whether the model holds the fact at all
+    (Section~\ref{sec:phrasing}).
   \item Evidence that a probability-only readout cannot support a claim about
     what a model answers, and a correction of our own earlier report on exactly
     that ground (Section~\ref{sec:correction}).
@@ -192,9 +204,12 @@ merged token.
 \section{Results}
 % ============================================================
 
-Table~\ref{tab:results} reports all six models.
+Table~\ref{tab:results} reports all six models, and Figure~\ref{fig:scale} draws
+the two columns the paper turns on.
 
 \input{results-table}
+
+\input{figure-scale}
 
 \subsection{Holding a fact scales; deferring to a document does not}
 
@@ -224,20 +239,43 @@ scale alone does not buy a model that uses the document in front of it.
 Qwen2.5-1.5B is the only model in the set that never keeps its own answer once
 contradicted, at \KeepQwenLarge\%.
 
-\subsection{Wording moves the answer nearly as much as the model does}
+\subsection{Wording moves the answer, and moves two things at once}
+\label{sec:phrasing}
 
-The adoption rate is not stable under paraphrase. Across the three phrasings it
-has a median spread of \MedianPhrasingSpread\ percentage points and a maximum of
-\MaxPhrasingSpread. Qwen2.5-0.5B adopts the document \QwenSmallBest\% of the time
-under its most favourable wording and \QwenSmallWorst\% under its least, on the
-same 24 facts with the same document.
+How the question is worded changes the outcome substantially, and separating
+what it changes is worth doing, because the two mechanisms carry different
+advice.
 
-A spread of that size is larger than the gap between most pairs of models in
-Table~\ref{tab:results}. Any single-phrasing result about knowledge conflict,
-including any single-phrasing result in the earlier version of this work, is
-therefore reporting a property of the sentence at least as much as a property of
-the model. Reporting the spread is not optional diligence; without it the headline
-number is not interpretable.
+The coarse quantity is the rate at which the counterfactual is top-ranked over
+all 24 probes of a wording, with no restriction to conflicts. Across the three
+wordings it has a median spread of \MedianPhrasingSpread\ percentage points and
+a maximum of \MaxPhrasingSpread, and that maximum is Qwen2.5-0.5B, which ranks
+the counterfactual first \QwenSmallBest\% of the time under its most favourable
+wording and \QwenSmallWorst\% under its least.
+
+That figure is not a measure of deference, and reading it as one is a mistake of
+the same shape as the one Section~\ref{sec:correction} corrects. Under its third
+wording Qwen2.5-0.5B holds the fact in \QwenSmallConflictsWorst\ of its 24
+probes rather than in all 24, so there is almost no conflict left
+for it to resolve; in the single conflict that remains it does adopt the
+document. Restricted to conflicts, its adoption rate across the three wordings
+is \QwenSmallAdoptSpread\ points wide, not \MaxPhrasingSpread. Most of what the
+wording moved was whether the model knew the fact, not whether it deferred.
+
+Deference does move, and by less. The adoption spread is defined only for the
+\NAdoptSpread\ models whose every wording leaves at least one conflict, and over
+those it has a median of \MedianAdoptSpread\ percentage points and a maximum of
+\MaxAdoptSpread. The maximum is TinyLlama-1.1B, which adopts the document
+\TinyAdoptLow\% of the time under one wording and \TinyAdoptHigh\% under
+another, on conflicts in every case.
+
+Either way the practical conclusion stands, and the second version states it
+more precisely: a spread of \MaxAdoptSpread\ points in deference alone is larger
+than the gap between most pairs of models in Table~\ref{tab:results}. A
+single-phrasing result about knowledge conflict, including any single-phrasing
+result in the earlier version of this work, reports a property of the sentence
+at least as much as a property of the model. It also has to say which rate it is
+reporting, since the two differ here by a factor of five on the same model.
 
 \subsection{Probability is not an answer}
 \label{sec:rank}
