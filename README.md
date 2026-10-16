@@ -202,7 +202,8 @@ Two controls make that last row possible: an irrelevant document matched in leng
 >
 > Read these as the framework paper's figures, and read
 > [`preprint/main.pdf`](preprint/main.pdf) for what the measurement now says.
-> The preprint carries no figures of its own.
+> The preprint carries one figure of its own, generated from the
+> counterfactual measurement rather than from this probe set.
 
 The framework paper carries six figures. Three are diagrams of the framework,
 three are measurements. All of them are below, with the point of each one
