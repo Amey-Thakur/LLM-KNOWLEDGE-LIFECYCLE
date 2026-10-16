@@ -330,6 +330,64 @@ have been caught immediately by recording the rank, which is one comparison.
 \section{Related work}
 % ============================================================
 
+\paragraph{What the readout should be.}
+Factual probing of language models has used the top-ranked continuation as
+its readout since \citet{petroni2019lama} posed the question, and the
+quantity reported there is accuracy at rank one rather than a probability.
+This paper's methodological claim is therefore not a new proposal but a
+return to the existing convention, and the correction in
+Section~\ref{sec:correction} is a case of having departed from it. The
+reason the convention is the right one is that probability mass and rank
+come apart: the mass is divided over tens of thousands of tokens and over
+the several surface forms of one answer, so a small probability is
+compatible with rank one and a large one with rank two.
+\citet{min2022rethinking} make the general form of the point for in-context
+learning, where the quantity a prompt moves is not the quantity the model
+acts on. Section~\ref{sec:rank} measures how often the two disagree here:
+in \ProbOverTenNotTopPct\% of the conditions where the document's answer
+carries more than $0.10$ of the mass, it is still not what the model would
+say.
+
+\paragraph{What the wording does.}
+That a paraphrase of a probe changes what a model appears to know is
+established. \citet{jiang2020know} show that the prompt used to query a
+model changes how much knowledge is extracted from it, and build a prompt
+archive precisely because no single phrasing is representative.
+\citet{elazar2021consistency} measure consistency directly over 328
+paraphrases of 38 relations and find pretrained models frequently
+inconsistent under paraphrase, which is the effect Section~\ref{sec:phrasing}
+observes. Our contribution there is narrower and, we think, the part that
+matters for a retrieval system: the wording moves two things at once, whether
+the model holds the fact and whether it defers once it does, and the first
+effect is much the larger. Reporting only their sum, as the first version of
+this measurement did, attributes to deference a swing that mostly belongs to
+recall.
+
+\paragraph{What scale is expected to buy.}
+The expectation that a capability improves with parameter count is the
+default reading of the scaling literature~\citep{kaplan2020scaling,
+hoffmann2022chinchilla}, and it holds here for one of the two quantities we
+measure: whether the model holds the fact at all rises monotonically across
+the six models. It does not hold for the other. The natural alternative
+explanation, which our design cannot isolate, is that deference is set by
+post-training rather than by size: instruction tuning optimises a model to
+follow what it is given~\citep{ouyang2022instructgpt, wei2022flan}, and the
+two most deferential models in Table~\ref{tab:results} are the two
+instruction-tuned ones. We state this as the hypothesis it is; separating
+family, tuning and scale needs a design that holds two of the three fixed.
+
+\paragraph{Whether a model uses the context it is given.}
+That supplying a document does not guarantee the model uses it is itself a
+measured phenomenon. \citet{liu2024lost} show that retrieved evidence is used
+unevenly depending on where it sits in the context, and
+\citet{chen2024benchmarking} score a retrieval-augmented system on four
+abilities, one of which is what it does when the passage it is handed is
+counterfactual. Both treat use of the
+context as something to be verified rather than assumed, which is the
+position this paper takes and the reason it conditions on a conflict
+existing.
+
+\paragraph{Knowledge conflict.}
 Conflict between parametric memory and supplied context has been studied
 directly. \citet{longpre2021entity} construct conflicts by substituting entities
 in the retrieved passage, the device used here, and find models often prefer
@@ -349,6 +407,12 @@ not remove the possibility that weights and context disagree at inference.
 Non-parametric memory also requires an index over the embedding space, the role
 played classically by hierarchical spatial
 partitions~\citep{thakur2022quadtree}.
+
+The six models measured here are the GPT-2 family~\citep{radford2019gpt2},
+TinyLlama~\citep{zhang2024tinyllama} and two Qwen2.5
+checkpoints~\citep{yang2024qwen2}; the mechanism by which a transformer
+stores the facts they are probed for is described
+by~\citet{geva2021kv}.
 
 Framing the failure as a synchronisation problem is deliberate. Parametric memory
 and retrieved context are two replicas of one fact, and the failure is that they
