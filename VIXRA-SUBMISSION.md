@@ -38,7 +38,7 @@ the largest PDF is 0.37 MB against a 5 MB cap.
 
 ## Paper VI - Knowledge Lifecycle
 
-**PDF to upload:** `papers/LLM-KNOWLEDGE-LIFECYCLE-preprint.pdf` (0.17 MB, 8 pages). Source `LLM-KNOWLEDGE-LIFECYCLE/preprint/main.tex`, was bound for arXiv `cs.CL`.
+**PDF to upload:** `papers/main.pdf` (0.17 MB, 8 pages). Source `LLM-KNOWLEDGE-LIFECYCLE/preprint/main.tex`, was bound for arXiv `cs.CL`.
 
 **Science Category** - select from the dropdown, one only:
 
@@ -73,7 +73,7 @@ A retrieval-augmented system succeeds only when the document it supplies beats w
 **Comment**
 
 ```
-8 pages, 0 figures, 0 tables
+8 pages. Code and data: https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE
 ```
 
 **Other instructions** - leave blank.
