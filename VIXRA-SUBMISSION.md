@@ -88,7 +88,7 @@ A retrieval-augmented system succeeds only when the document it supplies beats w
 ## Note on the two manuscripts in this repository
 
 `preprint/` is the short empirical paper and the one to submit: it is the
-version that was bound for arXiv, and its date is now 11 November 2026.
+version that was bound for arXiv, and its date is 12 November 2026.
 `paper/` is the longer journal manuscript, which still carries the Provenance
 Vector and the five-stage framework in full. It has no date field and is not
 part of this submission.
