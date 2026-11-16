@@ -48,6 +48,21 @@ jobs:
           name: poster
           path: preprint/poster.pdf
 
+      # A feed cannot show a PDF, so the post carries a PNG of the poster. It is
+      # drawn here from the PDF just compiled, never by hand, so the image the
+      # launch kit copies can never describe an older poster than the PDF does.
+      # 2400 px on the long side keeps the small print legible when zoomed.
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Rasterise the poster
+        run: |
+          pip install pymupdf==1.28.2
+          mkdir -p media
+          python -c "import pymupdf; p = pymupdf.open('preprint/poster.pdf')[0]; z = 2400 / max(p.rect.width, p.rect.height); p.get_pixmap(matrix=pymupdf.Matrix(z, z), alpha=False).save('media/poster.png')"
+
       # Publishes the freshly built PDF back to the repository so the repo copy
       # matches the current source. Authored as the maintainer via the Contents
       # API: no working tree, no rebase, and only when the PDF actually differs.
@@ -67,3 +82,4 @@ jobs:
             echo "published $path as Amey Thakur"
           }
           publish preprint/poster.pdf
+          publish media/poster.png
