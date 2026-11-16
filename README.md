@@ -98,7 +98,7 @@ Each probe states a fact no model of this size gets wrong, then supplies a docum
 | TinyLlama-1.1B | 1100M | 97.2% | **38.6%** | 57.1% |
 | Qwen2.5-1.5B | 1540M | 98.6% | 87.3% | 0.0% |
 
-**Holding a fact scales. Deferring to a document does not.** Knowing the answer rises monotonically with parameter count, 25.0% to 98.6%, with no inversion anywhere. What the model then does with a contradicting document follows no such order: TinyLlama-1.1B knows the fact 97.2% of the time and defers *least* of the six, while Qwen2.5-0.5B, a third its size, defers 91.8%.
+**Holding a fact scales. Deferring to a document does not.** Knowing the answer rises monotonically with parameter count, 25.0% to 98.6%, with no inversion anywhere. What the model then does with a contradicting document follows no such order: TinyLlama-1.1B knows the fact 97.2% of the time and defers *least* of the six, while Qwen2.5-0.5B, less than half its size, defers 91.8%.
 
 **Wording moves the answer nearly as much as the model does.** Across three phrasings the adoption rate has a median spread of **47.9** percentage points and a maximum of **87.5**. Qwen2.5-0.5B ranges from 100.0% to 12.5% on the same 24 facts with the same document.
 
