@@ -41,8 +41,13 @@ preferred-citation:
       given-names: Sarvesh
       orcid: "https://orcid.org/0009-0002-0818-461X"
   year: 2026
-  journal: "Preprint"
+  month: 11
+  journal: "viXra"
+  url: "https://vixra.org/abs/2611.0038"
 identifiers:
+  - type: url
+    value: "https://vixra.org/abs/2611.0038"
+    description: "The paper, viXra:2611.0038."
   - type: other
     value: "2026-05-07"
     description: "Date this repository was created on GitHub."

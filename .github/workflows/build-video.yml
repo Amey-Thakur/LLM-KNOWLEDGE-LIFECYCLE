@@ -1,0 +1,101 @@
+# =============================================================================
+# Workflow    : Video
+# Project     : The Knowledge Lifecycle of Large Language Models
+# Purpose     : Render the explainer video, its cover and the GIFs from the
+#               measurement, encode the video, and publish all of it to media/.
+# Repository  : https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE
+# License     : CC BY 4.0
+# =============================================================================
+#
+# The renderer reads the measurement and refuses to draw if any number differs
+# from preprint/numbers.tex, so a change to the data rebuilds the media and a
+# disagreement with the paper fails this job instead of shipping.
+#
+# Encoding: H.264 High, yuv420p, 30 fps, with a silent AAC track. Both LinkedIn
+# and X accept the file as uploaded; some upload paths reject a video that has
+# no audio stream at all, so an empty one is carried.
+
+name: Video
+permissions:
+  contents: write
+
+on:
+  push:
+    paths:
+      - 'tools/video/**'
+      - 'experiments/counterfactual_summary.json'
+      - 'experiments/counterfactual_update.csv'
+      - 'preprint/numbers.tex'
+      - '.github/workflows/build-video.yml'
+  workflow_dispatch:
+
+jobs:
+  video:
+    name: Explainer video and GIFs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # The same Pillow as the maintainer's machine, so frames match.
+      - name: Install the renderer's one dependency
+        run: pip install pillow==12.1.1
+
+      - name: Make sure ffmpeg is present
+        run: |
+          command -v ffmpeg || { sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg; }
+          ffmpeg -version | head -1
+
+      - name: Render the frames
+        run: python tools/video/render.py frames /tmp/frames
+
+      - name: Encode the video
+        run: |
+          mkdir -p media
+          ffmpeg -y -hide_banner -loglevel error \
+            -framerate 30 -i /tmp/frames/%05d.png \
+            -f lavfi -i anullsrc=channel_layout=stereo:sample_rate=48000 \
+            -map 0:v -map 1:a -shortest \
+            -c:v libx264 -profile:v high -pix_fmt yuv420p -crf 18 -preset slow \
+            -r 30 -g 60 -c:a aac -b:a 128k -movflags +faststart \
+            media/knowledge-lifecycle.mp4
+          ffprobe -v error -show_entries format=duration,size:stream=codec_name,width,height,r_frame_rate \
+            -of default=noprint_wrappers=1 media/knowledge-lifecycle.mp4
+
+      - name: Render the GIFs and the cover
+        run: |
+          python tools/video/render.py gifs
+          python tools/video/render.py cover
+          ls -la media
+
+      - name: Upload the media
+        uses: actions/upload-artifact@v4
+        with:
+          name: media
+          path: media/
+
+      # Publishes each file back as the maintainer via the Contents API, only
+      # when it differs from the committed copy. media/ is in no paths filter,
+      # so a publish never re-triggers this workflow.
+      - name: Publish the media
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          publish() {
+            path="$1"
+            newsha=$(git hash-object "$path")
+            cursha=$(gh api "repos/${{ github.repository }}/contents/$path?ref=${{ github.ref_name }}" --jq .sha 2>/dev/null || true)
+            if [ "$newsha" = "$cursha" ]; then echo "$path unchanged."; return 0; fi
+            base64 -w0 "$path" > /tmp/content.b64
+            jq -n --arg m 'Knowledge Lifecycle' --arg b '${{ github.ref_name }}' --arg an 'Amey Thakur' --arg ae 'ameythakur20@gmail.com' --rawfile c /tmp/content.b64 --arg s "$cursha" '{message:$m,branch:$b,content:$c,committer:{name:$an,email:$ae},author:{name:$an,email:$ae}} + (if $s=="" then {} else {sha:$s} end)' > /tmp/body.json
+            gh api --method PUT "repos/${{ github.repository }}/contents/$path" --input /tmp/body.json > /dev/null
+            echo "published $path as Amey Thakur"
+          }
+          for f in media/knowledge-lifecycle.mp4 media/cover.png media/*.gif; do
+            publish "$f"
+          done

@@ -17,3 +17,6 @@
 *.jpg binary
 *.pdf binary
 *.svg binary
+*.gif binary
+*.mp4 binary
+*.woff2 binary

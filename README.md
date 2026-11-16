@@ -126,7 +126,7 @@ Each probe states a fact no model of this size gets wrong, then supplies a docum
 **A design that isolates the conflict from the training cutoff.** Counterfactual probes assert something every model is confident is false, so the conflict exists by construction for all six regardless of vintage — the standard device in the knowledge-conflict literature. The no-document condition then identifies the subset in which the model actually held the fact, and every headline number is restricted to that subset. Without it, a model that never knew the answer is indistinguishable from one that knew it and deferred.
 
 > [!NOTE]
-> Everything above is measured. An earlier version of this work also proposed an architecture, the Provenance Vector, supported by an idealized proof rather than a trained system. It has been removed from the arXiv paper because nothing in these measurements tests it; it remains in the journal manuscript, where the framework it belongs to is the contribution.
+> Everything above is measured. An earlier version of this work also proposed an architecture, the Provenance Vector, supported by an idealized proof rather than a trained system. It has been removed from the published paper because nothing in these measurements tests it; it remains in the journal manuscript, where the framework it belongs to is the contribution.
 
 <br>
 
@@ -188,7 +188,7 @@ Two controls make that last row possible: an irrelevant document matched in leng
 
 > [!IMPORTANT]
 > **These six figures belong to the framework manuscript in `paper/`, not to
-> the arXiv preprint in `preprint/`.** The two are deliberately different
+> the preprint in `preprint/`, published as viXra:2611.0038.** The two are deliberately different
 > papers, and the difference matters here.
 >
 > The measurement figures below come from an earlier probe set built out of
@@ -196,7 +196,7 @@ Two controls make that last row possible: an irrelevant document matched in leng
 > That design has a defect. A documented update only creates a conflict for a
 > model whose training predates it, and the six models have different cutoffs,
 > so a model that never held the stale fact is indistinguishable from one that
-> held it and deferred. The arXiv preprint replaces those probes with
+> held it and deferred. The published preprint replaces those probes with
 > counterfactual ones, where the conflict exists whatever the model was
 > trained on, and it reports a correction to the earlier headline claim.
 >
@@ -293,7 +293,11 @@ eighteen measurements, and one of them is GPT-2 on the headline probe.
 
 <div align="center">
 
-[![Download the paper](https://img.shields.io/badge/Download-arXiv_paper_(PDF,_6_pages)-B31B1B?logo=adobeacrobatreader&logoColor=white)](preprint/main.pdf)
+[![Read on viXra](https://img.shields.io/badge/viXra-2611.0038-1A4F8A)](https://vixra.org/abs/2611.0038)
+&nbsp;
+[![Download the paper](https://img.shields.io/badge/Download-Paper_(PDF,_8_pages)-B31B1B?logo=adobeacrobatreader&logoColor=white)](preprint/main.pdf)
+&nbsp;
+[![Watch the explainer](https://img.shields.io/badge/Watch-Explainer_(MP4,_73_s)-D05353?logo=youtube&logoColor=white)](media/knowledge-lifecycle.mp4)
 &nbsp;
 [![Download the slides](https://img.shields.io/badge/Download-Slides_(PDF)-4A7FD4?logo=adobeacrobatreader&logoColor=white)](preprint/presentation.pdf)
 &nbsp;
@@ -308,15 +312,25 @@ eighteen measurements, and one of them is GPT-2 on the headline probe.
 > [!NOTE]
 > **There are two manuscripts here, and they are different papers.**
 >
-> `preprint/` is **“Probability Is Not an Answer: Rank-Level Measurement of Knowledge Conflict in Small Language Models”**, six pages, built on the 864 measurements above. It is the arXiv submission.
+> `preprint/` is **“The Knowledge Lifecycle of Large Language Models”**, eight pages, built on the 864 measurements above and published on viXra as [viXra:2611.0038](https://vixra.org/abs/2611.0038).
 >
-> `paper/` is the long **“Knowledge Lifecycle”** framework manuscript, which is the journal submission. The split is deliberate: arXiv's computer-science policy declines framework and position papers without prior journal or conference acceptance, while a framework paper is precisely what a survey venue wants.
+> `paper/` is the long framework manuscript of the same name, which is the journal submission. The split is deliberate: arXiv's computer-science policy declines framework and position papers without prior journal or conference acceptance, while a framework paper is precisely what a survey venue wants.
 
 <br>
 
 <div align="center">
 
-<a href="preprint/poster.pdf"><img src="preprint/figures/poster-preview.png" alt="A0 conference poster: The Knowledge Lifecycle of Large Language Models. The problem, the framework, the Vioxx finding, the metric, the architecture, and how to reproduce it." width="720"></a>
+<a href="media/knowledge-lifecycle.mp4"><img src="media/scale-is-not-deference.gif" alt="Animated chart. Across six open models ordered by size, holding the fact rises from 25.0 to 98.6 per cent, while adopting a contradicting document follows no order: TinyLlama-1.1B holds the fact 97.2 per cent of the time and adopts the document 38.6 per cent." width="560"></a>
+
+**The paper in 73 seconds.** &nbsp; A text-led explainer, square for the feed, rendered frame by frame from the measurement by [`tools/video/render.py`](tools/video/render.py), which refuses to draw any number that differs from `preprint/numbers.tex`. [Watch the video](media/knowledge-lifecycle.mp4) (MP4, 1080 × 1080). Four loops cut from it: [the framework](media/lifecycle-framework.gif), [one document, two answers](media/one-document-two-answers.gif), [scale is not deference](media/scale-is-not-deference.gif), and [probability is not an answer](media/probability-is-not-an-answer.gif).
+
+</div>
+
+<br>
+
+<div align="center">
+
+<a href="preprint/poster.pdf"><img src="preprint/figures/poster-preview.png" alt="A0 conference poster: The Knowledge Lifecycle of Large Language Models. The problem, the five stages as framing, the 864-pass measurement, why the answer has to be read at the rank, and the correction to the earlier report." width="720"></a>
 
 **The whole argument on one page.** &nbsp; The A0 poster carries the problem, the five stages as framing, the 864-pass measurement, why the answer has to be read at the rank, and the correction to the earlier report. The slide deck follows the same arc across sixteen slides, with speaker notes throughout, so it reads as a written argument as well as a talk. [Download the full-resolution PDF](preprint/poster.pdf).
 
@@ -332,7 +346,7 @@ eighteen measurements, and one of them is GPT-2 on the headline probe.
 
 ```
 .
-├── preprint/       The arXiv paper (short, empirical), slides, poster, bibliography
+├── preprint/       The paper (short, empirical, viXra:2611.0038), slides, poster, bibliography
 │   ├── main.tex            the manuscript
 │   ├── numbers.tex         every quoted figure, generated from the measurement
 │   └── results-table.tex   the results table, generated from the measurement
@@ -342,6 +356,8 @@ eighteen measurements, and one of them is GPT-2 on the headline probe.
 │   ├── analyse_counterfactual.py    turns it into the reported figures
 │   └── make_paper_numbers.py        turns those into LaTeX
 ├── space/          The live demonstration
+├── media/          The explainer video, its cover, and four GIFs, all rendered
+├── tools/video/    The renderer that draws them from the measurement
 ├── CITATION.cff    How to cite this work
 └── LICENSE         CC BY 4.0
 ```
