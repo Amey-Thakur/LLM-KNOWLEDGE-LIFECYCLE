@@ -23,13 +23,17 @@ keywords:
   - machine unlearning
   - knowledge conflicts
 abstract: >-
-  A unified framework organizing LLM knowledge management into five structural
-  stages (Acquisition, Storage, Retrieval, Update, Forgetting), with two
-  technical contributions: the Provenance Vector, an architectural proposal that
-  gates stale parametric activations using acquisition metadata, and Lifecycle
-  Desynchronization, a KL-based metric quantifying the failure that occurs when
-  parametric weights and retrieved context conflict, measured reproducibly on
-  GPT-2.
+  The Knowledge Lifecycle names how a large language model acquires, stores,
+  retrieves, updates and forgets knowledge, and this repository measures what
+  breaks where retrieval meets update: a document in the prompt that
+  contradicts what the model learned. Across 864 forward passes on six open
+  models from 124M to 1.5B parameters, holding a fact rises with size at every
+  step, from 25.0% to 98.6%, while deferring to the document follows no such
+  order. Every result is read at the rank of the answer, which is what the
+  model would actually say, and every number comes from one deterministic
+  script that runs on an ordinary CPU. The repository holds the preprint
+  (viXra:2611.0038), the framework manuscript, the measurement code, a live
+  demonstration and the explainer video.
 preferred-citation:
   type: article
   title: "The Knowledge Lifecycle of Large Language Models"
