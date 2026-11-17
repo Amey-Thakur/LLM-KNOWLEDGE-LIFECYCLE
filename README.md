@@ -322,7 +322,7 @@ eighteen measurements, and one of them is GPT-2 on the headline probe.
 
 <a href="media/knowledge-lifecycle.mp4"><img src="media/scale-is-not-deference.gif" alt="Animated chart. Across six open models ordered by size, holding the fact rises from 25.0 to 98.6 per cent, while adopting a contradicting document follows no order: TinyLlama-1.1B holds the fact 97.2 per cent of the time and adopts the document 38.6 per cent." width="560"></a>
 
-**The paper in 73 seconds.** &nbsp; A text-led explainer, square for the feed, rendered frame by frame from the measurement by [`tools/video/render.py`](tools/video/render.py), which refuses to draw any number that differs from `preprint/numbers.tex`. [Watch the video](media/knowledge-lifecycle.mp4) (MP4, 1080 × 1080). Four loops cut from it: [the framework](media/lifecycle-framework.gif), [one document, two answers](media/one-document-two-answers.gif), [scale is not deference](media/scale-is-not-deference.gif), and [probability is not an answer](media/probability-is-not-an-answer.gif).
+**The paper in 134 seconds.** &nbsp; A text-led explainer, square for the feed, rendered frame by frame from the measurement by [`tools/video/render.py`](tools/video/render.py), which refuses to draw any number that differs from `preprint/numbers.tex`. [Watch the video](media/knowledge-lifecycle.mp4) (MP4, 1080 × 1080). Five loops cut from it: [the framework](media/lifecycle-framework.gif), [one document, two answers](media/one-document-two-answers.gif), [scale is not deference](media/scale-is-not-deference.gif), [the wording moves the answer](media/wording-moves-the-answer.gif), and [probability is not an answer](media/probability-is-not-an-answer.gif).
 
 </div>
 
@@ -330,7 +330,7 @@ eighteen measurements, and one of them is GPT-2 on the headline probe.
 
 <div align="center">
 
-<a href="preprint/poster.pdf"><img src="preprint/figures/poster-preview.png" alt="A0 conference poster: The Knowledge Lifecycle of Large Language Models. The problem, the five stages as framing, the 864-pass measurement, why the answer has to be read at the rank, and the correction to the earlier report." width="720"></a>
+<a href="preprint/poster.pdf"><img src="media/poster.png" alt="A0 conference poster: The Knowledge Lifecycle of Large Language Models. The problem, the five stages as framing, the 864-pass measurement, why the answer has to be read at the rank, and the correction to the earlier report." width="720"></a>
 
 **The whole argument on one page.** &nbsp; The A0 poster carries the problem, the five stages as framing, the 864-pass measurement, why the answer has to be read at the rank, and the correction to the earlier report. The slide deck follows the same arc across sixteen slides, with speaker notes throughout, so it reads as a written argument as well as a talk. [Download the full-resolution PDF](preprint/poster.pdf).
 

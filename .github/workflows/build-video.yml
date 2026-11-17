@@ -67,10 +67,14 @@ jobs:
           ffprobe -v error -show_entries format=duration,size:stream=codec_name,width,height,r_frame_rate \
             -of default=noprint_wrappers=1 media/knowledge-lifecycle.mp4
 
-      - name: Render the GIFs and the cover
+      # The figures are the method diagram, the repository's social card and the
+      # two settled frames the newsletter carries, all drawn by the same renderer
+      # as the video so they share its frame and pass the same number guard.
+      - name: Render the GIFs, the cover and the figures
         run: |
           python tools/video/render.py gifs
           python tools/video/render.py cover
+          python tools/video/render.py figures
           ls -la media
 
       - name: Upload the media
@@ -96,6 +100,10 @@ jobs:
             gh api --method PUT "repos/${{ github.repository }}/contents/$path" --input /tmp/body.json > /dev/null
             echo "published $path as Amey Thakur"
           }
-          for f in media/knowledge-lifecycle.mp4 media/cover.png media/*.gif; do
+          # Named one by one, so media/poster.png, which the Poster workflow
+          # owns, is never republished from here.
+          for f in media/knowledge-lifecycle.mp4 media/cover.png media/*.gif \
+                   media/research-pipeline.png media/social-preview-1280x640.png \
+                   media/scale-is-not-deference.png media/probability-is-not-an-answer.png; do
             publish "$f"
           done
