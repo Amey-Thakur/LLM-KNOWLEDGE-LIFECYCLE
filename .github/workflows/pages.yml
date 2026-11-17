@@ -1,0 +1,73 @@
+# Deploys the watch page to GitHub Pages. GitHub plays no video inside a
+# README and serves a committed MP4 only as a download, so the explainer is
+# watched at https://amey-thakur.github.io/LLM-KNOWLEDGE-LIFECYCLE/.
+#
+# The page is assembled at deploy time from tools/site/ and the committed
+# media, so it always shows the render on main. The Video and Poster workflows
+# publish their output with the workflow token, and commits made with that
+# token start no workflow, so this one also runs when either of them finishes.
+name: Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'tools/site/**'
+      - 'media/**'
+      - 'preprint/amey-thakur.jpg'
+      - 'preprint/sarvesh-talele.jpg'
+      - '.github/workflows/pages.yml'
+  workflow_run:
+    workflows: ['Video', 'Poster']
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Assemble the site
+        run: |
+          set -euo pipefail
+          mkdir -p _site/media _site/fonts
+          cp tools/site/index.html _site/
+          cp tools/video/fonts/inter-variable.woff2 tools/video/fonts/NOTICE.md _site/fonts/
+          cp media/knowledge-lifecycle.mp4 media/cover.png media/social-preview-1280x640.png \
+             media/lifecycle-framework.gif media/one-document-two-answers.gif \
+             media/scale-is-not-deference.gif media/wording-moves-the-answer.gif \
+             media/probability-is-not-an-answer.gif _site/media/
+          cp preprint/amey-thakur.jpg preprint/sarvesh-talele.jpg _site/media/
+          touch _site/.nojekyll
+          # Every file the page names must be in the site, or the deploy stops.
+          grep -oE '(src|href|poster)="(media|fonts)/[^"]+"' _site/index.html \
+            | sed -E 's/^[a-z]+="//; s/"$//' | sort -u | while read -r f; do
+              test -s "_site/$f" || { echo "missing: $f"; exit 1; }
+            done
+          ls -la _site _site/media _site/fonts
+
+      - name: Upload the site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4

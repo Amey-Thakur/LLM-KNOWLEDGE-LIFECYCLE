@@ -14,8 +14,8 @@ LICENSE      : CC BY 4.0
 
 Every figure on screen is read from experiments/counterfactual_summary.json and
 experiments/counterfactual_update.csv, and checked against the macros in
-preprint/numbers.tex before a single frame is drawn. If the paper and the
-measurement ever disagree, rendering stops.
+preprint/numbers.tex and the rows of preprint/results-table.tex before a single
+frame is drawn. If the paper and the measurement ever disagree, rendering stops.
 
 The visual system is the one every other surface of the project uses: white
 with a faint grid, the five lifecycle colours, ink and muted greys, Inter, and
@@ -173,10 +173,29 @@ def load_data() -> dict:
         "TinyAdoptHigh": max(x for x in d["tiny_by_phrasing"] if x is not None),
         "PerModel": d["n_probes"] * d["n_phrasings"],
     }
-    bad = [f"{k}: paper {macros.get(k)!r}, data {v!r}" for k, v in want.items()
+    bad = [f"numbers.tex {k}: paper {macros.get(k)!r}, data {v!r}" for k, v in want.items()
            if k not in macros or float(macros[k]) != float(v)]
+    # The scale chart and the pipeline figure draw every model's size, how often
+    # it holds the fact and how often it adopts the document. The paper prints
+    # all eighteen in its results table, so each is checked there as well.
+    table = (ROOT / "preprint" / "results-table.tex").read_text(encoding="utf-8")
+    printed = {m.group(1).strip(): tuple(float(x) for x in m.groups()[1:])
+               for m in re.finditer(r"^([^&\n]+?) & (\d+) & ([\d.]+)\\% & \d+ & ([\d.]+)\\%",
+                                    table, re.M)}
+    in_table = {"gpt2": "GPT-2", "gpt2-medium": "GPT-2 medium", "gpt2-large": "GPT-2 large",
+                "Qwen/Qwen2.5-0.5B-Instruct": "Qwen2.5-0.5B-Instruct",
+                "TinyLlama/TinyLlama-1.1B-Chat-v1.0": "TinyLlama-1.1B-Chat",
+                "Qwen/Qwen2.5-1.5B-Instruct": "Qwen2.5-1.5B-Instruct"}
+    for k, v in models:
+        data = (float(v["params_m"]), float(v["knows_no_doc_pct"]),
+                float(v["adopt_in_conflict_pct"]))
+        if printed.get(in_table[k]) != data:
+            bad.append(f"results-table.tex {in_table[k]}: paper "
+                       f"{printed.get(in_table[k])!r}, data {data!r}")
+    if len(printed) != len(models):
+        bad.append(f"results-table.tex: {len(printed)} model rows, data has {len(models)}")
     if bad:
-        raise SystemExit("numbers disagree with preprint/numbers.tex:\n  " + "\n  ".join(bad))
+        raise SystemExit("numbers disagree with the paper:\n  " + "\n  ".join(bad))
     knows = [m["knows"] for m in d["models"]]
     assert knows == sorted(knows), "holding the fact is no longer monotone in size"
     assert d["ex_qwen"]["says_cf"] and d["ex_tiny"]["says_true"]

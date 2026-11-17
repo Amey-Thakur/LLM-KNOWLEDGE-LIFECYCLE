@@ -297,7 +297,7 @@ eighteen measurements, and one of them is GPT-2 on the headline probe.
 &nbsp;
 [![Download the paper](https://img.shields.io/badge/Download-Paper_(PDF,_8_pages)-B31B1B?logo=adobeacrobatreader&logoColor=white)](preprint/main.pdf)
 &nbsp;
-[![Watch the explainer](https://img.shields.io/badge/Watch-Explainer_(MP4,_73_s)-D05353?logo=youtube&logoColor=white)](media/knowledge-lifecycle.mp4)
+[![Watch the explainer](https://img.shields.io/badge/Watch-Explainer_(134_s)-D05353?logo=youtube&logoColor=white)](https://amey-thakur.github.io/LLM-KNOWLEDGE-LIFECYCLE/)
 &nbsp;
 [![Download the slides](https://img.shields.io/badge/Download-Slides_(PDF)-4A7FD4?logo=adobeacrobatreader&logoColor=white)](preprint/presentation.pdf)
 &nbsp;
@@ -320,9 +320,29 @@ eighteen measurements, and one of them is GPT-2 on the headline probe.
 
 <div align="center">
 
-<a href="media/knowledge-lifecycle.mp4"><img src="media/scale-is-not-deference.gif" alt="Animated chart. Across six open models ordered by size, holding the fact rises from 25.0 to 98.6 per cent, while adopting a contradicting document follows no order: TinyLlama-1.1B holds the fact 97.2 per cent of the time and adopts the document 38.6 per cent." width="560"></a>
+<a href="https://amey-thakur.github.io/LLM-KNOWLEDGE-LIFECYCLE/"><img src="media/cover.png" alt="Title card of the explainer: The Knowledge Lifecycle of Large Language Models, viXra:2611.0038, the five stages acquire, store, retrieve, update and forget, the line A model holds two memories, which one comes out is not a question of size, and the authors Amey Thakur and Sarvesh Talele. Opens the watch page, where the 134-second video plays." width="560"></a>
 
-**The paper in 134 seconds.** &nbsp; A text-led explainer, square for the feed, rendered frame by frame from the measurement by [`tools/video/render.py`](tools/video/render.py), which refuses to draw any number that differs from `preprint/numbers.tex`. [Watch the video](media/knowledge-lifecycle.mp4) (MP4, 1080 × 1080). Five loops cut from it: [the framework](media/lifecycle-framework.gif), [one document, two answers](media/one-document-two-answers.gif), [scale is not deference](media/scale-is-not-deference.gif), [the wording moves the answer](media/wording-moves-the-answer.gif), and [probability is not an answer](media/probability-is-not-an-answer.gif).
+[![Play the explainer](https://img.shields.io/badge/%E2%96%B6_Play_the_explainer-134_seconds-1A4F8A?style=for-the-badge)](https://amey-thakur.github.io/LLM-KNOWLEDGE-LIFECYCLE/)
+
+**The paper in 134 seconds.** &nbsp; A text-led explainer, square for the feed, rendered frame by frame from the measurement by [`tools/video/render.py`](tools/video/render.py), which reads every number from the data and stops if any figure the paper prints disagrees with it. GitHub does not play video inside a README, so the explainer plays on its [watch page](https://amey-thakur.github.io/LLM-KNOWLEDGE-LIFECYCLE/), or you can [download the MP4](media/knowledge-lifecycle.mp4) (1080 × 1080, 9.6 MB).
+
+<br>
+
+**Five loops cut from it,** each holding its headline through the restart, so it reads from any frame.
+
+<table>
+<tr>
+<td colspan="2" align="center"><img src="media/lifecycle-framework.gif" alt="An animated list titled A fact passes through five stages: acquire, store, retrieve, update, forget, each with a one-line definition. Retrieve and Update are outlined together and marked conflict. The line beneath reads: the failure sits between Retrieve and Update; the document arrives, and nothing tells the model which copy of the fact to trust." width="420"><br><b>The framework</b><br><sub>A fact passes through five stages, and the failure sits between retrieve and update.</sub></td>
+</tr>
+<tr>
+<td align="center" width="50%"><img src="media/one-document-two-answers.gif" alt="An animated comparison titled Same question, same document. With a document claiming the capital of France moved to Lyon, Qwen2.5-1.5B gives Lyon 0.72, ranked first, and answers Lyon, while TinyLlama-1.1B gives Paris 0.95, ranked first, and answers Paris." width="400"><br><b>One document, two answers</b><br><sub>The same question and the same document, and two models answer differently.</sub></td>
+<td align="center" width="50%"><img src="media/scale-is-not-deference.gif" alt="Animated chart. Across six open models ordered by size, holding the fact rises from 25.0 to 98.6 per cent, while adopting a contradicting document follows no order: TinyLlama-1.1B holds the fact 97.2 per cent of the time and adopts the document 38.6 per cent." width="400"><br><b>Scale is not deference</b><br><sub>Holding the fact climbs with size; adopting the document follows no order.</sub></td>
+</tr>
+<tr>
+<td align="center" width="50%"><img src="media/wording-moves-the-answer.gif" alt="An animated bar chart titled Change only the wording. For TinyLlama-1.1B on conflicts only, three wordings of the same question adopt the document 17.4, 21.7 and 75.0 per cent of the time: 57.6 points apart." width="400"><br><b>The wording moves the answer</b><br><sub>Three phrasings of one question, 57.6 points apart on conflicts alone.</sub></td>
+<td align="center" width="50%"><img src="media/probability-is-not-an-answer.gif" alt="An animated card titled Probability is not an answer. TinyLlama-1.1B gives Paris 0.36 and Lyon 0.19 and still says Paris. Of 432 conditions with the document present, 332 give the document's answer more than 0.10, and 69 of those still do not say it: 20.8 per cent." width="400"><br><b>Probability is not an answer</b><br><sub>Where the document's answer carries more than 0.10, it is still not said 20.8 per cent of the time.</sub></td>
+</tr>
+</table>
 
 </div>
 
@@ -356,8 +376,9 @@ eighteen measurements, and one of them is GPT-2 on the headline probe.
 │   ├── analyse_counterfactual.py    turns it into the reported figures
 │   └── make_paper_numbers.py        turns those into LaTeX
 ├── space/          The live demonstration
-├── media/          The explainer video, its cover, and four GIFs, all rendered
+├── media/          The explainer video, its cover, five GIFs and the figures, all rendered
 ├── tools/video/    The renderer that draws them from the measurement
+├── tools/site/     The watch page, deployed to GitHub Pages
 ├── CITATION.cff    How to cite this work
 └── LICENSE         CC BY 4.0
 ```
