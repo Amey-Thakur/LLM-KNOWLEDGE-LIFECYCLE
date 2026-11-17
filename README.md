@@ -87,7 +87,7 @@ Mapping twenty representative papers onto the five stages, the median covers **t
 
 A boundary failure, measured across **864 forward passes**: six open models from 124M to 1.5B parameters, 24 counterfactual probes, three phrasings each, with and without a contradicting document.
 
-Each probe states a fact no model of this size gets wrong, then supplies a document asserting a plausible substitute. Restricting to the **304 pairs where the model demonstrably held the fact beforehand** — the cases where a conflict actually exists — the document is adopted **66.8%** of the time and the model keeps its own answer **27.3%**.
+Each probe states a fact no model of this size gets wrong, then supplies a document asserting a plausible substitute. Restricting to the **304 pairs where the model demonstrably held the fact beforehand**, the cases where a conflict actually exists, the document is adopted **66.8%** of the time and the model keeps its own answer **27.3%**.
 
 | Model | Params | Knows the fact | Adopts the document | Keeps its own |
 | :--- | ---: | ---: | ---: | ---: |
@@ -107,10 +107,10 @@ Each probe states a fact no model of this size gets wrong, then supplies a docum
 
 <br>
 
-**And probability is not an answer.** The in-context answer carries more than 0.10 of the probability mass in **332** of the 432 conditions with the document present, and in **69** of those — 20.8% — it is still not the token the model ranks first. A reader given only the probability would conclude the document had landed; a reader given the rank would see the model say something else.
+**And probability is not an answer.** The in-context answer carries more than 0.10 of the probability mass in **332** of the 432 conditions with the document present, and in **69** of those, 20.8%, it is still not the token the model ranks first. A reader given only the probability would conclude the document had landed; a reader given the rank would see the model say something else.
 
 > [!IMPORTANT]
-> **This corrects an earlier version of this work.** That version reported, on a drug-withdrawal probe, that no model answered correctly under any phrasing. The claim was false. The script behind it recorded only the surprisal of the expected answer, never the rank or the top-ranked token, so it could not have tested the claim it was cited for. Its probes were also real-world updates, so whether a model held the stale fact depended on training cutoffs that differ across the six models — and that withdrawal predates every model's training data, so no model held the superseded fact and there was no conflict to resist. Both defects are removed by the counterfactual design above, and the correction is written up as its own section of the paper rather than quietly dropped.
+> **This corrects an earlier version of this work.** That version reported, on a drug-withdrawal probe, that no model answered correctly under any phrasing. The claim was false. The script behind it recorded only the surprisal of the expected answer, never the rank or the top-ranked token, so it could not have tested the claim it was cited for. Its probes were also real-world updates, so whether a model held the stale fact depended on training cutoffs that differ across the six models; and that withdrawal predates every model's training data, so no model held the superseded fact and there was no conflict to resist. Both defects are removed by the counterfactual design above, and the correction is written up as its own section of the paper rather than quietly dropped.
 
 <br>
 
@@ -123,7 +123,7 @@ Each probe states a fact no model of this size gets wrong, then supplies a docum
 
 [![Acquire](https://img.shields.io/badge/Acquire-4A7FD4)](#the-five-stages) [![Store](https://img.shields.io/badge/Store-2A9D8F)](#the-five-stages)
 
-**A design that isolates the conflict from the training cutoff.** Counterfactual probes assert something every model is confident is false, so the conflict exists by construction for all six regardless of vintage — the standard device in the knowledge-conflict literature. The no-document condition then identifies the subset in which the model actually held the fact, and every headline number is restricted to that subset. Without it, a model that never knew the answer is indistinguishable from one that knew it and deferred.
+**A design that isolates the conflict from the training cutoff.** Counterfactual probes assert something every model is confident is false, so the conflict exists by construction for all six regardless of vintage, which is the standard device in the knowledge-conflict literature. The no-document condition then identifies the subset in which the model actually held the fact, and every headline number is restricted to that subset. Without it, a model that never knew the answer is indistinguishable from one that knew it and deferred.
 
 > [!NOTE]
 > Everything above is measured. An earlier version of this work also proposed an architecture, the Provenance Vector, supported by an idealized proof rather than a trained system. It has been removed from the published paper because nothing in these measurements tests it; it remains in the journal manuscript, where the framework it belongs to is the contribution.
@@ -137,7 +137,7 @@ Each probe states a fact no model of this size gets wrong, then supplies a docum
 > ### 🤗 &nbsp; Run the measurement yourself, right now
 > **[huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle](https://huggingface.co/spaces/ameythakur/llm-knowledge-lifecycle)**
 >
-> No install, no sign-in, no API key. Press **Measure** and watch a model ignore a document sitting in its own prompt.
+> No install, no sign-in, no API key. Put a document in front of GPT-2 that contradicts what it learned, press **Measure**, and see which one it answers with.
 
 <div align="center">
 
@@ -147,9 +147,9 @@ Each probe states a fact no model of this size gets wrong, then supplies a docum
 
 <br>
 
-GPT-2 runs inside your own browser, so nothing you type leaves your machine and the same input always returns the same number. The demonstration's full source is in [`space/`](space/), byte for byte what the Space serves. Three worked examples cover three different ways the failure appears, and you can enter any fact change of your own.
+GPT-2 runs inside your own browser, so nothing you type leaves your machine and the same input always returns the same number. The demonstration's full source is in [`space/`](space/), byte for byte what the Space serves. Three worked examples, France to Lyon, Japan to Osaka and Egypt to Alexandria, are counterfactual probes from the paper's own set, and you can enter any fact change of your own.
 
-Vioxx is the outright failure. The British monarch case is stranger: after the 2022 succession, telling the model that Elizabeth II has died mostly makes it *more* likely to answer "Queen". The Twitter rename shows a document shifting the model hard and still losing.
+Read the top-ranked token, not the probability. The Space shows both, because the gap between them is the paper's point: a document can carry real probability and still not be what the model says.
 
 <br>
 
@@ -158,13 +158,16 @@ Vioxx is the outright failure. The British monarch case is stranger: after the 2
 
 ```bash
 pip install torch transformers
-python experiments/dsync_experiment.py
+cd experiments
+python counterfactual_update.py    # the 864 forward passes; writes counterfactual_update.csv
+python analyse_counterfactual.py   # turns them into counterfactual_summary.json
+python make_paper_numbers.py       # writes preprint/numbers.tex and preprint/results-table.tex
 ```
 
 > [!NOTE]
-> **Every number in this README comes out of that one script**, and nothing in it samples. The digits are identical on every machine and every run, so any claim above can be checked in under a minute.
+> **Every figure from the current measurement comes out of those three scripts**, and nothing in them samples. The digits are identical on every machine and every run, so any claim above can be checked against your own run. The paper reads its numbers from the two files the last script writes, and the explainer refuses to render if any figure it draws disagrees with them.
 
- A laptop is enough: GPT-2 base at 124M parameters, chosen because it is small, fully open, and free of the instruction tuning that would confound the result.
+A laptop is enough: the six models, from 124M to 1.5B parameters, are loaded one at a time and run in float32 on an ordinary CPU. The first run downloads their weights, roughly 13 GB; these are single forward passes rather than generation, so a GPU buys almost nothing.
 
 ### The cross-model notebook
 
@@ -175,7 +178,7 @@ The [Kaggle notebook](https://www.kaggle.com/code/ameythakur20/cross-model-lifec
 
 | It asked | What it reported |
 | :--- | :--- |
-| Does scale resolve the conflict? | Inside the GPT-2 family the drug probe runs 12.05 → 10.96 → 11.91 nats. **The stronger reading once drawn from this — that no model answers it correctly — does not hold:** with rank recorded, three of the six rank the corrected answer first under two of three phrasings. |
+| Does scale resolve the conflict? | Inside the GPT-2 family the drug probe runs 12.05 → 10.96 → 11.91 nats. **The stronger reading once drawn from this, that no model answers it correctly, does not hold:** with rank recorded, three of the six rank the corrected answer first under two of three phrasings. |
 | Does instruction tuning resolve it? | On two probes of three, by that measurement. |
 | Was the answer out of reach, or the document unused? | Stating the answer outright is worth 7.7 to 10.6 nats to every model; the corrective document is worth at most 0.41 nats to any GPT-2. |
 
@@ -235,45 +238,56 @@ wins.
 
 <img src="preprint/figures/fig3-failure-cascade.png" alt="Six stacked stages showing the Vioxx failure: acquire, store, retrieve, then update not applied, then conflict, then cannot forget." width="560">
 
-**Figure 3 &nbsp;·&nbsp; How the failure actually happens.** &nbsp; Read it top to
-bottom. The first three steps all succeed: the model learned the drug was
-approved, stored it, and the search pipeline correctly returned the 2004
-withdrawal notice. The weights were never edited, so the conflict at step 5 is
-resolved in favour of the old memory, and step 6 cannot undo it without
-retraining. **Every individual stage passed its own test.**
+**Figure 3 &nbsp;·&nbsp; How the failure would happen.** &nbsp; Read it top to
+bottom. In the framework's account the first three steps all succeed: a model
+learns a fact, stores it, and the search pipeline correctly returns the update.
+The weights are never edited, so the conflict at step 5 is resolved in favour of
+the old memory, and step 6 cannot undo it without retraining. **Every individual
+stage passes its own test.** The drug example the figure is drawn with does not
+exercise this path: the withdrawal predates every model's training data, so no
+model held the superseded fact. The preprint's counterfactual probes are built
+so that the conflict exists for every model.
 
 </div>
 
-### The measurement
+### The earlier measurement, superseded
+
+What the earlier probe set reported, kept for the record. Every number in these
+charts is surprisal, read without the rank, and Section 4 of the preprint sets
+out why that cannot say what a model answers.
 
 <div align="center">
 
 <img src="preprint/figures/scale.png" alt="D_sync against model size for each probe. The Vioxx curve stays high and is not monotone, while the Twitter curve falls away." width="640">
 
-**Figure 4 &nbsp;·&nbsp; Does a bigger model fix it?** &nbsp; No. Lower is better.
-The Twitter probe (teal) falls steadily as models grow, which is what resolving
-looks like. The Vioxx probe (red) stays above the dashed failure line and is not
-even ordered by size: the 774M model is **worse** than the 355M one.
+**Figure 4 &nbsp;·&nbsp; Does a bigger model fix it?** &nbsp; The earlier answer
+was no. Lower is better. The Twitter probe (teal) fell steadily as models grew,
+and the Vioxx probe (red) stayed above the dashed failure line, not even ordered
+by size. Measured at the rank on counterfactual probes, the question has a
+sharper answer: holding the fact rises with size at every step, and deferring to
+the document follows no order.
 
 <br>
 
 <img src="preprint/figures/exposure.png" alt="Nats the corrective document moved the stale answer, per model and probe. The Vioxx bars sit above zero on five of six models." width="640">
 
-**Figure 5 &nbsp;·&nbsp; The exposure trap.** &nbsp; Anything above zero means the
-document that *corrects* the fact made the **wrong** answer more likely. On the
-Vioxx probe that happens on five of the six models. Naming a fact, even in order
-to deny it, strengthens what the model already believes.
+**Figure 5 &nbsp;·&nbsp; The exposure trap, as first reported.** &nbsp; Anything
+above zero means the document that *corrects* the fact made the stale answer
+more likely, which happened on the Vioxx probe for five of the six models. The
+framework manuscript reads that as naming a fact strengthening the belief. The
+preprint withdraws the reading: no model held the superseded fact, and the
+surprisal was the question frame declining a participle.
 
 <br>
 
 <img src="preprint/figures/help.png" alt="Help delivered by the corrective document against help available when the answer is stated outright, per model and probe." width="640">
 
 **Figure 6 &nbsp;·&nbsp; Was the answer even reachable?** &nbsp; The pale bar is how
-far the model *can* be moved, measured by simply stating the answer outright. The
-solid bar is how far the real document moved it. On Twitter the document collects
-nearly everything available. On Vioxx it collects almost none of roughly ten nats,
-and on the largest model it moves the wrong way. The answer was in reach; the
-document did not deliver it.
+far the model *can* be moved, measured by stating the answer outright. The solid
+bar is how far the real document moved it. On Twitter the document collected
+nearly everything available; on Vioxx, almost none of roughly ten nats, and on
+the largest model it moved the wrong way. Both bars measure surprisal, so
+neither says which answer the model would give.
 
 <br>
 
@@ -281,8 +295,8 @@ document did not deliver it.
 
 **A fourth chart, not in the paper.** &nbsp; Each point is one measurement. Above
 the line, the corrective document moved the model more than an unrelated
-paragraph about the Danube. Below it, the Danube won. That happens twice in
-eighteen measurements, and one of them is GPT-2 on the headline probe.
+paragraph about the Danube. Below it, the Danube won. That happened twice in
+eighteen measurements, and one of them was GPT-2 on the drug probe.
 
 </div>
 
