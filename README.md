@@ -336,9 +336,13 @@ eighteen measurements, and one of them was GPT-2 on the drug probe.
 
 <a href="https://amey-thakur.github.io/LLM-KNOWLEDGE-LIFECYCLE/"><img src="media/cover.png" alt="Title card of the explainer: The Knowledge Lifecycle of Large Language Models, viXra:2611.0038, the five stages acquire, store, retrieve, update and forget, the line A model holds two memories, which one comes out is not a question of size, and the authors Amey Thakur and Sarvesh Talele. Opens the watch page, where the 134-second video plays." width="560"></a>
 
-[![Play the explainer](https://img.shields.io/badge/%E2%96%B6_Play_the_explainer-134_seconds-1A4F8A?style=for-the-badge)](https://amey-thakur.github.io/LLM-KNOWLEDGE-LIFECYCLE/)
+[![Watch the explainer with narration](https://img.shields.io/badge/Watch-With_narration_(134_s)-D05353?logo=youtube&logoColor=white)](https://amey-thakur.github.io/LLM-KNOWLEDGE-LIFECYCLE/)
+&nbsp;
+[![Download the narrated MP4](https://img.shields.io/badge/Download-Narrated_MP4_(12.8_MB)-1A4F8A)](media/knowledge-lifecycle-narrated.mp4)
+&nbsp;
+[![Download the silent MP4](https://img.shields.io/badge/Download-Silent_MP4_(9.6_MB)-4A7FD4)](media/knowledge-lifecycle.mp4)
 
-**The paper in 134 seconds.** &nbsp; A text-led explainer, square for the feed, rendered frame by frame from the measurement by [`tools/video/render.py`](tools/video/render.py), which reads every number from the data and stops if any figure the paper prints disagrees with it. It comes in two cuts with the same frames. The narrated cut adds a voice that speaks those same figures over a quiet score, both synthesized by [`tools/video/voiceover.py`](tools/video/voiceover.py), and the silent cut carries everything in its text alone. GitHub does not play video inside a README, so the explainer plays on its [watch page](https://amey-thakur.github.io/LLM-KNOWLEDGE-LIFECYCLE/), or you can download the [narrated MP4](media/knowledge-lifecycle-narrated.mp4) (12.8 MB, with [captions](media/knowledge-lifecycle-narrated.srt)) or the [silent MP4](media/knowledge-lifecycle.mp4) (9.6 MB), both 1080 × 1080.
+**The paper in 134 seconds.** &nbsp; A text-led explainer, square for the feed, rendered frame by frame from the measurement by [`tools/video/render.py`](tools/video/render.py), which reads every number from the data and stops if any figure the paper prints disagrees with it. It comes in two cuts with the same frames. The narrated cut adds a voice that speaks those same figures over a quiet score, both synthesized by [`tools/video/voiceover.py`](tools/video/voiceover.py), and the silent cut carries everything in its text alone. GitHub does not play video inside a README, so the explainer plays on its [watch page](https://amey-thakur.github.io/LLM-KNOWLEDGE-LIFECYCLE/), where either cut can be chosen. Both are 1080 × 1080, and the narration has [captions](media/knowledge-lifecycle-narrated.srt).
 
 <br>
 
