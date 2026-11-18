@@ -50,7 +50,9 @@ jobs:
           mkdir -p _site/media _site/fonts
           cp tools/site/index.html _site/
           cp tools/video/fonts/inter-variable.woff2 tools/video/fonts/NOTICE.md _site/fonts/
-          cp media/knowledge-lifecycle.mp4 media/cover.png media/social-preview-1280x640.png \
+          cp media/knowledge-lifecycle.mp4 media/knowledge-lifecycle-narrated.mp4 \
+             media/knowledge-lifecycle-narrated.vtt media/knowledge-lifecycle-narrated.srt \
+             media/cover.png media/social-preview-1280x640.png \
              media/lifecycle-framework.gif media/one-document-two-answers.gif \
              media/scale-is-not-deference.gif media/wording-moves-the-answer.gif \
              media/probability-is-not-an-answer.gif _site/media/

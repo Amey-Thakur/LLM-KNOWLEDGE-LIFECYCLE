@@ -338,7 +338,7 @@ eighteen measurements, and one of them was GPT-2 on the drug probe.
 
 [![Play the explainer](https://img.shields.io/badge/%E2%96%B6_Play_the_explainer-134_seconds-1A4F8A?style=for-the-badge)](https://amey-thakur.github.io/LLM-KNOWLEDGE-LIFECYCLE/)
 
-**The paper in 134 seconds.** &nbsp; A text-led explainer, square for the feed, rendered frame by frame from the measurement by [`tools/video/render.py`](tools/video/render.py), which reads every number from the data and stops if any figure the paper prints disagrees with it. GitHub does not play video inside a README, so the explainer plays on its [watch page](https://amey-thakur.github.io/LLM-KNOWLEDGE-LIFECYCLE/), or you can [download the MP4](media/knowledge-lifecycle.mp4) (1080 × 1080, 9.6 MB).
+**The paper in 134 seconds.** &nbsp; A text-led explainer, square for the feed, rendered frame by frame from the measurement by [`tools/video/render.py`](tools/video/render.py), which reads every number from the data and stops if any figure the paper prints disagrees with it. It comes in two cuts with the same frames. The narrated cut adds a voice that speaks those same figures over a quiet score, both synthesized by [`tools/video/voiceover.py`](tools/video/voiceover.py), and the silent cut carries everything in its text alone. GitHub does not play video inside a README, so the explainer plays on its [watch page](https://amey-thakur.github.io/LLM-KNOWLEDGE-LIFECYCLE/), or you can download the [narrated MP4](media/knowledge-lifecycle-narrated.mp4) (12.8 MB, with [captions](media/knowledge-lifecycle-narrated.srt)) or the [silent MP4](media/knowledge-lifecycle.mp4) (9.6 MB), both 1080 × 1080.
 
 <br>
 
@@ -390,8 +390,8 @@ eighteen measurements, and one of them was GPT-2 on the drug probe.
 │   ├── analyse_counterfactual.py    turns it into the reported figures
 │   └── make_paper_numbers.py        turns those into LaTeX
 ├── space/          The live demonstration
-├── media/          The explainer video, its cover, five GIFs and the figures, all rendered
-├── tools/video/    The renderer that draws them from the measurement
+├── media/          The explainer video in two cuts, its cover, five GIFs and the figures, all rendered
+├── tools/video/    The renderer that draws them from the measurement, and the narration
 ├── tools/site/     The watch page, deployed to GitHub Pages
 ├── CITATION.cff    How to cite this work
 └── LICENSE         CC BY 4.0

@@ -117,6 +117,14 @@
     box-shadow: 0 0 0 1px var(--hair), 0 12px 40px rgba(26, 26, 28, 0.08);
   }
   .player figcaption { margin-top: 12px; font-size: 14px; color: var(--muted); }
+  .cut { display: inline-flex; margin: 0 0 12px; padding: 3px; gap: 2px;
+         border: 1px solid var(--hair); border-radius: 999px; background: var(--panel); }
+  .cut button {
+    font: inherit; font-size: 14px; font-weight: 500; color: var(--muted);
+    padding: 6px 14px; border: 0; border-radius: 999px; background: transparent; cursor: pointer;
+  }
+  .cut button[aria-pressed="true"] { background: var(--accent); color: var(--bg); }
+  .cut button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
   .actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 28px 0 0; padding: 0; list-style: none; }
   .actions a {
@@ -188,11 +196,16 @@
   <p class="lead">The paper in 134 seconds. Give six open models a document that contradicts what they know, 864 forward passes in all, and the result is plain: holding a fact scales with size, and using the document does not.</p>
 
   <figure class="player">
-    <video controls playsinline preload="metadata" poster="media/cover.png" width="1080" height="1080">
-      <source src="media/knowledge-lifecycle.mp4" type="video/mp4">
-      Your browser cannot play this video. <a href="media/knowledge-lifecycle.mp4">Download the MP4</a> (1080 &times; 1080).
+    <div class="cut" role="group" aria-label="Version of the video">
+      <button type="button" data-cut="media/knowledge-lifecycle-narrated.mp4" aria-pressed="true">With narration</button>
+      <button type="button" data-cut="media/knowledge-lifecycle.mp4" aria-pressed="false">Silent</button>
+    </div>
+    <video id="film" controls playsinline preload="metadata" poster="media/cover.png" width="1080" height="1080">
+      <source src="media/knowledge-lifecycle-narrated.mp4" type="video/mp4">
+      <track kind="captions" src="media/knowledge-lifecycle-narrated.vtt" srclang="en" label="English">
+      Your browser cannot play this video. <a href="media/knowledge-lifecycle-narrated.mp4">Download the MP4</a> (1080 &times; 1080).
     </video>
-    <figcaption>Square for the feed, 1080 &times; 1080, rendered frame by frame from the measurement. Every number on screen is read from the data, and rendering stops if one disagrees with the paper. <a href="media/knowledge-lifecycle.mp4" download>Download the MP4</a>.</figcaption>
+    <figcaption>Square for the feed, 1080 &times; 1080, rendered frame by frame from the measurement. Every number on screen is read from the data, and rendering stops if one disagrees with the paper. The narration speaks those same figures, and the silent cut carries everything in its text alone. Download it <a href="media/knowledge-lifecycle-narrated.mp4" download>with narration</a> or <a href="media/knowledge-lifecycle.mp4" download>silent</a>, and the captions as <a href="media/knowledge-lifecycle-narrated.srt" download>SRT</a>.</figcaption>
   </figure>
 
   <ul class="actions">
@@ -232,9 +245,32 @@
 
   <footer>
     <p>Rendered from the measurement by <a href="https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE/blob/main/tools/video/render.py"><code>tools/video/render.py</code></a>, which reads every number from the measurement and stops if any figure the paper prints disagrees with it. Set in Inter, under the SIL Open Font License (<a href="https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE/blob/main/tools/video/fonts/NOTICE.md">notice</a>).</p>
+    <p>Narrated by <a href="https://github.com/Amey-Thakur/LLM-KNOWLEDGE-LIFECYCLE/blob/main/tools/video/voiceover.py"><code>tools/video/voiceover.py</code></a> with the Kokoro-82M speech model (<a href="https://huggingface.co/hexgrad/Kokoro-82M">Apache 2.0</a>), each line timed to the frame it describes. The music under it is synthesized in the same script, so the soundtrack holds no recording.</p>
     <p>&copy; 2026 Amey Thakur and Sarvesh Talele. Licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.</p>
   </footer>
 </main>
+
+<script>
+  // Switch between the two cuts without losing the place in the film.
+  (function () {
+    var film = document.getElementById("film");
+    var buttons = document.querySelectorAll(".cut button");
+    buttons.forEach(function (b) {
+      b.addEventListener("click", function () {
+        if (b.getAttribute("aria-pressed") === "true") return;
+        var at = film.currentTime, playing = !film.paused;
+        buttons.forEach(function (o) { o.setAttribute("aria-pressed", String(o === b)); });
+        film.src = b.dataset.cut;
+        film.addEventListener("loadedmetadata", function seek() {
+          film.removeEventListener("loadedmetadata", seek);
+          film.currentTime = at;
+          if (playing) film.play();
+        });
+        film.load();
+      });
+    });
+  })();
+</script>
 
 </body>
 </html>
